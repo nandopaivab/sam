@@ -82,15 +82,15 @@ include __DIR__ . '/templates/header.php';
                         <div>
                             <div class="d-flex align-items-center gap-2 mb-2">
                                 <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
-                                    <i class="fa-solid fa-check-circle me-1"></i> <?php echo htmlspecialchars($p['opportunity_badge']); ?> (Score: <?php echo $p['trend_score']; ?>/100)
+                                    <i class="fa-solid fa-check-circle me-1"></i> <?php echo htmlspecialchars((string)($p['opportunity_badge'] ?? '')); ?> (Score: <?php echo $p['trend_score']; ?>/100)
                                 </span>
                                 <span class="badge bg-dark-subtle text-white">
-                                    <?php echo htmlspecialchars($p['category']); ?> • <?php echo htmlspecialchars($p['niche']); ?>
+                                    <?php echo htmlspecialchars((string)($p['category'] ?? '')); ?> • <?php echo htmlspecialchars((string)($p['niche'] ?? '')); ?>
                                 </span>
                             </div>
-                            <h4 class="fw-bold text-white mb-1"><?php echo htmlspecialchars($p['title']); ?></h4>
+                            <h4 class="fw-bold text-white mb-1"><?php echo htmlspecialchars((string)($p['title'] ?? '')); ?></h4>
                             <div class="text-muted small" style="font-size: 12px;">
-                                <i class="fa-solid fa-users me-1 text-accent-turquoise"></i> Público-alvo: <strong><?php echo htmlspecialchars($p['target_audience']); ?></strong>
+                                <i class="fa-solid fa-users me-1 text-accent-turquoise"></i> Público-alvo: <strong><?php echo htmlspecialchars((string)($p['target_audience'] ?? '')); ?></strong>
                             </div>
                         </div>
                         <div class="text-end">
@@ -103,7 +103,7 @@ include __DIR__ . '/templates/header.php';
                         <!-- Problem Solved Alert -->
                         <div class="p-3 rounded mb-4 border border-info-subtle" style="background: rgba(0, 210, 255, 0.05);">
                             <div class="fw-bold small text-info mb-1"><i class="fa-solid fa-lightbulb me-1"></i> Problema Resolvido & Diferencial</div>
-                            <p class="text-white small mb-0" style="font-size: 12px;"><?php echo htmlspecialchars($p['problem_solved']); ?></p>
+                            <p class="text-white small mb-0" style="font-size: 12px;"><?php echo htmlspecialchars((string)($p['problem_solved'] ?? '')); ?></p>
                         </div>
 
                         <!-- Financials & Market Stats -->
@@ -131,12 +131,12 @@ include __DIR__ . '/templates/header.php';
                         <!-- 3 AI Suggested Kits -->
                         <h6 class="fw-bold text-white mb-2 small"><i class="fa-solid fa-box-open text-warning me-1"></i> Sugestões de Kits de Diferenciação por IA:</h6>
                         <?php 
-                        $kits = explode(' | ', $p['suggested_kits'] ?: 'Kit Econômico | Kit Intermediário | Kit Premium');
+                        $kits = explode(' | ', (string)($p['suggested_kits'] ?: 'Kit Econômico | Kit Intermediário | Kit Premium'));
                         foreach ($kits as $kit):
                         ?>
                             <div class="p-2 mb-2 rounded border border-light-subtle d-flex align-items-center" style="background: rgba(255,255,255,0.02); font-size: 12px;">
                                 <i class="fa-solid fa-gift text-accent-purple me-2"></i>
-                                <span><?php echo htmlspecialchars($kit); ?></span>
+                                <span><?php echo htmlspecialchars((string)($kit ?? '')); ?></span>
                             </div>
                         <?php endforeach; ?>
 
@@ -144,15 +144,15 @@ include __DIR__ . '/templates/header.php';
                         <div class="mt-3 pt-3 border-top border-light-subtle">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span class="fw-bold small text-white"><i class="fa-solid fa-chart-line text-success me-1"></i> Recomendação IA (<?php echo date('d/m/Y'); ?>):</span>
-                                <span class="badge bg-dark-subtle text-muted small"><?php echo htmlspecialchars($p['seasonality']); ?></span>
+                                <span class="badge bg-dark-subtle text-muted small"><?php echo htmlspecialchars((string)($p['seasonality'] ?? '')); ?></span>
                             </div>
-                            <p class="text-muted small mb-3" style="font-size: 12px;"><?php echo htmlspecialchars($p['investment_recommendation']); ?></p>
+                            <p class="text-muted small mb-3" style="font-size: 12px;"><?php echo htmlspecialchars((string)($p['investment_recommendation'] ?? '')); ?></p>
 
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="text-muted small" style="font-size: 11px;">
-                                    <i class="fa-solid fa-truck me-1 text-accent-turquoise"></i> Fornecedor: <strong><?php echo htmlspecialchars($p['related_suppliers'] ?: 'Distribuidor BR'); ?></strong>
+                                    <i class="fa-solid fa-truck me-1 text-accent-turquoise"></i> Fornecedor: <strong><?php echo htmlspecialchars((string)($p['related_suppliers'] ?? 'Distribuidor BR')); ?></strong>
                                 </span>
-                                <a href="crm.php?company=<?php echo urlencode(substr($p['related_suppliers'] ?? '', 0, 15)); ?>" class="btn btn-sm btn-outline-primary border-light-subtle">
+                                <a href="crm.php?company=<?php echo urlencode(substr((string)($p['related_suppliers'] ?? ''), 0, 15)); ?>" class="btn btn-sm btn-outline-primary border-light-subtle">
                                     <i class="fa-solid fa-handshake-angle me-1"></i> Abrir Negociação
                                 </a>
                             </div>

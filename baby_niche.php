@@ -113,15 +113,15 @@ include __DIR__ . '/templates/header.php';
                             <div>
                                 <div class="d-flex align-items-center gap-2 mb-2">
                                     <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
-                                        <i class="fa-solid fa-certificate me-1"></i> <?php echo htmlspecialchars($p['safety_cert']); ?>
+                                        <i class="fa-solid fa-certificate me-1"></i> <?php echo htmlspecialchars((string)($p['safety_cert'] ?? '')); ?>
                                     </span>
                                     <span class="badge bg-dark-subtle text-white">
-                                        <?php echo htmlspecialchars($p['sub_category']); ?> • <?php echo htmlspecialchars($p['age_range']); ?>
+                                        <?php echo htmlspecialchars((string)($p['sub_category'] ?? '')); ?> • <?php echo htmlspecialchars((string)($p['age_range'] ?? '')); ?>
                                     </span>
                                 </div>
-                                <h4 class="fw-bold text-white mb-1"><?php echo htmlspecialchars($p['title']); ?></h4>
+                                <h4 class="fw-bold text-white mb-1"><?php echo htmlspecialchars((string)($p['title'] ?? '')); ?></h4>
                                 <div class="text-muted small" style="font-size: 12px;">
-                                    <i class="fa-solid fa-wallet me-1 text-accent-turquoise"></i> Faixa Econômica: <strong><?php echo htmlspecialchars($p['income_bracket']); ?></strong>
+                                    <i class="fa-solid fa-wallet me-1 text-accent-turquoise"></i> Faixa Econômica: <strong><?php echo htmlspecialchars((string)($p['income_bracket'] ?? '')); ?></strong>
                                 </div>
                             </div>
                             <div class="text-end">
@@ -136,19 +136,19 @@ include __DIR__ . '/templates/header.php';
                                 <div class="col-4">
                                     <div class="p-2 rounded border border-light-subtle" style="background: rgba(255,255,255,0.02);">
                                         <div class="text-muted small" style="font-size: 10px;">MATERIAL</div>
-                                        <div class="fw-bold text-white mt-1 small"><?php echo htmlspecialchars($p['material_info']); ?></div>
+                                        <div class="fw-bold text-white mt-1 small"><?php echo htmlspecialchars((string)($p['material_info'] ?? '')); ?></div>
                                     </div>
                                 </div>
                                 <div class="col-4">
                                     <div class="p-2 rounded border border-light-subtle" style="background: rgba(255,255,255,0.02);">
                                         <div class="text-muted small" style="font-size: 10px;">LIMPEZA & HIGIENE</div>
-                                        <div class="fw-bold text-accent-turquoise mt-1 small"><?php echo htmlspecialchars($p['cleaning_ease']); ?></div>
+                                        <div class="fw-bold text-accent-turquoise mt-1 small"><?php echo htmlspecialchars((string)($p['cleaning_ease'] ?? '')); ?></div>
                                     </div>
                                 </div>
                                 <div class="col-4">
                                     <div class="p-2 rounded border border-light-subtle" style="background: rgba(255,255,255,0.02);">
                                         <div class="text-muted small" style="font-size: 10px;">RISCO PEÇAS PEQ.</div>
-                                        <div class="fw-bold text-success mt-1 small"><?php echo htmlspecialchars($p['small_parts_risk']); ?></div>
+                                        <div class="fw-bold text-success mt-1 small"><?php echo htmlspecialchars((string)($p['small_parts_risk'] ?? '')); ?></div>
                                     </div>
                                 </div>
                             </div>
@@ -156,12 +156,12 @@ include __DIR__ . '/templates/header.php';
                             <!-- 3 AI Suggested Kits -->
                             <h6 class="fw-bold text-white mb-2 small"><i class="fa-solid fa-gift text-accent-purple me-1"></i> Kits Inteligentes (Econômico, Intermediário e Premium):</h6>
                             <?php 
-                            $kits = explode(' | ', $p['suggested_kits'] ?: 'Kit Econômico | Kit Intermediário | Kit Premium');
+                            $kits = explode(' | ', (string)($p['suggested_kits'] ?: 'Kit Econômico | Kit Intermediário | Kit Premium'));
                             foreach ($kits as $kit):
                             ?>
                                 <div class="p-2 mb-2 rounded border border-light-subtle d-flex align-items-center" style="background: rgba(255,255,255,0.02); font-size: 12px;">
                                     <i class="fa-solid fa-wand-magic-sparkles text-accent-turquoise me-2"></i>
-                                    <span><?php echo htmlspecialchars($kit); ?></span>
+                                    <span><?php echo htmlspecialchars((string)($kit ?? '')); ?></span>
                                 </div>
                             <?php endforeach; ?>
 
@@ -171,7 +171,7 @@ include __DIR__ . '/templates/header.php';
                                     <span class="fw-bold small text-white"><i class="fa-solid fa-robot text-warning me-1"></i> Parecer IA Maternidade & Infância:</span>
                                     <span class="badge bg-success-subtle text-success small">Alta Aprovação Pais</span>
                                 </div>
-                                <p class="text-muted small mb-3" style="font-size: 12px;"><?php echo htmlspecialchars($p['ai_analysis']); ?></p>
+                                <p class="text-muted small mb-3" style="font-size: 12px;"><?php echo htmlspecialchars((string)($p['ai_analysis'] ?? '')); ?></p>
 
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="text-muted small" style="font-size: 11px;">
