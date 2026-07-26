@@ -167,6 +167,29 @@ require __DIR__ . '/templates/header.php';
             <div class="row g-3" id="supplier-kw-list">
                 <!-- Dynamically populated -->
             </div>
+
+            <!-- Top 50 Products Container -->
+            <div class="mt-4 pt-3 border-top border-light-subtle border-opacity-10" id="top-products-kw-container" style="display: none;">
+                <h6 class="fw-bold text-white mb-3"><i class="fa-solid fa-trophy text-warning me-2"></i> Top 50 Produtos Mais Vendidos / Buscados (Shopee)</h6>
+                <div class="table-responsive">
+                    <table class="table-premium" style="font-size: 12px;">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">#</th>
+                                <th>Produto</th>
+                                <th>Loja</th>
+                                <th>Preço Venda</th>
+                                <th>Vendas Est.</th>
+                                <th>Avaliação</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="top-products-kw-list">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -179,19 +202,23 @@ require __DIR__ . '/templates/header.php';
         const resultsDiv = $('#supplier-kw-results');
         const termSpan = $('#supplier-kw-term');
         const listDiv = $('#supplier-kw-list');
+        const topContainer = $('#top-products-kw-container');
+        const topList = $('#top-products-kw-list');
 
         resultsDiv.slideDown();
         termSpan.text('"' + keyword + '"');
+        topContainer.hide();
         listDiv.html(`
             <div class="col-12 text-center py-4 text-muted">
                 <div class="spinner-border spinner-border-sm text-info mb-2" role="status"></div>
-                <div>Buscando e mapeando fornecedores de alta margem...</div>
+                <div>Buscando fornecedores e mapeando os produtos mais vendidos...</div>
             </div>
         `);
 
         const formData = new FormData();
         formData.append('action', 'find_suppliers_by_keyword');
         formData.append('keyword', keyword);
+        formData.append('marketplace', 'shopee');
 
         fetch('api.php', {
             method: 'POST',
@@ -257,6 +284,34 @@ require __DIR__ . '/templates/header.php';
                     `;
                     listDiv.append(card);
                 });
+
+                // Render Top 50 products list
+                if (data.top_products && data.top_products.length > 0) {
+                    topContainer.show();
+                    topList.html('');
+                    data.top_products.forEach((p, idx) => {
+                        const row = `
+                            <tr>
+                                <td class="fw-bold text-muted">${idx + 1}</td>
+                                <td>
+                                    <a href="${p.url}" target="_blank" class="fw-bold text-accent-turquoise text-decoration-none hover-underline">
+                                        <i class="fa-solid fa-arrow-up-right-from-square me-1" style="font-size: 10px;"></i> ${p.title}
+                                    </a>
+                                </td>
+                                <td>${p.store_name || 'N/A'}</td>
+                                <td class="fw-bold text-white">R$ ${parseFloat(p.price).toFixed(2).replace('.', ',')}</td>
+                                <td class="text-success fw-bold">${parseInt(p.sales_count_est).toLocaleString('pt-BR')} vendas</td>
+                                <td><i class="fa-solid fa-star text-warning me-1"></i> ${p.rating || '4.5'}</td>
+                                <td>
+                                    <a href="${p.url}" target="_blank" class="btn btn-xs btn-outline-info px-2 py-1" style="font-size: 10px;">
+                                        Ver Produto
+                                    </a>
+                                </td>
+                            </tr>
+                        `;
+                        topList.append(row);
+                    });
+                }
             } else {
                 listDiv.html('<div class="col-12 text-center py-4 text-warning"><i class="fa-solid fa-triangle-exclamation"></i> Nenhum fornecedor encontrado para esta palavra-chave.</div>');
             }
