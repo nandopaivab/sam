@@ -126,7 +126,7 @@ include __DIR__ . '/templates/header.php';
                             </div>
                             <div class="text-end">
                                 <div class="text-muted small" style="font-size: 11px;">PREÇO MÉDIO</div>
-                                <div class="h4 fw-bold text-success mb-0">R$ <?php echo number_format($p['avg_price'], 2, ',', '.'); ?></div>
+                                <div class="h4 fw-bold text-success mb-0">R$ <?php echo number_format((float)($p['avg_price'] ?? 0.0), 2, ',', '.'); ?></div>
                             </div>
                         </div>
 
@@ -175,7 +175,7 @@ include __DIR__ . '/templates/header.php';
 
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="text-muted small" style="font-size: 11px;">
-                                        <i class="fa-solid fa-box-open me-1 text-accent-turquoise"></i> Custo Atacado BR: <strong>R$ <?php echo number_format($p['est_cost'], 2, ',', '.'); ?></strong>
+                                        <i class="fa-solid fa-box-open me-1 text-accent-turquoise"></i> Custo Atacado BR: <strong>R$ <?php echo number_format((float)($p['est_cost'] ?? 0.0), 2, ',', '.'); ?></strong>
                                     </span>
                                     <a href="crm.php?company=<?php echo urlencode('Atacadista Infantil BR'); ?>" class="btn btn-sm btn-outline-success border-light-subtle">
                                         <i class="fa-solid fa-handshake-angle me-1"></i> Abrir CRM

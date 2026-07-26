@@ -95,7 +95,7 @@ include __DIR__ . '/templates/header.php';
                         </div>
                         <div class="text-end">
                             <div class="text-muted small" style="font-size: 11px;">MARGEM PROJETADA</div>
-                            <div class="h4 fw-bold text-success mb-0">+<?php echo number_format($p['proj_margin'], 1, ',', '.'); ?>%</div>
+                            <div class="h4 fw-bold text-success mb-0">+<?php echo number_format((float)($p['proj_margin'] ?? 0.0), 1, ',', '.'); ?>%</div>
                         </div>
                     </div>
 
@@ -111,13 +111,13 @@ include __DIR__ . '/templates/header.php';
                             <div class="col-4">
                                 <div class="p-3 rounded border border-light-subtle" style="background: rgba(255,255,255,0.02);">
                                     <div class="text-muted small" style="font-size: 11px;">PREÇO MÉDIO VAREJO</div>
-                                    <div class="fw-bold text-white mt-1">R$ <?php echo number_format($p['avg_price'], 2, ',', '.'); ?></div>
+                                    <div class="fw-bold text-white mt-1">R$ <?php echo number_format((float)($p['avg_price'] ?? 0.0), 2, ',', '.'); ?></div>
                                 </div>
                             </div>
                             <div class="col-4">
                                 <div class="p-3 rounded border border-light-subtle" style="background: rgba(255,255,255,0.02);">
                                     <div class="text-muted small" style="font-size: 11px;">CUSTO ATACADO BR</div>
-                                    <div class="fw-bold text-accent-turquoise mt-1">R$ <?php echo number_format($p['est_cost'], 2, ',', '.'); ?></div>
+                                    <div class="fw-bold text-accent-turquoise mt-1">R$ <?php echo number_format((float)($p['est_cost'] ?? 0.0), 2, ',', '.'); ?></div>
                                 </div>
                             </div>
                             <div class="col-4">
