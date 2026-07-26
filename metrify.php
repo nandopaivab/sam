@@ -309,7 +309,7 @@ require __DIR__ . '/templates/header.php';
     <!-- Header Block -->
     <div class="row align-items-center mb-4">
         <div class="col-12 col-md-6">
-            <h1 class="h3 fw-bold mb-1 text-white"><i class="fa-solid fa-chart-column text-accent-turquoise me-2"></i> Metrify Análise de Participação</h1>
+            <h1 class="h3 fw-bold mb-1 text-white"><i class="fa-solid fa-chart-column text-accent-turquoise me-2"></i> SAM - Mercado Livre</h1>
             <p class="text-muted small mb-0">Visão geral do ecossistema de anúncios divididos por categorias e participação de mercado total.</p>
         </div>
         <div class="col-12 col-md-6 text-md-end mt-3 mt-md-0">

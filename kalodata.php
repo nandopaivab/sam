@@ -50,7 +50,7 @@ require __DIR__ . '/templates/header.php';
     <div class="col-12">
         <div class="d-flex align-items-center justify-content-between flex-wrap">
             <div>
-                <h2 class="fw-bold text-white mb-1"><i class="fa-brands fa-tiktok text-danger me-2 animate-pulse"></i> Kalodata TikTok Shop Analítico</h2>
+                <h2 class="fw-bold text-white mb-1"><i class="fa-brands fa-tiktok text-danger me-2 animate-pulse"></i> SAM - TikTok</h2>
                 <p class="text-muted mb-0">Rastreamento avançado de lojas, receitas, taxas de crescimento e produtos mais vendidos no TikTok Shop Brasil.</p>
             </div>
             <div class="bg-card-glow p-2 px-3 rounded-3 border border-light-subtle d-flex align-items-center my-2" style="background-color: rgba(255,255,255,0.01);">
