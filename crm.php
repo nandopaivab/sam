@@ -1,12 +1,21 @@
 <?php
-require_once __DIR__ . '/src/Auth.php';
-require_once __DIR__ . '/src/Database.php';
+declare(strict_types=1);
+
+spl_autoload_register(function ($class) {
+    $prefix = 'TrendHunter\\';
+    $baseDir = __DIR__ . '/src/';
+    $len = strlen($prefix);
+    if (strncmp($prefix, $class, $len) !== 0) return;
+    $relativeClass = substr($class, $len);
+    $file = $baseDir . str_replace('\\', '/', $relativeClass) . '.php';
+    if (file_exists($file)) require $file;
+});
 
 use TrendHunter\Auth;
 use TrendHunter\Database;
 
 Auth::requireLogin();
-$user = Auth::user();
+$user = Auth::getCurrentUser();
 $db = Database::getConnection();
 
 // Create CRM tables if not exist
