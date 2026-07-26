@@ -97,6 +97,12 @@ $darkMode = $user['dark_mode'] ?? true;
                     <span>Kalodata TikTok Intel</span>
                 </a>
             </li>
+            <li class="sidebar-item <?php echo basename($_SERVER['PHP_SELF']) === 'metrify.php' ? 'active' : ''; ?>">
+                <a href="metrify.php" class="sidebar-link">
+                    <i class="fa-solid fa-chart-pie text-success"></i>
+                    <span>Metrify Hub de Métricas</span>
+                </a>
+            </li>
             <li class="sidebar-item <?php echo basename($_SERVER['PHP_SELF']) === 'affiliate_generator.php' ? 'active' : ''; ?>">
                 <a href="affiliate_generator.php" class="sidebar-link">
                     <i class="fa-solid fa-wand-magic-sparkles text-accent-purple"></i>
