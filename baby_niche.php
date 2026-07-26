@@ -80,6 +80,9 @@ include __DIR__ . '/templates/header.php';
             <button class="btn btn-outline-secondary border-light-subtle d-flex align-items-center" onclick="alert('IA reanalisando normas de segurança do INMETRO e demanda no TikTok...'); location.reload();">
                 <i class="fa-solid fa-arrows-rotate me-2"></i> Atualizar IA Real-Time
             </button>
+            <button class="btn btn-primary px-4 fw-bold shadow-lg" data-bs-toggle="modal" data-bs-target="#babyNicheModal">
+                <i class="fa-solid fa-plus me-2"></i> Cadastrar Oportunidade
+            </button>
         </div>
     </div>
 
@@ -186,5 +189,127 @@ include __DIR__ . '/templates/header.php';
         <?php endif; ?>
     </div>
 </div>
+
+<!-- Modal: Register Baby Niche Opportunity -->
+<div class="modal fade" id="babyNicheModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-light-subtle shadow-lg" style="border-radius: 16px; background: #181920;">
+            <div class="modal-header border-bottom border-light-subtle p-4">
+                <h5 class="modal-title fw-bold text-white"><i class="fa-solid fa-baby text-success me-2"></i> Cadastrar Produto no Nicho Infantil</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="babyNicheForm">
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small text-muted mb-1">Título do Produto *</label>
+                            <input type="text" name="title" class="form-control bg-dark text-white border-light-subtle" required placeholder="Ex: Copo de Transição 360 Antivazamento">
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="form-label small text-muted mb-1">Categoria *</label>
+                            <select name="sub_category" class="form-select bg-dark text-white border-light-subtle" required>
+                                <?php foreach ($categories as $cat): ?>
+                                    <option value="<?php echo $cat; ?>"><?php echo $cat; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="form-label small text-muted mb-1">Faixa Etária *</label>
+                            <input type="text" name="age_range" class="form-control bg-dark text-white border-light-subtle" required placeholder="Ex: 6 a 24 meses">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-6 col-md-4">
+                            <label class="form-label small text-muted mb-1">Certificação de Segurança</label>
+                            <input type="text" name="safety_cert" class="form-control bg-dark text-white border-light-subtle" value="INMETRO / Atóxico">
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <label class="form-label small text-muted mb-1">Material do Produto</label>
+                            <input type="text" name="material_info" class="form-control bg-dark text-white border-light-subtle" value="Livre de BPA / Silicone">
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Facilidade de Higienização</label>
+                            <input type="text" name="cleaning_ease" class="form-control bg-dark text-white border-light-subtle" value="Fácil higienização">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-6 col-md-3">
+                            <label class="form-label small text-muted mb-1">Risco Peças Pequenas</label>
+                            <select name="small_parts_risk" class="form-select bg-dark text-white border-light-subtle">
+                                <option value="Baixo Risco">Baixo Risco</option>
+                                <option value="Médio Risco">Médio Risco</option>
+                                <option value="Alto Risco (Aviso!)">Alto Risco (Aviso!)</option>
+                            </select>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="form-label small text-muted mb-1">Preço Médio (R$) *</label>
+                            <input type="number" step="0.01" name="avg_price" class="form-control bg-dark text-white border-light-subtle" required placeholder="0.00">
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="form-label small text-muted mb-1">Custo Atacado BR (R$) *</label>
+                            <input type="number" step="0.01" name="est_cost" class="form-control bg-dark text-white border-light-subtle" required placeholder="0.00">
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="form-label small text-muted mb-1">Faixa de Renda Público</label>
+                            <select name="income_bracket" class="form-select bg-dark text-white border-light-subtle">
+                                <option value="Todas as faixas (Acessível)">Todas as faixas (Acessível)</option>
+                                <option value="Econômico / Popular">Econômico / Popular</option>
+                                <option value="Premium / Classe A/B">Premium / Classe A/B</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small text-muted mb-1">Sugestões de Kits de Venda (Use ' | ' para separar)</label>
+                        <input type="text" name="suggested_kits" class="form-control bg-dark text-white border-light-subtle" placeholder="Kit 2 Mordedores | Kit Alimentação Completo | Compre 1 Leve 2">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small text-muted mb-1">Parecer de Análise IA *</label>
+                        <textarea name="ai_analysis" class="form-control bg-dark text-white border-light-subtle" rows="3" required placeholder="Descreva os diferenciais sensoriais, anatômicos, normas de segurança e avaliação comercial..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-top border-light-subtle p-3">
+                <button type="button" class="btn btn-outline-secondary border-light-subtle" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary px-4 fw-bold" onclick="saveBabyNicheProduct()">
+                    <i class="fa-solid fa-check me-1"></i> Cadastrar Produto
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function saveBabyNicheProduct() {
+    const form = document.getElementById('babyNicheForm');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
+    const formData = new FormData(form);
+    formData.append('action', 'save_baby_niche');
+
+    fetch('api.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Erro ao salvar: ' + (data.error || 'Erro desconhecido.'));
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Erro ao se conectar com o servidor.');
+    });
+}
+</script>
 
 <?php include __DIR__ . '/templates/footer.php'; ?>

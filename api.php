@@ -1719,6 +1719,79 @@ switch ($action) {
         ]);
         break;
 
+    // 19. Save Blue Ocean Product Opportunity
+    case 'save_blue_ocean':
+        $title = trim($_POST['title'] ?? '');
+        $category = trim($_POST['category'] ?? '');
+        $niche = trim($_POST['niche'] ?? '');
+        $targetAudience = trim($_POST['target_audience'] ?? '');
+        $problemSolved = trim($_POST['problem_solved'] ?? '');
+        $avgPrice = (float)($_POST['avg_price'] ?? 0);
+        $estCost = (float)($_POST['est_cost'] ?? 0);
+        $projMargin = (float)($_POST['proj_margin'] ?? 0);
+        $approxCompetitors = (int)($_POST['approx_competitors'] ?? 10);
+        $trendScore = (int)($_POST['trend_score'] ?? 90);
+        $seasonality = trim($_POST['seasonality'] ?? 'Ano Todo');
+        $relatedSuppliers = trim($_POST['related_suppliers'] ?? '');
+        $suggestedKits = trim($_POST['suggested_kits'] ?? '');
+        $opportunityBadge = trim($_POST['opportunity_badge'] ?? 'Alta Oportunidade');
+        $investmentRec = trim($_POST['investment_recommendation'] ?? '');
+
+        if (empty($title) || empty($category) || empty($niche)) {
+            Validator::jsonResponse(400, ['success' => false, 'error' => 'Título, categoria e nicho são obrigatórios.']);
+        }
+
+        $stmt = $db->prepare("INSERT INTO blue_ocean_products (title, category, niche, target_audience, problem_solved, avg_price, est_cost, proj_margin, approx_competitors, trend_score, seasonality, related_suppliers, suggested_kits, opportunity_badge, investment_recommendation) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([
+            $title, $category, $niche, $targetAudience, $problemSolved,
+            $avgPrice, $estCost, $projMargin, $approxCompetitors, $trendScore,
+            $seasonality, $relatedSuppliers, $suggestedKits, $opportunityBadge, $investmentRec
+        ]);
+
+        // Log Audit
+        try {
+            $logStmt = $db->prepare("INSERT INTO activity_logs (user_id, user_name, module, action_type, target_record, new_values, ip_address) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $logStmt->execute([$userId, $user['name'] ?? 'Admin', 'Produtos Oceano Azul', 'CADASTRO', $title, "Novo produto cadastrado no catálogo", $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1']);
+        } catch (\Exception $e) {}
+
+        Validator::jsonResponse(200, ['success' => true]);
+        break;
+
+    // 20. Save Baby Niche Product Opportunity
+    case 'save_baby_niche':
+        $title = trim($_POST['title'] ?? '');
+        $subCategory = trim($_POST['sub_category'] ?? '');
+        $ageRange = trim($_POST['age_range'] ?? '');
+        $safetyCert = trim($_POST['safety_cert'] ?? 'INMETRO / Atóxico');
+        $materialInfo = trim($_POST['material_info'] ?? 'Livre de BPA');
+        $cleaningEase = trim($_POST['cleaning_ease'] ?? 'Fácil higienização');
+        $smallPartsRisk = trim($_POST['small_parts_risk'] ?? 'Baixo Risco');
+        $avgPrice = (float)($_POST['avg_price'] ?? 0);
+        $estCost = (float)($_POST['est_cost'] ?? 0);
+        $suggestedKits = trim($_POST['suggested_kits'] ?? '');
+        $incomeBracket = trim($_POST['income_bracket'] ?? 'Todas as faixas (Acessível)');
+        $aiAnalysis = trim($_POST['ai_analysis'] ?? '');
+
+        if (empty($title) || empty($subCategory) || empty($ageRange)) {
+            Validator::jsonResponse(400, ['success' => false, 'error' => 'Título, categoria e faixa etária são obrigatórios.']);
+        }
+
+        $stmt = $db->prepare("INSERT INTO baby_niche_products (title, sub_category, age_range, safety_cert, material_info, cleaning_ease, small_parts_risk, avg_price, est_cost, suggested_kits, income_bracket, ai_analysis) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([
+            $title, $subCategory, $ageRange, $safetyCert, $materialInfo,
+            $cleaningEase, $smallPartsRisk, $avgPrice, $estCost, $suggestedKits,
+            $incomeBracket, $aiAnalysis
+        ]);
+
+        // Log Audit
+        try {
+            $logStmt = $db->prepare("INSERT INTO activity_logs (user_id, user_name, module, action_type, target_record, new_values, ip_address) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $logStmt->execute([$userId, $user['name'] ?? 'Admin', 'Nicho de Bebês', 'CADASTRO', $title, "Novo produto infantil cadastrado", $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1']);
+        } catch (\Exception $e) {}
+
+        Validator::jsonResponse(200, ['success' => true]);
+        break;
+
     default:
         Validator::jsonResponse(404, ['success' => false, 'error' => 'Ação de API não implementada.']);
         break;

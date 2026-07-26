@@ -166,23 +166,132 @@ include __DIR__ . '/templates/header.php';
 
 <!-- Modal to add new Blue Ocean item -->
 <div class="modal fade" id="blueOceanModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-light-subtle shadow-lg" style="border-radius: 16px; background: #181920;">
             <div class="modal-header border-bottom border-light-subtle p-4">
                 <h5 class="modal-title fw-bold text-white"><i class="fa-solid fa-water text-primary me-2"></i> Cadastrar Produto Oceano Azul</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-4">
-                <p class="text-muted small">Para adicionar novas oportunidades do seu nicho, utilize o painel comercial principal ou importe planilhas de produtos virais.</p>
-                <div class="alert alert-dark border-light-subtle small mb-0">
-                    <i class="fa-solid fa-robot text-accent-purple me-2"></i> O motor da IA analisa diariamente produtos com alta procura em termos de busca e menos de 15 concorrentes com selo Full.
-                </div>
+                <form id="blueOceanForm">
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small text-muted mb-1">Título do Produto *</label>
+                            <input type="text" name="title" class="form-control bg-dark text-white border-light-subtle" required placeholder="Ex: Mini Processador de Alimentos Portátil">
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="form-label small text-muted mb-1">Categoria *</label>
+                            <input type="text" name="category" class="form-control bg-dark text-white border-light-subtle" required placeholder="Ex: Cozinha / Utilidades">
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="form-label small text-muted mb-1">Nicho *</label>
+                            <input type="text" name="niche" class="form-control bg-dark text-white border-light-subtle" required placeholder="Ex: Utilidades Domésticas">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small text-muted mb-1">Público-alvo *</label>
+                            <input type="text" name="target_audience" class="form-control bg-dark text-white border-light-subtle" required placeholder="Ex: Moradores de apartamentos compactos">
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="form-label small text-muted mb-1">Score de Tendência (0-100)</label>
+                            <input type="number" name="trend_score" class="form-control bg-dark text-white border-light-subtle" value="92">
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="form-label small text-muted mb-1">Etiqueta de Oportunidade</label>
+                            <select name="opportunity_badge" class="form-select bg-dark text-white border-light-subtle">
+                                <option value="Alta Oportunidade">Alta Oportunidade</option>
+                                <option value="Média Oportunidade">Média Oportunidade</option>
+                                <option value="Baixa Oportunidade">Baixa Oportunidade</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-4">
+                            <label class="form-label small text-muted mb-1">Preço Venda Médio (R$) *</label>
+                            <input type="number" step="0.01" name="avg_price" class="form-control bg-dark text-white border-light-subtle" required placeholder="0.00">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label small text-muted mb-1">Custo Atacado BR (R$) *</label>
+                            <input type="number" step="0.01" name="est_cost" class="form-control bg-dark text-white border-light-subtle" required placeholder="0.00">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label small text-muted mb-1">Margem Projetada (%)</label>
+                            <input type="number" step="0.1" name="proj_margin" class="form-control bg-dark text-white border-light-subtle" required placeholder="Ex: 150">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-6 col-md-4">
+                            <label class="form-label small text-muted mb-1">Concorrentes 1ª Pág</label>
+                            <input type="number" name="approx_competitors" class="form-control bg-dark text-white border-light-subtle" value="5">
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <label class="form-label small text-muted mb-1">Sazonalidade</label>
+                            <input type="text" name="seasonality" class="form-control bg-dark text-white border-light-subtle" value="Ano Todo">
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Fornecedor Recomendado</label>
+                            <input type="text" name="related_suppliers" class="form-control bg-dark text-white border-light-subtle" placeholder="Ex: Distribuidora China BR">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small text-muted mb-1">Problema Resolvido & Diferencial *</label>
+                        <textarea name="problem_solved" class="form-control bg-dark text-white border-light-subtle" rows="2" required placeholder="Descreva a dor que o produto sana e como se destacar no anúncio..."></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small text-muted mb-1">Kits Sugeridos por IA (Use ' | ' para separar os kits)</label>
+                        <input type="text" name="suggested_kits" class="form-control bg-dark text-white border-light-subtle" placeholder="Kit Básico | Kit Duplo + Brinde | Kit Premium 3 Unidades">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small text-muted mb-1">Recomendação IA de Investimento</label>
+                        <textarea name="investment_recommendation" class="form-control bg-dark text-white border-light-subtle" rows="2" placeholder="Recomendações e estratégias de anúncio do robô..."></textarea>
+                    </div>
+                </form>
             </div>
-            <div class="modal-footer border-top border-light-subtle">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            <div class="modal-footer border-top border-light-subtle p-3">
+                <button type="button" class="btn btn-outline-secondary border-light-subtle" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary px-4 fw-bold" onclick="saveBlueOceanProduct()">
+                    <i class="fa-solid fa-check me-1"></i> Cadastrar Produto
+                </button>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+function saveBlueOceanProduct() {
+    const form = document.getElementById('blueOceanForm');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
+    const formData = new FormData(form);
+    formData.append('action', 'save_blue_ocean');
+
+    fetch('api.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Erro ao salvar: ' + (data.error || 'Erro desconhecido.'));
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Erro ao se conectar com o servidor.');
+    });
+}
+</script>
 
 <?php include __DIR__ . '/templates/footer.php'; ?>
