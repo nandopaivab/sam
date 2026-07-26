@@ -103,6 +103,12 @@ $darkMode = $user['dark_mode'] ?? true;
                     <span>SAM - Mercado Livre</span>
                 </a>
             </li>
+            <li class="sidebar-item <?php echo basename($_SERVER['PHP_SELF']) === 'shopee.php' ? 'active' : ''; ?>">
+                <a href="shopee.php" class="sidebar-link">
+                    <i class="fa-solid fa-bag-shopping" style="color: #ee4d2d;"></i>
+                    <span>SAM - Shopee</span>
+                </a>
+            </li>
             <li class="sidebar-item <?php echo basename($_SERVER['PHP_SELF']) === 'affiliate_generator.php' ? 'active' : ''; ?>">
                 <a href="affiliate_generator.php" class="sidebar-link">
                     <i class="fa-solid fa-wand-magic-sparkles text-accent-purple"></i>
