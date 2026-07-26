@@ -195,9 +195,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <div class="login-card">
         <div class="d-flex flex-column align-items-center text-center">
-            <div class="logo-icon">
-                <i class="fa-solid fa-square-trend-up"></i>
-            </div>
+            <img src="/assets/logo.png" alt="SAM Logo" class="mb-3 animate-bounce" style="width: 80px; height: 80px; border-radius: 16px; box-shadow: 0 8px 24px rgba(116, 93, 247, 0.35); object-fit: contain;">
             <h2 class="logo-title mb-1">SAM</h2>
             <p style="color: var(--accent-turquoise); font-size: 12px; font-weight: 700; letter-spacing: 1.5px;" class="mb-4">SISTEMA DE ANÁLISE DE MERCADO</p>
         </div>

@@ -160,11 +160,9 @@ if (Auth::isLoggedIn()) {
 <body>
     <div class="register-card">
         <div class="d-flex flex-column align-items-center text-center">
-            <div class="logo-icon">
-                <i class="fa-solid fa-square-trend-up"></i>
-            </div>
-            <h3 class="logo-title mb-1">TrendHunter</h3>
-            <p style="color: var(--accent-turquoise); font-size: 13px; font-weight: 600; letter-spacing: 1px;" class="mb-4">BRASIL</p>
+            <img src="/assets/logo.png" alt="SAM Logo" class="mb-3 animate-bounce" style="width: 80px; height: 80px; border-radius: 16px; box-shadow: 0 8px 24px rgba(116, 93, 247, 0.35); object-fit: contain;">
+            <h3 class="logo-title mb-1">SAM</h3>
+            <p style="color: var(--accent-turquoise); font-size: 12px; font-weight: 700; letter-spacing: 1.5px;" class="mb-4">SISTEMA DE ANÁLISE DE MERCADO</p>
         </div>
 
         <!-- Feedback Alerts -->
