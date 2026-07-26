@@ -178,6 +178,32 @@ abstract class BaseMarketplace implements MarketplaceInterface {
                 'price_max' => 149.00,
                 'category' => 'Moda Infantil',
                 'image_prefix' => 'kids_wear'
+            ],
+            'iphone' => [
+                'titles' => [
+                    'iPhone 14 Apple 128GB Estelar Tela 6.1" Câmera 12MP',
+                    'iPhone 13 Apple 128GB Meia-noite Tela 6.1" Câmera 12MP',
+                    'iPhone 15 Pro Max 256GB Titânio Natural Original',
+                    'iPhone 11 Apple 64GB Preto Tela 6.1" Câmera Dupla Reforçada',
+                    'iPhone 12 Apple 128GB Azul Tela 6.1" Super Retina XDR'
+                ],
+                'price_min' => 1999.00,
+                'price_max' => 8499.00,
+                'category' => 'Eletrônicos & Áudio',
+                'image_prefix' => 'smartphone'
+            ],
+            'celular' => [
+                'titles' => [
+                    'Smartphone Samsung Galaxy S23 Ultra 5G 256GB',
+                    'Celular Motorola Moto G54 5G 128GB Grafite',
+                    'Smartphone Xiaomi Redmi Note 12 128GB Original',
+                    'Celular Samsung Galaxy A54 5G 128GB Tela 6.4"',
+                    'Smartphone Realme C55 256GB NFC Tela 6.72"'
+                ],
+                'price_min' => 799.00,
+                'price_max' => 5999.00,
+                'category' => 'Eletrônicos & Áudio',
+                'image_prefix' => 'smartphone'
             ]
         ];
 
@@ -203,16 +229,18 @@ abstract class BaseMarketplace implements MarketplaceInterface {
 
         // Standard fallback templates for generic keywords
         if ($activeTemplate === null) {
+            $cleanQuery = ucwords($query ?: 'Produto');
             $activeTemplate = [
                 'titles' => [
-                    'Organizador de Acrílico Multiuso Organizador de Gavetas',
-                    'Mini Projetor Portátil LED Full HD Wifi Integrado',
-                    'Luminária de Mesa LED Flexível com Carregador Sem Fio',
-                    'Kit 3 Camisetas Masculinas Algodão Premium Fio 30.1',
-                    'Mochila Antifurto Impermeável com Entrada USB para Notebook'
+                    $cleanQuery . ' Premium com Garantia Nacional',
+                    'Kit ' . $cleanQuery . ' Completo Importado Original',
+                    $cleanQuery . ' Inteligente de Alta Performance',
+                    'Mini ' . $cleanQuery . ' Portátil Recarregável USB',
+                    $cleanQuery . ' Ultra Pro - Edição de Lançamento',
+                    'Acessório Compatível com ' . $cleanQuery . ' Multifuncional'
                 ],
-                'price_min' => 35.00,
-                'price_max' => 350.00,
+                'price_min' => 29.90,
+                'price_max' => 599.90,
                 'category' => 'Geral & Variedades',
                 'image_prefix' => 'general'
             ];
