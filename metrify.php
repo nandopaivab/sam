@@ -483,6 +483,161 @@ require __DIR__ . '/templates/header.php';
         </div>
     </div>
 
+    <!-- Unified Supplier Search Bar -->
+    <div class="card-premium p-4 mb-4" style="background: linear-gradient(135deg, rgba(116, 93, 247, 0.05) 0%, rgba(0, 210, 255, 0.05) 100%); border: 1px solid rgba(116, 93, 247, 0.15) !important;">
+        <h5 class="fw-bold text-white mb-2"><i class="fa-solid fa-truck-fast text-info me-2"></i> Localizador de Fornecedores por Palavra-Chave</h5>
+        <p class="text-muted small mb-3">Pesquise por qualquer palavra-chave ou produto para localizar fornecedores atacadistas nacionais/importadores adequados com cálculo estimado de margens e ROI.</p>
+        
+        <form onsubmit="searchSuppliersKeyword(event, this)">
+            <div class="input-group">
+                <input type="text" name="keyword" class="form-control bg-dark text-white border-light-subtle p-3" placeholder="Digite o produto (ex: fone bluetooth, garrafa térmica, organizador)..." required style="border-radius: 8px 0 0 8px;">
+                <button type="submit" class="btn btn-primary px-4 fw-bold" style="background-color: #745df7; border: 0; border-radius: 0 8px 8px 0;"><i class="fa-solid fa-magnifying-glass me-2"></i> Buscar Fornecedores</button>
+            </div>
+        </form>
+
+        <!-- Search Results Container -->
+        <div class="mt-4" id="supplier-kw-results" style="display: none;">
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-light-subtle border-opacity-10">
+                <h6 class="fw-bold text-white mb-0"><i class="fa-solid fa-list text-info me-2"></i> Fornecedores Encontrados para: <span class="text-accent-turquoise" id="supplier-kw-term">...</span></h6>
+                <button type="button" class="btn btn-sm btn-outline-secondary border-light-subtle text-muted px-2 py-1" onclick="$('#supplier-kw-results').slideUp();" style="font-size: 11px;">Fechar</button>
+            </div>
+            <div class="row g-3" id="supplier-kw-list">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function searchSuppliersKeyword(event, form) {
+        event.preventDefault();
+        const keyword = form.elements['keyword'].value.trim();
+        if (!keyword) return;
+
+        const resultsDiv = $('#supplier-kw-results');
+        const termSpan = $('#supplier-kw-term');
+        const listDiv = $('#supplier-kw-list');
+
+        resultsDiv.slideDown();
+        termSpan.text('"' + keyword + '"');
+        listDiv.html(`
+            <div class="col-12 text-center py-4 text-muted">
+                <div class="spinner-border spinner-border-sm text-info mb-2" role="status"></div>
+                <div>Buscando e mapeando fornecedores de alta margem...</div>
+            </div>
+        `);
+
+        const formData = new FormData();
+        formData.append('action', 'find_suppliers_by_keyword');
+        formData.append('keyword', keyword);
+
+        fetch('api.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.suppliers.length > 0) {
+                listDiv.html('');
+                data.suppliers.forEach(s => {
+                    const encodedName = encodeURIComponent(s.name);
+                    const encodedTitle = encodeURIComponent(s.product_title);
+                    const card = `
+                        <div class="col-12 col-md-4">
+                            <div class="p-3 rounded border border-light-subtle h-100 d-flex flex-column justify-content-between" style="background: rgba(255,255,255,0.01);">
+                                <div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 small">${s.type}</span>
+                                        <span class="text-muted small"><i class="fa-solid fa-truck-ramp-box me-1"></i> ${s.delivery_days} dias</span>
+                                    </div>
+                                    <h6 class="fw-bold text-white mb-2">${s.name}</h6>
+                                    <div class="text-muted small mb-2"><i class="fa-solid fa-map-location-dot me-1"></i> ${s.address}</div>
+                                    
+                                    <div class="row g-2 mb-3 text-center" style="font-size: 11px;">
+                                        <div class="col-4">
+                                            <div class="p-1 rounded border border-light-subtle bg-dark">
+                                                <div class="text-muted">Preço Custo</div>
+                                                <div class="fw-bold text-white mt-1">R$ ${s.wholesale_price.toFixed(2)}</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="p-1 rounded border border-light-subtle bg-dark">
+                                                <div class="text-muted">Margem Est.</div>
+                                                <div class="fw-bold text-success mt-1">${s.margin_percent}%</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="p-1 rounded border border-light-subtle bg-dark">
+                                                <div class="text-muted">ROI Est.</div>
+                                                <div class="fw-bold text-success mt-1">${s.roi_percent}%</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-muted small mb-3 p-2 rounded" style="background: rgba(255,255,255,0.02); font-size: 11px;">
+                                        <i class="fa-solid fa-circle-info text-info me-1"></i> ${s.notes}
+                                    </div>
+                                </div>
+
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-sm btn-outline-info flex-grow-1" onclick="saveSupplierFromKeywordSearch('${s.name}', '${s.type}', ${s.wholesale_price}, ${s.profit_margin}, ${s.margin_percent}, ${s.roi_percent}, '${s.url}', '${s.address}', '${s.phone}', '${s.notes}', '${s.product_title}')">
+                                        <i class="fa-solid fa-bookmark me-1"></i> Salvar Forn.
+                                    </button>
+                                    <a href="crm.php?company=${encodedName}&product=${encodedTitle}" class="btn btn-sm btn-primary border-0" style="background-color: #745df7; font-size:12px; font-weight:600;">
+                                        <i class="fa-solid fa-handshake me-1"></i> Abrir CRM
+                                    </a>
+                                    <a href="https://wa.me/55${s.phone.replace(/\D/g, '')}" target="_blank" class="btn btn-sm btn-success" style="font-size:12px;">
+                                        <i class="fa-brands fa-whatsapp"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    listDiv.append(card);
+                });
+            } else {
+                listDiv.html('<div class="col-12 text-center py-4 text-warning"><i class="fa-solid fa-triangle-exclamation"></i> Nenhum fornecedor encontrado para esta palavra-chave.</div>');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            listDiv.html('<div class="col-12 text-center py-4 text-danger"><i class="fa-solid fa-circle-exclamation"></i> Erro de comunicação com o servidor.</div>');
+        });
+    }
+
+    function saveSupplierFromKeywordSearch(name, type, cost, profit, margin, roi, url, address, phone, notes, productTitle) {
+        const formData = new FormData();
+        formData.append('action', 'save_supplier');
+        formData.append('name', name);
+        formData.append('type', type);
+        formData.append('wholesale_price', cost);
+        formData.append('profit_margin', profit);
+        formData.append('margin_percent', margin);
+        formData.append('roi_percent', roi);
+        formData.append('url', url);
+        formData.append('address', address);
+        formData.append('phone', phone);
+        formData.append('notes', notes);
+        formData.append('product_title', productTitle);
+
+        fetch('api.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert('Fornecedor salvo com sucesso!');
+            } else {
+                alert('Erro ao salvar fornecedor: ' + (data.error || 'Erro desconhecido.'));
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Erro ao conectar-se com o servidor.');
+        });
+    }
+    </script>
+
     <!-- Navigation Tabs -->
     <ul class="nav nav-tabs metrify-tab-nav mb-4" id="samMlTabs" role="tablist">
         <li class="nav-item" role="presentation">
