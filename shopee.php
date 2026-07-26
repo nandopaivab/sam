@@ -197,9 +197,14 @@ require __DIR__ . '/templates/header.php';
                                         <span class="badge bg-success-subtle text-success border border-success-subtle"><?php echo $v['score']; ?> pts</span>
                                     </td>
                                     <td>
-                                        <button class="btn btn-sm btn-outline-info" onclick="openShopeeCalculatorWith(<?php echo $v['price']; ?>)">
-                                            <i class="fa-solid fa-calculator me-1"></i> Margem
-                                        </button>
+                                        <div class="d-flex gap-1">
+                                            <button class="btn btn-sm btn-outline-info" onclick="openShopeeCalculatorWith(<?php echo $v['price']; ?>)">
+                                                <i class="fa-solid fa-calculator me-1"></i> Margem
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-warning text-warning border-warning border-opacity-25" onclick="openShopeeSuppliersModal(<?php echo $v['id']; ?>)">
+                                                <i class="fa-solid fa-truck me-1"></i> Fornecedores
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -428,6 +433,290 @@ function calculateShopeeProfit() {
 $(document).ready(function() {
     calculateShopeeProfit();
 });
+</script>
+
+<!-- Modal: Shopee Product Suppliers -->
+<div class="modal fade" id="shopeeSuppliersModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-light-subtle shadow-lg" style="border-radius: 16px; background: #181920;">
+            <div class="modal-header border-bottom border-light-subtle p-4">
+                <h5 class="modal-title fw-bold text-white"><i class="fa-solid fa-truck text-warning me-2"></i> Fornecedores Atacado Recomendados</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <h6 class="fw-bold text-metrify-cyan mb-3" id="modal-shopee-product-title">Produto</h6>
+                
+                <div class="row g-3" id="modal-shopee-suppliers-container">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+            <div class="modal-footer border-top border-light-subtle">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const shopeeSuppliers = {
+    1: { // Fone de Ouvido Gatinho
+        title: "Fone de Ouvido Gatinho com Led Bluetooth",
+        retail_price: 39.90,
+        suppliers: [
+            {
+                name: "Atacadão dos Eletrônicos SP",
+                type: "Distribuidor Nacional SP",
+                wholesale_price: 14.90,
+                delivery_days: 4,
+                phone: "(11) 99128-4499",
+                address: "Brás, São Paulo - SP",
+                url: "https://www.atacadaodoseletronicos.com.br",
+                notes: "Pedido mínimo: R$ 500,00 | Grade fechada"
+            },
+            {
+                name: "AliExpress Tech Wholesale",
+                type: "Importação Direta",
+                wholesale_price: 11.80,
+                delivery_days: 14,
+                phone: "(11) 99000-0000",
+                address: "Shenzhen, China",
+                url: "https://pt.aliexpress.com",
+                notes: "Isento de taxas pelo Remessa Conforme"
+            },
+            {
+                name: "Importadora MultiUtil PR",
+                type: "Distribuidor Nacional PR",
+                wholesale_price: 13.50,
+                delivery_days: 3,
+                phone: "(41) 98711-2244",
+                address: "Curitiba - PR",
+                url: "https://www.multiutilpr.com.br",
+                notes: "Faturamento mínimo: R$ 1.000,00"
+            }
+        ]
+    },
+    2: { // Mini Liquidificador
+        title: "Mini Liquidificador Squeeze Portátil USB",
+        retail_price: 29.90,
+        suppliers: [
+            {
+                name: "Utilidades Brasil Atacado SP",
+                type: "Distribuidor Nacional SP",
+                wholesale_price: 9.90,
+                delivery_days: 3,
+                phone: "(11) 98765-4321",
+                address: "Guarulhos - SP",
+                url: "https://www.utilidadesbrasilatacado.com.br",
+                notes: "Desconto de 5% no PIX"
+            },
+            {
+                name: "AliExpress Home Dropship",
+                type: "Importação Direta",
+                wholesale_price: 7.50,
+                delivery_days: 12,
+                phone: "(11) 99111-2222",
+                address: "Yiwu, China",
+                url: "https://pt.aliexpress.com",
+                notes: "Envio aéreo expresso"
+            },
+            {
+                name: "Mega Distribuidora Sul SC",
+                type: "Distribuidor Nacional SC",
+                wholesale_price: 9.20,
+                delivery_days: 3,
+                phone: "(47) 98822-1100",
+                address: "Joinville - SC",
+                url: "https://www.megadistribuidorasul.com.br",
+                notes: "Pedido mínimo de 50 unidades"
+            }
+        ]
+    },
+    3: { // Escova de Limpeza Spin
+        title: "Escova de Limpeza Elétrica Spin Recarregável",
+        retail_price: 69.90,
+        suppliers: [
+            {
+                name: "Mega Utilidades Brás",
+                type: "Distribuidor Nacional SP",
+                wholesale_price: 24.90,
+                delivery_days: 4,
+                phone: "(11) 99312-8844",
+                address: "Brás, São Paulo - SP",
+                url: "https://www.megautilidadesbras.com.br",
+                notes: "Retirada em loja física no Brás"
+            },
+            {
+                name: "AliExpress Home Gadgets",
+                type: "Importação Direta",
+                wholesale_price: 18.90,
+                delivery_days: 15,
+                phone: "(11) 99222-3333",
+                address: "Guangzhou, China",
+                url: "https://pt.aliexpress.com",
+                notes: "Lote mínimo de 20 peças"
+            }
+        ]
+    },
+    4: { // Seladora de Embalagens
+        title: "Seladora de Embalagens Plásticas Portátil Ímã",
+        retail_price: 12.90,
+        suppliers: [
+            {
+                name: "Utilidades Brasil Atacado SP",
+                type: "Distribuidor Nacional SP",
+                wholesale_price: 4.50,
+                delivery_days: 3,
+                phone: "(11) 98765-4321",
+                address: "Guarulhos - SP",
+                url: "https://www.utilidadesbrasilatacado.com.br",
+                notes: "Excelente para brindes ou kits"
+            },
+            {
+                name: "AliExpress Mini Seals",
+                type: "Importação Direta",
+                wholesale_price: 2.90,
+                delivery_days: 14,
+                phone: "(11) 99333-4444",
+                address: "Yiwu, China",
+                url: "https://pt.aliexpress.com",
+                notes: "Frete grátis acima de R$ 99"
+            }
+        ]
+    },
+    5: { // Caneta Depiladora
+        title: "Caneta Depiladora de Sobrancelha Elétrica USB",
+        retail_price: 19.90,
+        suppliers: [
+            {
+                name: "Beleza Viva Atacado SP",
+                type: "Distribuidor Nacional SP",
+                wholesale_price: 6.50,
+                delivery_days: 3,
+                phone: "(11) 99281-8812",
+                address: "Brás, São Paulo - SP",
+                url: "https://www.belezavivaatacado.com.br",
+                notes: "Melhor preço de cosméticos do Brás"
+            },
+            {
+                name: "AliExpress Beauty Group",
+                type: "Importação Direta",
+                wholesale_price: 4.80,
+                delivery_days: 13,
+                phone: "(11) 99444-5555",
+                address: "Shenzhen, China",
+                url: "https://pt.aliexpress.com",
+                notes: "Embalagem personalizada disponível"
+            }
+        ]
+    }
+};
+
+function openShopeeSuppliersModal(productId) {
+    const product = shopeeSuppliers[productId];
+    if (!product) return;
+
+    document.getElementById('modal-shopee-product-title').innerText = product.title + ' (Preço Shopee: R$ ' + product.retail_price.toFixed(2) + ')';
+    
+    const container = document.getElementById('modal-shopee-suppliers-container');
+    container.innerHTML = '';
+
+    product.suppliers.forEach(s => {
+        const profit = product.retail_price - s.wholesale_price;
+        const margin = (profit / product.retail_price) * 100;
+        const roi = (profit / s.wholesale_price) * 100;
+        const encodedName = encodeURIComponent(s.name);
+        const encodedTitle = encodeURIComponent(product.title);
+
+        const card = `
+            <div class="col-12 col-md-6">
+                <div class="p-3 rounded border border-light-subtle h-100 d-flex flex-column justify-content-between" style="background: rgba(255,255,255,0.01);">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 small">${s.type}</span>
+                            <span class="text-muted small"><i class="fa-solid fa-truck-ramp-box me-1"></i> ${s.delivery_days} dias</span>
+                        </div>
+                        <h6 class="fw-bold text-white mb-2">${s.name}</h6>
+                        <div class="text-muted small mb-2"><i class="fa-solid fa-map-location-dot me-1"></i> ${s.address}</div>
+                        
+                        <div class="row g-2 mb-3 text-center" style="font-size: 11px;">
+                            <div class="col-4">
+                                <div class="p-1 rounded border border-light-subtle bg-dark">
+                                    <div class="text-muted">Custo Atacado</div>
+                                    <div class="fw-bold text-white mt-1">R$ ${s.wholesale_price.toFixed(2)}</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="p-1 rounded border border-light-subtle bg-dark">
+                                    <div class="text-muted">Margem Est.</div>
+                                    <div class="fw-bold text-success mt-1">${margin.toFixed(1)}%</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="p-1 rounded border border-light-subtle bg-dark">
+                                    <div class="text-muted">ROI Est.</div>
+                                    <div class="fw-bold text-success mt-1">${roi.toFixed(1)}%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-muted small mb-3 p-2 rounded" style="background: rgba(255,255,255,0.02); font-size: 11px;">
+                            <i class="fa-solid fa-circle-info text-info me-1"></i> ${s.notes}
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-info flex-grow-1" onclick="saveShopeeSupplier('${s.name}', '${s.type}', ${s.wholesale_price}, ${profit}, ${margin}, ${roi}, '${s.url}', '${s.address}', '${s.phone}', '${s.notes}', '${product.title}')">
+                            <i class="fa-solid fa-bookmark me-1"></i> Salvar Forn.
+                        </button>
+                        <a href="crm.php?company=${encodedName}&product=${encodedTitle}" class="btn btn-sm btn-primary bg-shopee-orange border-0" style="font-size:12px; font-weight:600;">
+                            <i class="fa-solid fa-handshake me-1"></i> Abrir CRM
+                        </a>
+                        <a href="https://wa.me/55${s.phone.replace(/\D/g, '')}" target="_blank" class="btn btn-sm btn-success" style="font-size:12px;">
+                            <i class="fa-brands fa-whatsapp"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        `;
+        container.innerHTML += card;
+    });
+
+    const modal = new bootstrap.Modal(document.getElementById('shopeeSuppliersModal'));
+    modal.show();
+}
+
+function saveShopeeSupplier(name, type, cost, profit, margin, roi, url, address, phone, notes, productTitle) {
+    const formData = new FormData();
+    formData.append('action', 'save_supplier');
+    formData.append('name', name);
+    formData.append('type', type);
+    formData.append('wholesale_price', cost);
+    formData.append('profit_margin', profit);
+    formData.append('margin_percent', margin);
+    formData.append('roi_percent', roi);
+    formData.append('url', url);
+    formData.append('address', address);
+    formData.append('phone', phone);
+    formData.append('notes', notes);
+    formData.append('product_title', productTitle);
+
+    fetch('api.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert('Fornecedor de Shopee salvo com sucesso!');
+        } else {
+            alert('Erro ao salvar fornecedor: ' + (data.error || 'Erro desconhecido.'));
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Erro ao conectar-se com o servidor.');
+    });
+}
 </script>
 
 <?php include __DIR__ . '/templates/footer.php'; ?>
