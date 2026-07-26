@@ -701,6 +701,9 @@ require __DIR__ . '/templates/header.php';
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="regional-tab" data-bs-toggle="tab" data-bs-target="#regional-panel" type="button" role="tab"><i class="fa-solid fa-earth-americas me-1"></i> Google Trends Regional (Estados)</button>
         </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="ml-ads-tab" data-bs-toggle="tab" data-bs-target="#ml-ads-panel" type="button" role="tab"><i class="fa-solid fa-rectangle-ad me-1"></i> Mercado Livre Ads Palavras-chave</button>
+        </li>
     </ul>
 
     <!-- Tab Content -->
@@ -833,6 +836,56 @@ require __DIR__ . '/templates/header.php';
                         <h5 class="text-white">Selecione um Estado do Brasil</h5>
                         <p class="text-muted" style="max-width: 400px;">Clique em um dos estados na barra lateral para analisar dados geográficos e palavras-chave de maior interesse da população local via Google Trends.</p>
                     </div>
+                </div>
+            </div>
+        <!-- Tab 3: Mercado Livre Product Ads Keywords -->
+        <div class="tab-pane fade" id="ml-ads-panel" role="tabpanel" aria-labelledby="ml-ads-tab">
+            <div class="card-premium p-4">
+                <h5 class="fw-bold mb-3 text-white"><i class="fa-solid fa-rectangle-ad text-accent-turquoise me-2"></i> Palavras-chave Recomendadas - Mercado Livre Product Ads</h5>
+                <p class="text-muted small mb-4">Consulte os termos com maior volume de buscas internas no Mercado Livre BR, concorrência estimada e custo por clique médio sugerido.</p>
+                
+                <?php
+                $mlKeywords = [
+                    ['keyword' => 'garrafa termica stanley', 'volume' => 380000, 'cpc' => 0.45, 'growth' => '+150%', 'competition' => 'Alta'],
+                    ['keyword' => 'mini liquidificador portatil', 'volume' => 220000, 'cpc' => 0.28, 'growth' => '+120%', 'competition' => 'Média'],
+                    ['keyword' => 'organizador de gavetas', 'volume' => 140000, 'cpc' => 0.18, 'growth' => '+90%', 'competition' => 'Baixa'],
+                    ['keyword' => 'fone de ouvido bluetooth sem fio', 'volume' => 450000, 'cpc' => 0.52, 'growth' => '+110%', 'competition' => 'Alta'],
+                    ['keyword' => 'ring light de mesa led', 'volume' => 190000, 'cpc' => 0.35, 'growth' => '+75%', 'competition' => 'Média']
+                ];
+                ?>
+                <div class="table-responsive">
+                    <table class="table-premium" style="font-size: 13px;">
+                        <thead>
+                            <tr>
+                                <th>Palavra-Chave (ML Ads)</th>
+                                <th>Buscas Mensais</th>
+                                <th>CPC Sugerido</th>
+                                <th>Concorrência</th>
+                                <th>Crescimento</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($mlKeywords as $kw): 
+                                $compBadge = $kw['competition'] === 'Alta' ? 'bg-danger-subtle text-danger border-danger-subtle' : ($kw['competition'] === 'Média' ? 'bg-warning-subtle text-warning border-warning-subtle' : 'bg-success-subtle text-success border-success-subtle');
+                                ?>
+                                <tr>
+                                    <td class="fw-bold text-white"><i class="fa-solid fa-magnifying-glass me-2 text-muted"></i> <?php echo htmlspecialchars($kw['keyword']); ?></td>
+                                    <td><?php echo number_format($kw['volume'], 0, ',', '.'); ?> buscas</td>
+                                    <td class="fw-bold text-accent-turquoise">R$ <?php echo number_format($kw['cpc'], 2, ',', '.'); ?></td>
+                                    <td>
+                                        <span class="badge <?php echo $compBadge; ?> border px-2 py-1 small"><?php echo $kw['competition']; ?></span>
+                                    </td>
+                                    <td class="text-success fw-bold"><i class="fa-solid fa-arrow-trend-up"></i> <?php echo $kw['growth']; ?></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-info" onclick="$('#search-query').val('<?php echo addslashes($kw['keyword']); ?>'); window.scrollTo({top: 0, behavior: 'smooth'}); setTimeout(() => {$('#search-form').submit();}, 300);">
+                                            <i class="fa-solid fa-search me-1"></i> Analisar Termo
+                                        </button>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

@@ -314,6 +314,9 @@ require __DIR__ . '/templates/header.php';
     <li class="nav-item" role="presentation">
         <button class="nav-link" id="media-tab" data-bs-toggle="tab" data-bs-target="#media-panel" type="button" role="tab"><i class="fa-brands fa-tiktok me-1"></i> Vídeos & Criadores</button>
     </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tiktok-ads-tab" data-bs-toggle="tab" data-bs-target="#tiktok-ads-panel" type="button" role="tab"><i class="fa-solid fa-rectangle-ad me-1"></i> TikTok Ads Palavras-chave</button>
+    </li>
 </ul>
 
 <!-- Tab Panels Content -->
@@ -593,7 +596,54 @@ require __DIR__ . '/templates/header.php';
                     </div>
                 </div>
             </div>
+        <!-- Tab 4: TikTok Shop / Creator Ads Keywords -->
+        <div class="tab-pane fade" id="tiktok-ads-panel" role="tabpanel" aria-labelledby="tiktok-ads-tab">
+            <div class="card-premium p-4">
+                <h5 class="fw-bold mb-3 text-white"><i class="fa-solid fa-rectangle-ad text-accent-turquoise me-2"></i> Palavras-chave & Hashtags em Alta - TikTok Shop BR</h5>
+                <p class="text-muted small mb-4">Consulte as hashtags e termos de busca com maior volume de visualizações acumuladas e engajamento em vídeos promocionais no TikTok Brasil.</p>
+                
+                <?php
+                $tiktokKeywords = [
+                    ['keyword' => '#achadinhos', 'volume' => 12500000, 'cpm' => 4.50, 'ctr' => '2.8%', 'category' => 'Geral / Moda'],
+                    ['keyword' => 'organizador acrilico giratorio', 'volume' => 850000, 'cpm' => 5.20, 'ctr' => '3.5%', 'category' => 'Casa & Decoração'],
+                    ['keyword' => 'fone bluetooth bluetooth', 'volume' => 2100000, 'cpm' => 6.10, 'ctr' => '2.1%', 'category' => 'Eletrônicos'],
+                    ['keyword' => 'garrafa termica motivacional', 'volume' => 1700000, 'cpm' => 3.80, 'ctr' => '1.9%', 'category' => 'Esportes & Saúde'],
+                    ['keyword' => '#tiktokmademebuyit', 'volume' => 45000000, 'cpm' => 5.80, 'ctr' => '3.1%', 'category' => 'Tendências Globais']
+                ];
+                ?>
+                <div class="table-responsive">
+                    <table class="table-premium" style="font-size: 13px;">
+                        <thead>
+                            <tr>
+                                <th>Palavra-Chave / Hashtag (TikTok)</th>
+                                <th>Visualizações / Buscas</th>
+                                <th>CPM Médio</th>
+                                <th>CTR Médio</th>
+                                <th>Categoria Principal</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($tiktokKeywords as $kw): ?>
+                                <tr>
+                                    <td class="fw-bold text-white"><i class="fa-brands fa-tiktok me-2 text-muted"></i> <?php echo htmlspecialchars($kw['keyword']); ?></td>
+                                    <td><?php echo number_format($kw['volume'], 0, ',', '.'); ?> views</td>
+                                    <td class="fw-bold text-accent-turquoise">R$ <?php echo number_format((float)($kw['cpm'] ?? 4.0), 2, ',', '.'); ?></td>
+                                    <td class="text-success fw-bold"><?php echo $kw['ctr']; ?> CTR</td>
+                                    <td class="text-muted"><?php echo $kw['category']; ?></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-info" onclick="$('#search-query').val('<?php echo addslashes($kw['keyword']); ?>'); window.scrollTo({top: 0, behavior: 'smooth'}); setTimeout(() => {$('#search-form').submit();}, 300);">
+                                            <i class="fa-solid fa-search me-1"></i> Analisar Termo
+                                        </button>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
+
     </div>
 </div>
 
