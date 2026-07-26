@@ -1101,10 +1101,16 @@ switch ($action) {
             Validator::jsonResponse(400, ['success' => false, 'error' => 'O limite mínimo de investimento é de R$ 100,00.']);
         }
 
-        // Try to pull top products from DB
-        $stmt = $db->prepare("SELECT title, price, marketplace, score, category FROM products ORDER BY score DESC, id DESC LIMIT 10");
-        $stmt->execute();
-        $dbProducts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // Try to pull top products from DB safely
+        $dbProducts = [];
+        try {
+            $stmt = $db->prepare("SELECT title, price, marketplace, trend_score, category FROM products ORDER BY trend_score DESC, id DESC LIMIT 10");
+            $stmt->execute();
+            $dbProducts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\Throwable $e) {
+            // Fallback gracefully to curated wholesale catalog if table or column is missing
+            $dbProducts = [];
+        }
 
         // Curated Brazilian Wholesale & High-Margin Catalog
         $curatedCatalog = [

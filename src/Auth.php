@@ -184,10 +184,10 @@ class Auth {
         }
 
         return [
-            'id' => $_SESSION['user_id'],
-            'name' => $_SESSION['user_name'],
-            'email' => $_SESSION['user_email'],
-            'role' => $_SESSION['user_role'],
+            'id' => $_SESSION['user_id'] ?? 0,
+            'name' => $_SESSION['user_name'] ?? 'Usuário',
+            'email' => $_SESSION['user_email'] ?? '',
+            'role' => $_SESSION['user_role'] ?? 'user',
             'dark_mode' => $_SESSION['dark_mode'] ?? true,
         ];
     }
