@@ -596,6 +596,7 @@ require __DIR__ . '/templates/header.php';
                     </div>
                 </div>
             </div>
+        </div>
         <!-- Tab 4: TikTok Shop / Creator Ads Keywords -->
         <div class="tab-pane fade" id="tiktok-ads-panel" role="tabpanel" aria-labelledby="tiktok-ads-tab">
             <div class="card-premium p-4">

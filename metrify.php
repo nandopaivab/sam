@@ -838,6 +838,7 @@ require __DIR__ . '/templates/header.php';
                     </div>
                 </div>
             </div>
+        </div>
         <!-- Tab 3: Mercado Livre Product Ads Keywords -->
         <div class="tab-pane fade" id="ml-ads-panel" role="tabpanel" aria-labelledby="ml-ads-tab">
             <div class="card-premium p-4">
