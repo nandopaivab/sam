@@ -214,6 +214,82 @@ class Database {
                 growth_rate DOUBLE DEFAULT 0.00,
                 seasonality VARCHAR(100),
                 last_analyzed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;",
+
+            "CREATE TABLE IF NOT EXISTS crm_activities (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                company_name VARCHAR(255) NOT NULL,
+                contact_type VARCHAR(50) NOT NULL,
+                contact_date DATE NOT NULL,
+                contact_time TIME NOT NULL,
+                responsible_name VARCHAR(100) NOT NULL,
+                objective VARCHAR(255) NOT NULL,
+                description TEXT NOT NULL,
+                result_summary TEXT DEFAULT NULL,
+                negotiation_status VARCHAR(50) NOT NULL,
+                interest_level VARCHAR(50) DEFAULT 'Alto',
+                priority VARCHAR(50) DEFAULT 'Média',
+                next_action VARCHAR(255) DEFAULT NULL,
+                followup_date DATE DEFAULT NULL,
+                product_id INT DEFAULT NULL,
+                product_title VARCHAR(255) DEFAULT NULL,
+                marketplace VARCHAR(100) DEFAULT NULL,
+                attachment_url VARCHAR(500) DEFAULT NULL,
+                created_by_name VARCHAR(100) DEFAULT 'Sistema',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;",
+
+            "CREATE TABLE IF NOT EXISTS activity_logs (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT DEFAULT NULL,
+                user_name VARCHAR(100) DEFAULT 'Sistema',
+                module VARCHAR(100) NOT NULL,
+                action_type VARCHAR(100) NOT NULL,
+                target_record VARCHAR(255) DEFAULT NULL,
+                old_values TEXT DEFAULT NULL,
+                new_values TEXT DEFAULT NULL,
+                ip_address VARCHAR(50) DEFAULT '127.0.0.1',
+                device_info VARCHAR(255) DEFAULT 'Navegador Web',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;",
+
+            "CREATE TABLE IF NOT EXISTS blue_ocean_products (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                title VARCHAR(255) NOT NULL,
+                category VARCHAR(100) NOT NULL,
+                niche VARCHAR(100) NOT NULL,
+                target_audience VARCHAR(255) NOT NULL,
+                problem_solved TEXT NOT NULL,
+                avg_price DECIMAL(10,2) NOT NULL,
+                est_cost DECIMAL(10,2) NOT NULL,
+                proj_margin DECIMAL(5,2) NOT NULL,
+                approx_competitors INT DEFAULT 10,
+                trend_score INT DEFAULT 90,
+                seasonality VARCHAR(100) DEFAULT 'Ano Todo',
+                related_suppliers TEXT DEFAULT NULL,
+                suggested_kits TEXT DEFAULT NULL,
+                opportunity_badge VARCHAR(50) DEFAULT 'Alta Oportunidade',
+                investment_recommendation TEXT DEFAULT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;",
+
+            "CREATE TABLE IF NOT EXISTS baby_niche_products (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                title VARCHAR(255) NOT NULL,
+                sub_category VARCHAR(100) NOT NULL,
+                age_range VARCHAR(100) NOT NULL,
+                safety_cert VARCHAR(100) DEFAULT 'INMETRO / Atóxico',
+                material_info VARCHAR(255) DEFAULT 'Livre de BPA',
+                cleaning_ease VARCHAR(100) DEFAULT 'Fácil higienização',
+                small_parts_risk VARCHAR(50) DEFAULT 'Baixo Risco',
+                avg_price DECIMAL(10,2) NOT NULL,
+                est_cost DECIMAL(10,2) NOT NULL,
+                suggested_kits TEXT DEFAULT NULL,
+                income_bracket VARCHAR(100) DEFAULT 'Todas as faixas (Acessível)',
+                ai_analysis TEXT DEFAULT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;"
         ];
 
@@ -223,6 +299,38 @@ class Database {
             } catch (PDOException $e) {
                 // Ignore if exists
             }
+        }
+
+        // Seed MySQL default records if tables are empty
+        try {
+            $cntCrm = (int)self::$pdo->query("SELECT COUNT(*) FROM crm_activities")->fetchColumn();
+            if ($cntCrm === 0) {
+                $today = date('Y-m-d');
+                $tomorrow = date('Y-m-d', strtotime('+1 day'));
+                $insCrm = self::$pdo->prepare("INSERT INTO crm_activities (user_id, company_name, contact_type, contact_date, contact_time, responsible_name, objective, description, negotiation_status, interest_level, priority, next_action, followup_date, product_title, marketplace, created_by_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                
+                $insCrm->execute([1, 'Distribuidora SP Tech Express', 'WhatsApp', $today, '10:30:00', 'Fernando Paiva', 'Verificar tabela progressiva de desconto', 'Conversa inicial para lote acima de 100 un. do Projetor 4K.', 'Descoberta', 'Alto', 'Média', 'Solicitar envio de catálogo', $tomorrow, 'Projetor 4K', 'Shopee', 'Sistema']);
+                $insCrm->execute([1, 'Forn. Bebê Feliz Atacado', 'WhatsApp', $today, '14:00:00', 'Fernando Paiva', 'Amostra de Prato Ventosa Silicone', 'Solicitado envio de amostra nas cores azul e rosa para testes de durabilidade e aderência.', 'Amostra Solicitada', 'Alto', 'Alta', 'Verificar código de rastreio da amostra', $tomorrow, 'Prato com Ventosa Silicone', 'Shopee', 'Sistema']);
+                $insCrm->execute([1, 'Atacadista MegaUtil BR', 'E-mail', $today, '09:15:00', 'Fernando Paiva', 'Cotação de Organizadores de Temperos', 'Recebida cotação inicial de R$ 12,50/unidade. Negociando para R$ 10,00.', 'Negociação', 'Médio', 'Média', 'Aguardar resposta sobre lote de 500 un.', $tomorrow, 'Organizador de Temperos', 'Mercado Livre', 'Sistema']);
+            }
+
+            $cntBlue = (int)self::$pdo->query("SELECT COUNT(*) FROM blue_ocean_products")->fetchColumn();
+            if ($cntBlue === 0) {
+                $insBlue = self::$pdo->prepare("INSERT INTO blue_ocean_products (title, category, niche, target_audience, problem_solved, avg_price, est_cost, proj_margin, approx_competitors, trend_score, seasonality, related_suppliers, suggested_kits, opportunity_badge, investment_recommendation) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                
+                $insBlue->execute(['Organizador de Temperos para Gaveta', 'Organização', 'Cozinha', 'Donas de casa e entusiastas de culinária', 'Organização e facilidade de visualização de potes de condimento em gavetas padrão.', 59.90, 15.00, 299.3, 4, 94, 'Ano Todo', 'Atacadista MegaUtil BR', 'Kit com 4 Organizadores | Kit Completo com 12 potes de vidro incluídos | Kit Duplo Organizador + Etiquetas de Identificação', 'Alta Oportunidade', 'Excelente para anúncios segmentados no TikTok focados em organização.']);
+                $insBlue->execute(['Suporte Organizador de Tampas de Panela', 'Organização', 'Cozinha', 'Pessoas com cozinhas compactas', 'Otimização de espaço em armários de cozinha ao organizar tampas verticalmente.', 45.00, 12.00, 275.0, 8, 88, 'Ano Todo', 'Mega Importadora SP', 'Kit Organizador de Tampas + Organizador de Panelas | Kit Duplo para armários grandes', 'Média Oportunidade', 'Bom para cross-sell com o Organizador de Gavetas.']);
+            }
+
+            $cntBaby = (int)self::$pdo->query("SELECT COUNT(*) FROM baby_niche_products")->fetchColumn();
+            if ($cntBaby === 0) {
+                $insBaby = self::$pdo->prepare("INSERT INTO baby_niche_products (title, sub_category, age_range, safety_cert, material_info, cleaning_ease, small_parts_risk, avg_price, est_cost, suggested_kits, income_bracket, ai_analysis) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                
+                $insBaby->execute(['Prato com Ventosa Silicone BPA Free', 'Alimentação', '6 meses a 3 anos', 'INMETRO / Atóxico', 'Silicone 100% Alimentar Livre de BPA', 'Pode ir à lava-louças', 'Sem peças pequenas', 39.90, 10.00, 'Kit Alimentação Completa (Prato + Babador + Colher de Silicone) | Kit com 2 Pratos Cores Sortidas | Kit Introdução Alimentar Premium', 'Todas as faixas (Acessível)', 'Produto altamente recomendado para introdução alimentar. O diferencial é a ventosa forte que evita quedas e bagunça.']);
+                $insBaby->execute(['Mordedor Sensorial Girafa Antiasfixia', 'Desenvolvimento Infantil', '3 meses a 18 meses', 'INMETRO / Atóxico', 'Silicone Macio BPA Free', 'Esterilizável em água fervente', 'Sem peças pequenas', 29.90, 7.50, 'Kit Mordedor + Preendedor de chupeta | Kit Mordedores Fofos (Girafa + Elefante) | Kit Dentinho Saudável Premium', 'Classe C/D/E (Acessível)', 'Mordedor anatômico que alivia as gengivas do bebê com segurança.']);
+            }
+        } catch (\Exception $e) {
+            // Ignore seeding errors
         }
     }
 
