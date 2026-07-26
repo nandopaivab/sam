@@ -178,23 +178,24 @@ body {
 }
 
 .sidebar-menu {
-    list-style: none;
-    padding: 20px 10px;
-    margin: 0;
+    list-style: none !important;
+    padding: 20px 10px !important;
+    margin: 0 !important;
     flex-grow: 1;
     overflow-y: auto;
 }
 
 .sidebar-item {
     margin-bottom: 4px;
+    list-style: none !important;
 }
 
 .sidebar-link {
     display: flex;
     align-items: center;
     padding: 12px 15px;
-    color: var(--text-secondary);
-    text-decoration: none;
+    color: var(--text-secondary) !important;
+    text-decoration: none !important;
     border-radius: 10px;
     font-weight: 500;
     transition: all 0.2s ease;

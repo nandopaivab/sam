@@ -35,7 +35,7 @@ $darkMode = $user['dark_mode'] ?? true;
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <!-- Custom Style Sheet -->
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v=<?php echo time(); ?>">
     <!-- jQuery (Load first in head for inline scripts compatibility) -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     
