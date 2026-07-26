@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - TrendHunter Brasil</title>
+    <title>SAM - Sistema de Análise de Mercado</title>
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -60,6 +60,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Global CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
     
     <style>
         :root {
@@ -196,15 +198,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="logo-icon">
                 <i class="fa-solid fa-square-trend-up"></i>
             </div>
-            <h3 class="logo-title mb-1">TrendHunter</h3>
-            <p style="color: var(--accent-turquoise); font-size: 13px; font-weight: 600; letter-spacing: 1px;" class="mb-4">BRASIL</p>
+            <h2 class="logo-title mb-1">SAM</h2>
+            <p style="color: var(--accent-turquoise); font-size: 12px; font-weight: 700; letter-spacing: 1.5px;" class="mb-4">SISTEMA DE ANÁLISE DE MERCADO</p>
         </div>
 
         <!-- Custom JS-driven error alert banner -->
-        <div id="error-alert" class="alert alert-danger border-0 py-2 px-3 mb-4 rounded-3 d-flex align-items-center" style="display: <?php echo !empty($errorMsg) ? 'flex' : 'none'; ?>; background-color: rgba(220, 53, 69, 0.15); color: #f87272; font-size: 13px;" role="alert">
+        <?php if (!empty($errorMsg)): ?>
+        <div id="error-alert" class="alert alert-danger border-0 py-2 px-3 mb-4 rounded-3 d-flex align-items-center" style="background-color: rgba(220, 53, 69, 0.15); color: #f87272; font-size: 13px;" role="alert">
             <i class="fa-solid fa-triangle-exclamation me-2"></i>
             <div id="error-text"><?php echo $errorMsg; ?></div>
         </div>
+        <?php else: ?>
+        <div id="error-alert" class="alert alert-danger border-0 py-2 px-3 mb-4 rounded-3 align-items-center" style="display: none !important; background-color: rgba(220, 53, 69, 0.15); color: #f87272; font-size: 13px;" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i>
+            <div id="error-text"></div>
+        </div>
+        <?php endif; ?>
 
         <form id="login-form" action="login.php" method="POST" autocomplete="off">
             <div class="mb-3">
@@ -224,25 +233,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <button type="submit" id="btn-submit" class="btn btn-submit w-100 mb-3">
-                <span id="btn-text">Entrar com Firebase</span>
+                <span id="btn-text">Acessar Painel SAM</span>
                 <span id="btn-spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
             </button>
         </form>
 
-        <div class="text-center mt-3">
-            <span style="color: var(--text-muted); font-size: 14px;">Novo por aqui? </span>
-            <a href="register.php" class="link-register">Crie uma conta</a>
-        </div>
-
-        <div class="border-top border-light-subtle my-3 opacity-25"></div>
-
-        <div class="text-center">
-            <p style="color: var(--text-muted); font-size: 11px; margin-bottom: 8px;">ENTRADA RÁPIDA (CONTROLE DE TESTE)</p>
-            <button onclick="fillAdmin()" class="btn btn-demo w-100"><i class="fa-solid fa-user-gear me-1"></i> Entrar como Admin (Demo Local)</button>
-        </div>
-
-        <div class="footer-text">
-            &copy; 2026 TrendHunter Brasil.
+        <div class="footer-text mt-4">
+            &copy; 2026 SAM - Sistema de Análise de Mercado.
         </div>
     </div>
 
@@ -320,18 +317,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
 
         function showError(msg) {
+            if (!msg) return;
             $('#btn-spinner').hide();
             $('#btn-text').show();
             $('#btn-submit').prop('disabled', false);
             $('#error-text').text(msg);
-            $('#error-alert').css('display', 'flex');
-        }
-
-        function fillAdmin() {
-            $('#email').val('admin@trendhunter.com.br');
-            $('#password').val('admin123');
-            // Directly submit the form to bypass client-side Firebase Auth for demo account
-            document.getElementById('login-form').submit();
+            $('#error-alert').css('display', 'flex').attr('style', 'display: flex !important; background-color: rgba(220, 53, 69, 0.15); color: #f87272; font-size: 13px;');
         }
     </script>
 </body>
