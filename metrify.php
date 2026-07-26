@@ -1,6 +1,6 @@
 <?php
 /**
- * TrendHunter Brasil - Metrify E-commerce Metrics & Financial Dashboard
+ * TrendHunter Brasil - Metrify Category Market Share Intelligence
  */
 
 declare(strict_types=1);
@@ -22,504 +22,539 @@ Auth::requireLogin();
 $user = Auth::getCurrentUser();
 $db = Database::getConnection();
 
-// Seed Metrify default metrics into memory/simulation
-$monthlyData = [
-    ['month' => 'Janeiro', 'revenue' => 95000, 'cost' => 32000, 'ads' => 11000, 'fee' => 15200, 'tax' => 5700, 'net' => 31100],
-    ['month' => 'Fevereiro', 'revenue' => 112000, 'cost' => 38000, 'ads' => 12500, 'fee' => 17920, 'tax' => 6720, 'net' => 36860],
-    ['month' => 'Março', 'revenue' => 134000, 'cost' => 45000, 'ads' => 14000, 'fee' => 21440, 'tax' => 8040, 'net' => 45520],
-    ['month' => 'Abril', 'revenue' => 128000, 'cost' => 43000, 'ads' => 13800, 'fee' => 20480, 'tax' => 7680, 'net' => 43040],
-    ['month' => 'Maio', 'revenue' => 145000, 'cost' => 49000, 'ads' => 16000, 'fee' => 23200, 'tax' => 8700, 'net' => 48100],
-    ['month' => 'Junho', 'revenue' => 158000, 'cost' => 53000, 'ads' => 17500, 'fee' => 25280, 'tax' => 9480, 'net' => 52740]
-];
-
-$topSKUs = [
-    ['sku' => 'PROJ-4K-WIFI', 'title' => 'Mini Projetor Smart 4K Wi-Fi', 'sales' => 340, 'price' => 289.90, 'cost' => 98.00, 'fee' => 46.38, 'shipping' => 12.00, 'ads' => 24.50, 'profit' => 109.02, 'margin' => 37.6],
-    ['sku' => 'SUP-TAMPA-KCH', 'title' => 'Suporte Organizador de Tampas Inox', 'sales' => 510, 'price' => 45.00, 'cost' => 12.00, 'fee' => 5.40, 'shipping' => 5.00, 'ads' => 3.50, 'profit' => 19.10, 'margin' => 42.4],
-    ['sku' => 'PRT-VENTOSA-SIL', 'title' => 'Prato com Ventosa Silicone BPA Free', 'sales' => 280, 'price' => 39.90, 'cost' => 10.00, 'fee' => 4.79, 'shipping' => 5.00, 'ads' => 4.20, 'profit' => 15.91, 'margin' => 39.9],
-    ['sku' => 'GIR-MORD-SENS', 'title' => 'Mordedor Sensorial Girafa Silicone', 'sales' => 420, 'price' => 29.90, 'cost' => 7.50, 'fee' => 3.59, 'shipping' => 5.00, 'ads' => 2.80, 'profit' => 11.01, 'margin' => 36.8],
-    ['sku' => 'ORG-TEMPERO-GAV', 'title' => 'Organizador de Temperos de Gaveta', 'sales' => 190, 'price' => 59.90, 'cost' => 15.00, 'fee' => 7.19, 'shipping' => 6.00, 'ads' => 5.80, 'profit' => 25.91, 'margin' => 43.3]
-];
-
-$adCampaigns = [
-    ['platform' => 'Mercado Livre Product Ads', 'spend' => 6400.00, 'impressions' => 128000, 'clicks' => 4800, 'conversions' => 320, 'cpc' => 1.33, 'ctr' => 3.75, 'revenue' => 26880.00, 'roas' => 4.2, 'acos' => 23.8],
-    ['platform' => 'Shopee Ads - Busca & Descoberta', 'spend' => 4800.00, 'impressions' => 185000, 'clicks' => 6200, 'conversions' => 410, 'cpc' => 0.77, 'ctr' => 3.35, 'revenue' => 19680.00, 'roas' => 4.1, 'acos' => 24.4],
-    ['platform' => 'Facebook/Instagram Ads (TikTok Shop)', 'spend' => 4000.00, 'impressions' => 95000, 'clicks' => 3100, 'conversions' => 190, 'cpc' => 1.29, 'ctr' => 3.26, 'revenue' => 16400.00, 'roas' => 4.1, 'acos' => 24.3]
+// Mock Categories database mirroring the user's Metrify screenshot
+$categoriesData = [
+    [
+        'id' => 1,
+        'name' => 'Acessórios para Veículos',
+        'share' => 47.3,
+        'ads' => '102.93 mi',
+        'subcategories_count' => 24,
+        'avg_ads' => '4.29 mi',
+        'color' => '#8e44ad',
+        'subcategories' => [
+            ['name' => 'Peças de Carros e Caminhonetes', 'share' => 38.2, 'ads' => '39.32 mi'],
+            ['name' => 'Acessórios de Tuning', 'share' => 22.5, 'ads' => '23.15 mi'],
+            ['name' => 'Pneus e Rodas', 'share' => 18.3, 'ads' => '18.83 mi'],
+            ['name' => 'Som Automotivo', 'share' => 11.0, 'ads' => '11.32 mi'],
+            ['name' => 'Ferramentas de Oficina', 'share' => 10.0, 'ads' => '10.29 mi']
+        ]
+    ],
+    [
+        'id' => 2,
+        'name' => 'Casa, Móveis e Decoração',
+        'share' => 12.3,
+        'ads' => '26.81 mi',
+        'subcategories_count' => 12,
+        'avg_ads' => '2.23 mi',
+        'color' => '#2c3e50',
+        'subcategories' => [
+            ['name' => 'Móveis para Casa', 'share' => 35.1, 'ads' => '9.41 mi'],
+            ['name' => 'Decoração e Adornos', 'share' => 28.4, 'ads' => '7.61 mi'],
+            ['name' => 'Iluminação Residencial', 'share' => 18.0, 'ads' => '4.82 mi'],
+            ['name' => 'Organização de Espaços', 'share' => 10.5, 'ads' => '2.81 mi'],
+            ['name' => 'Cama, Mesa e Banho', 'share' => 8.0, 'ads' => '2.14 mi']
+        ]
+    ],
+    [
+        'id' => 3,
+        'name' => 'Livros, Revistas e Comics',
+        'share' => 5.6,
+        'ads' => '12.28 mi',
+        'subcategories_count' => 5,
+        'avg_ads' => '2.46 mi',
+        'color' => '#2980b9',
+        'subcategories' => [
+            ['name' => 'Livros Acadêmicos', 'share' => 45.0, 'ads' => '5.52 mi'],
+            ['name' => 'HQs e Mangás', 'share' => 25.0, 'ads' => '3.07 mi'],
+            ['name' => 'Revistas Especializadas', 'share' => 15.0, 'ads' => '1.84 mi'],
+            ['name' => 'Livros Infantis', 'share' => 10.0, 'ads' => '1.22 mi'],
+            ['name' => 'Colecionáveis', 'share' => 5.0, 'ads' => '0.61 mi']
+        ]
+    ],
+    [
+        'id' => 4,
+        'name' => 'Calçados, Roupas e Bolsas',
+        'share' => 4.1,
+        'ads' => '8.91 mi',
+        'subcategories_count' => 22,
+        'avg_ads' => '405.2 mil',
+        'color' => '#3498db',
+        'subcategories' => [
+            ['name' => 'Tênis e Calçados Esportivos', 'share' => 30.2, 'ads' => '2.69 mi'],
+            ['name' => 'Roupas Íntimas e Lingerie', 'share' => 25.5, 'ads' => '2.27 mi'],
+            ['name' => 'Moda Casual e Jeans', 'share' => 20.3, 'ads' => '1.81 mi'],
+            ['name' => 'Bolsas e Acessórios', 'share' => 14.0, 'ads' => '1.24 mi'],
+            ['name' => 'Moda Praia', 'share' => 10.0, 'ads' => '0.89 mi']
+        ]
+    ],
+    [
+        'id' => 5,
+        'name' => 'Beleza e Cuidado Pessoal',
+        'share' => 2.7,
+        'ads' => '5.86 mi',
+        'subcategories_count' => 13,
+        'avg_ads' => '450.9 mil',
+        'color' => '#9b59b6',
+        'subcategories' => [
+            ['name' => 'Cuidados com a Pele (Skincare)', 'share' => 38.0, 'ads' => '2.22 mi'],
+            ['name' => 'Maquiagem Facial', 'share' => 27.5, 'ads' => '1.61 mi'],
+            ['name' => 'Aparelhos de Cabelo (Secadores)', 'share' => 16.5, 'ads' => '0.96 mi'],
+            ['name' => 'Perfumes Importados', 'share' => 10.0, 'ads' => '0.58 mi'],
+            ['name' => 'Cuidados com Unhas', 'share' => 8.0, 'ads' => '0.46 mi']
+        ]
+    ],
+    [
+        'id' => 6,
+        'name' => 'Ferramentas',
+        'share' => 2.5,
+        'ads' => '5.42 mi',
+        'subcategories_count' => 9,
+        'avg_ads' => '601.7 mil',
+        'color' => '#d35400',
+        'subcategories' => [
+            ['name' => 'Ferramentas Elétricas', 'share' => 42.1, 'ads' => '2.28 mi'],
+            ['name' => 'Ferramentas Manuais', 'share' => 28.0, 'ads' => '1.51 mi'],
+            ['name' => 'Organizadores de Ferramentas', 'share' => 15.4, 'ads' => '0.83 mi'],
+            ['name' => 'Acessórios Industriais', 'share' => 14.5, 'ads' => '0.78 mi']
+        ]
+    ],
+    [
+        'id' => 7,
+        'name' => 'Informática',
+        'share' => 2.3,
+        'ads' => '5.07 mi',
+        'subcategories_count' => 19,
+        'avg_ads' => '266.6 mil',
+        'color' => '#1abc9c',
+        'subcategories' => [
+            ['name' => 'Acessórios de PC / Periféricos', 'share' => 35.2, 'ads' => '1.78 mi'],
+            ['name' => 'Armazenamento (SSD, Pendrive)', 'share' => 28.0, 'ads' => '1.41 mi'],
+            ['name' => 'Monitores e Telas', 'share' => 18.8, 'ads' => '0.95 mi'],
+            ['name' => 'Componentes de PC (Placas)', 'share' => 18.0, 'ads' => '0.91 mi']
+        ]
+    ],
+    [
+        'id' => 8,
+        'name' => 'Esportes e Fitness',
+        'share' => 2.3,
+        'ads' => '4.93 mi',
+        'subcategories_count' => 40,
+        'avg_ads' => '123.3 mil',
+        'color' => '#27ae60',
+        'subcategories' => [
+            ['name' => 'Musculação e Treino Funcional', 'share' => 33.5, 'ads' => '1.65 mi'],
+            ['name' => 'Suplementos Alimentares', 'share' => 26.5, 'ads' => '1.30 mi'],
+            ['name' => 'Ciclismo e Bicicletas', 'share' => 22.0, 'ads' => '1.08 mi'],
+            ['name' => 'Futebol e Quadra', 'share' => 18.0, 'ads' => '0.88 mi']
+        ]
+    ],
+    [
+        'id' => 9,
+        'name' => 'Arte, Papelaria e Armarinho',
+        'share' => 1.8,
+        'ads' => '3.88 mi',
+        'subcategories_count' => 4,
+        'avg_ads' => '970.0 mil',
+        'color' => '#e67e22',
+        'subcategories' => [
+            ['name' => 'Materiais Escolares', 'share' => 48.2, 'ads' => '1.87 mi'],
+            ['name' => 'Armarinho e Costura', 'share' => 26.4, 'ads' => '1.02 mi'],
+            ['name' => 'Desenho e Artesanato', 'share' => 15.4, 'ads' => '0.59 mi'],
+            ['name' => 'Decoração de Eventos', 'share' => 10.0, 'ads' => '0.38 mi']
+        ]
+    ],
+    [
+        'id' => 10,
+        'name' => 'Eletrônicos, Áudio e Vídeo',
+        'share' => 1.8,
+        'ads' => '3.88 mi',
+        'subcategories_count' => 15,
+        'avg_ads' => '258.6 mil',
+        'color' => '#e74c3c',
+        'subcategories' => [
+            ['name' => 'Smart TVs e Telas', 'share' => 38.0, 'ads' => '1.47 mi'],
+            ['name' => 'Caixas de Som Portáteis', 'share' => 27.5, 'ads' => '1.06 mi'],
+            ['name' => 'Acessórios de Áudio (Cabos)', 'share' => 19.5, 'ads' => '0.75 mi'],
+            ['name' => 'Drones e Câmeras', 'share' => 15.0, 'ads' => '0.58 mi']
+        ]
+    ]
 ];
 
 require __DIR__ . '/templates/header.php';
 ?>
 
-<!-- Inline CSS to replicate Metrify metrics cockpit -->
+<!-- Metrify style modifications matching Dhiegorose/Metrify screenshot layout -->
 <style>
-    .metrify-tab-nav {
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        gap: 6px;
+    /* Card design replica */
+    .metrify-card {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        transition: transform 0.2s ease, border-color 0.2s ease;
     }
-    .metrify-tab-nav .nav-link {
-        color: var(--text-secondary);
-        background: transparent;
-        border: 1px solid transparent;
-        border-radius: 8px 8px 0 0;
-        font-weight: 600;
-        padding: 12px 22px;
-        transition: all 0.2s ease;
-        font-size: 13px;
+    .metrify-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(255, 255, 255, 0.15);
     }
-    .metrify-tab-nav .nav-link:hover {
+    .card-stripe {
+        position: absolute;
+        top: 0;
+        left: 20px;
+        right: 20px;
+        height: 3px;
+        border-radius: 0 0 4px 4px;
+    }
+    .metrify-card-header {
+        display: flex;
+        align-items: center;
+        margin-top: 5px;
+        margin-bottom: 12px;
+    }
+    .bullet-indicator {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 8px;
+        display: inline-block;
+    }
+    .metrify-card-title {
         color: var(--text-primary);
-        background-color: rgba(255, 255, 255, 0.02);
+        font-weight: 700;
+        font-size: 14px;
+        margin-bottom: 0;
     }
-    .metrify-tab-nav .nav-link.active {
-        color: #00d2ff !important;
-        background-color: var(--card-bg) !important;
-        border-color: rgba(255, 255, 255, 0.08) rgba(255, 255, 255, 0.08) transparent !important;
-        border-top: 2px solid #00d2ff !important;
+    .metrify-stat-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
     }
-    .text-metrify-cyan {
-        color: #00d2ff;
+    .metrify-stat-col {
+        flex: 1;
     }
-    .border-metrify-cyan {
-        border-color: rgba(0, 210, 255, 0.2) !important;
+    .metrify-stat-label {
+        font-size: 11px;
+        color: var(--text-secondary);
+        text-transform: capitalize;
+        margin-bottom: 3px;
     }
-    .bg-metrify-glow {
-        background-color: rgba(0, 210, 255, 0.05);
+    .metrify-stat-val {
+        font-size: 18px;
+        font-weight: 800;
+        color: var(--text-primary);
     }
-    .progress-bar-cyan {
-        background-color: #00d2ff;
+    .metrify-pill-container {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 18px;
+    }
+    .metrify-pill {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 5px 8px;
+        text-align: center;
+        font-size: 11px;
+        color: var(--text-secondary);
+    }
+    .metrify-pill strong {
+        color: var(--text-primary);
+    }
+    .metrify-action-btn {
+        background-color: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        transition: all 0.2s ease;
+    }
+    .metrify-action-btn:hover {
+        background-color: var(--text-primary);
+        color: var(--card-bg);
+    }
+    .right-bar-line {
+        position: absolute;
+        top: 25px;
+        bottom: 25px;
+        right: 15px;
+        width: 1px;
+        background-color: var(--border-color);
+    }
+    .chevron-right-link {
+        position: absolute;
+        right: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+        transition: color 0.2s ease;
+    }
+    .metrify-card:hover .chevron-right-link {
+        color: var(--text-primary);
     }
 </style>
 
 <div class="container-fluid py-4 px-3 px-md-4">
     <!-- Header Block -->
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-2 border-bottom border-light-subtle gap-3">
-        <div>
-            <div class="d-flex align-items-center gap-2 mb-1">
-                <span class="badge bg-metrify-glow text-metrify-cyan border border-metrify-cyan px-3 py-1">
-                    <i class="fa-solid fa-chart-column me-1"></i> METRIFY HUB DE METRICAS
-                </span>
-                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
-                    <i class="fa-solid fa-arrows-spin me-1"></i> Mercado Livre & Shopee Integrados
-                </span>
-            </div>
-            <h1 class="h3 fw-bold mb-0 text-white">Metrify Dashboard e Inteligência Unitária</h1>
-            <p class="text-muted small mb-0">Cockpit financeiro avançado para rastreamento de DRE, ROAS de campanhas, CPA, comissão de marketplaces e lucro líquido unitário por SKU.</p>
+    <div class="row align-items-center mb-4">
+        <div class="col-12 col-md-6">
+            <h1 class="h3 fw-bold mb-1 text-white"><i class="fa-solid fa-chart-column text-accent-turquoise me-2"></i> Metrify Análise de Participação</h1>
+            <p class="text-muted small mb-0">Visão geral do ecossistema de anúncios divididos por categorias e participação de mercado total.</p>
         </div>
-        <div class="d-flex gap-2">
-            <button class="btn btn-outline-secondary border-light-subtle d-flex align-items-center" onclick="alert('Metrify atualizando dados das contas de Mercado Livre e Shopee...'); location.reload();">
-                <i class="fa-solid fa-arrows-rotate me-2"></i> Forçar Sincronização API
-            </button>
-        </div>
-    </div>
-
-    <!-- Metrify Top KPIs -->
-    <div class="row g-3 mb-4">
-        <div class="col-6 col-xl-3">
-            <div class="card-premium metric-card turquoise p-3">
-                <div class="metric-title"><i class="fa-solid fa-sack-dollar text-metrify-cyan me-1"></i> Faturamento Total (Bruto)</div>
-                <div class="metric-value text-white">R$ 158.000,00</div>
-                <div class="small text-success mt-1"><i class="fa-solid fa-arrow-trend-up me-1"></i>+8.9% vs mês anterior</div>
-            </div>
-        </div>
-        <div class="col-6 col-xl-3">
-            <div class="card-premium metric-card p-3" style="border-left: 4px solid #06d6a0;">
-                <div class="metric-title" style="color: #55efc4;"><i class="fa-solid fa-receipt me-1"></i> Lucro Líquido Total</div>
-                <div class="metric-value text-white">R$ 52.740,00</div>
-                <div class="small text-success mt-1">Margem Líquida Real: <strong>33.3%</strong></div>
-            </div>
-        </div>
-        <div class="col-6 col-xl-3">
-            <div class="card-premium metric-card purple p-3">
-                <div class="metric-title"><i class="fa-solid fa-rectangle-ad text-accent-purple me-1"></i> Investimento Ads (Total)</div>
-                <div class="metric-value text-white">R$ 17.500,00</div>
-                <div class="small text-success mt-1">ROAS Geral do Tráfego: <strong>4.1x</strong></div>
-            </div>
-        </div>
-        <div class="col-6 col-xl-3">
-            <div class="card-premium metric-card yellow p-3">
-                <div class="metric-title"><i class="fa-solid fa-percent text-warning me-1"></i> Taxa de Reclamação / Devolução</div>
-                <div class="metric-value text-white">1.25%</div>
-                <div class="small text-success mt-1"><i class="fa-solid fa-circle-check me-1"></i>Dentro do limite saudável</div>
+        <div class="col-12 col-md-6 text-md-end mt-3 mt-md-0">
+            <div class="d-inline-flex align-items-center bg-card-glow p-2 rounded-3 border border-light-subtle" style="background-color: rgba(255,255,255,0.01);">
+                <span class="text-muted small me-2"><i class="fa-solid fa-layer-group me-1"></i> Total Base:</span>
+                <span class="text-white small fw-bold">217.779.598 anúncios</span>
+                <span class="mx-2 text-muted">|</span>
+                <span class="text-white small fw-bold">32 categorias</span>
             </div>
         </div>
     </div>
 
-    <!-- Navigation Tabs -->
-    <ul class="nav nav-tabs metrify-tab-nav mb-4" id="metrifyTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview-panel" type="button" role="tab"><i class="fa-solid fa-table-list me-1"></i> DRE & Cockpit Geral</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="skus-tab" data-bs-toggle="tab" data-bs-target="#skus-panel" type="button" role="tab"><i class="fa-solid fa-tags me-1"></i> Análise e Rentabilidade por SKU</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="ads-tab" data-bs-toggle="tab" data-bs-target="#ads-panel" type="button" role="tab"><i class="fa-solid fa-gauge-high me-1"></i> Tráfego Pago & Metas Ads</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="sync-tab" data-bs-toggle="tab" data-bs-target="#sync-panel" type="button" role="tab"><i class="fa-solid fa-network-wired me-1"></i> Integrador de Contas</button>
-        </li>
-    </ul>
-
-    <!-- Tab Panels Content -->
-    <div class="tab-content" id="metrifyTabsContent">
+    <!-- Filters & Sorting Controls (Exact replica of the top buttons in user screenshot) -->
+    <div class="row g-3 mb-4 align-items-center">
+        <!-- Search bar -->
+        <div class="col-12 col-md-4 col-lg-3">
+            <div class="position-relative">
+                <i class="fa-solid fa-magnifying-glass position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                <input type="text" id="metrifySearchInput" onkeyup="filterMetrifyCategories()" class="form-control ps-5 bg-dark text-white border-light-subtle" style="border-radius: 10px;" placeholder="Buscar categoria...">
+            </div>
+        </div>
         
-        <!-- Tab 1: DRE & Cockpit Geral -->
-        <div class="tab-pane fade show active" id="overview-panel" role="tabpanel" aria-labelledby="overview-tab">
-            <div class="row g-4">
-                <!-- DRE Graph -->
-                <div class="col-12 col-lg-8">
-                    <div class="card-premium p-4">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h5 class="fw-bold mb-0 text-white"><i class="fa-solid fa-chart-line text-metrify-cyan me-2"></i> Evolução de Faturamento vs Lucro Líquido</h5>
-                            <span class="text-muted small">Últimos 6 meses</span>
-                        </div>
-                        <div style="height: 250px; position: relative;">
-                            <canvas id="dreChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Simulado DRE Month Selector -->
-                <div class="col-12 col-lg-4">
-                    <div class="card-premium p-4 h-100">
-                        <h5 class="fw-bold mb-3 text-white"><i class="fa-solid fa-file-invoice-dollar text-warning me-2"></i> Demonstrativo DRE Simplificado</h5>
-                        <div class="mb-3">
-                            <label class="form-label text-muted small mb-1">Mês de Referência</label>
-                            <select class="form-select bg-dark text-white border-light-subtle" id="dreMonthSelector" onchange="updateDREMetrics()">
-                                <option value="5">Junho (Mês Atual)</option>
-                                <option value="4">Maio</option>
-                                <option value="3">Abril</option>
-                                <option value="2">Março</option>
-                                <option value="1">Fevereiro</option>
-                                <option value="0">Janeiro</option>
-                            </select>
-                        </div>
-
-                        <div class="d-flex flex-column gap-2 text-white" style="font-size: 13px;">
-                            <div class="d-flex justify-content-between border-bottom border-light-subtle border-opacity-10 py-1">
-                                <span class="text-muted">Faturamento Bruto:</span>
-                                <strong id="dre-val-revenue">R$ 158.000,00</strong>
-                            </div>
-                            <div class="d-flex justify-content-between border-bottom border-light-subtle border-opacity-10 py-1">
-                                <span class="text-muted">(-) Custo do Produto (COGS):</span>
-                                <span id="dre-val-cost" class="text-danger">-R$ 53.000,00</span>
-                            </div>
-                            <div class="d-flex justify-content-between border-bottom border-light-subtle border-opacity-10 py-1">
-                                <span class="text-muted">(-) Comissão Mkt & Envios:</span>
-                                <span id="dre-val-fee" class="text-danger">-R$ 25.280,00</span>
-                            </div>
-                            <div class="d-flex justify-content-between border-bottom border-light-subtle border-opacity-10 py-1">
-                                <span class="text-muted">(-) Tráfego Pago (Ads):</span>
-                                <span id="dre-val-ads" class="text-danger">-R$ 17.500,00</span>
-                            </div>
-                            <div class="d-flex justify-content-between border-bottom border-light-subtle border-opacity-10 py-1">
-                                <span class="text-muted">(-) Imposto e Taxas:</span>
-                                <span id="dre-val-tax" class="text-danger">-R$ 9.480,00</span>
-                            </div>
-                            <div class="d-flex justify-content-between bg-metrify-glow border border-metrify-cyan p-2 rounded mt-2">
-                                <span class="text-metrify-cyan fw-bold">(=) Lucro Líquido Real:</span>
-                                <strong id="dre-val-net" class="text-success">R$ 52.740,00</strong>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <!-- Sorting tags -->
+        <div class="col-12 col-md-8 col-lg-9 text-md-end">
+            <span class="text-muted small me-2">Ordenar por:</span>
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-primary px-3 text-white fw-bold active" id="btn-sort-share" onclick="sortCategories('share')" style="border-radius: 8px 0 0 8px; font-size: 12px; background-color: #5f27cd; border-color: #5f27cd;">
+                    <i class="fa-solid fa-chart-pie me-1"></i> Participação
+                </button>
+                <button type="button" class="btn btn-outline-secondary border-light-subtle px-3 text-white" id="btn-sort-sub" onclick="sortCategories('sub')" style="border-radius: 0 8px 8px 0; font-size: 12px;">
+                    <i class="fa-solid fa-sitemap me-1"></i> Subcategorias
+                </button>
             </div>
         </div>
+    </div>
 
-        <!-- Tab 2: SKU Profitability Analyzer -->
-        <div class="tab-pane fade" id="skus-panel" role="tabpanel" aria-labelledby="skus-tab">
-            <div class="card-premium p-4">
-                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
-                    <h5 class="fw-bold mb-0 text-white"><i class="fa-solid fa-tags text-metrify-cyan me-2"></i> Performance Unitária por SKU</h5>
-                    <small class="text-muted">Analise custos, taxas, publicidade e margens líquidas detalhadas por produto</small>
-                </div>
-                
-                <div class="table-responsive">
-                    <table class="table-premium" style="font-size: 13px;">
-                        <thead>
-                            <tr>
-                                <th>SKU</th>
-                                <th>Produto</th>
-                                <th>Preço Venda</th>
-                                <th>Custo Prod</th>
-                                <th>Tarifas Mkt</th>
-                                <th>Ads / CPA</th>
-                                <th>Lucro Unit.</th>
-                                <th>Margem Líq.</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($topSKUs as $sku): ?>
-                                <tr>
-                                    <td class="font-monospace text-metrify-cyan fw-bold"><?php echo htmlspecialchars($sku['sku']); ?></td>
-                                    <td class="fw-semibold text-white"><?php echo htmlspecialchars($sku['title']); ?></td>
-                                    <td>R$ <?php echo number_format($sku['price'], 2, ',', '.'); ?></td>
-                                    <td>R$ <?php echo number_format($sku['cost'], 2, ',', '.'); ?></td>
-                                    <td class="text-danger">-R$ <?php echo number_format($sku['fee'] + $sku['shipping'], 2, ',', '.'); ?></td>
-                                    <td class="text-danger">-R$ <?php echo number_format($sku['ads'], 2, ',', '.'); ?></td>
-                                    <td class="text-success fw-bold">R$ <?php echo number_format($sku['profit'], 2, ',', '.'); ?></td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <span class="fw-bold text-white me-2"><?php echo $sku['margin']; ?>%</span>
-                                            <div class="progress w-100" style="height: 4px; background-color: rgba(255,255,255,0.05);">
-                                                <div class="progress-bar progress-bar-cyan" role="progressbar" style="width: <?php echo $sku['margin']; ?>%"></div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-info" onclick="openCalculatorWithProduct('<?php echo htmlspecialchars($sku['title']); ?>', <?php echo $sku['price']; ?>, <?php echo $sku['cost']; ?>)">
-                                            <i class="fa-solid fa-calculator me-1"></i> Simular
-                                        </button>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+    <!-- Metrify Grid list of Cards -->
+    <div class="row g-3" id="metrifyCardsGrid">
+        <?php foreach ($categoriesData as $c): ?>
+            <div class="col-12 col-md-6 col-lg-4 metrify-card-col" data-name="<?php echo htmlspecialchars(strtolower($c['name'])); ?>" data-share="<?php echo $c['share']; ?>" data-sub="<?php echo $c['subcategories_count']; ?>">
+                <div class="metrify-card h-100">
+                    <div class="card-stripe" style="background-color: <?php echo $c['color']; ?>;"></div>
+                    
+                    <div>
+                        <!-- Title header -->
+                        <div class="metrify-card-header">
+                            <span class="bullet-indicator" style="background-color: <?php echo $c['color']; ?>;"></span>
+                            <h3 class="metrify-card-title"><?php echo htmlspecialchars($c['name']); ?></h3>
+                        </div>
+
+                        <!-- Market Share & Ads count -->
+                        <div class="metrify-stat-row">
+                            <div class="metrify-stat-col">
+                                <div class="metrify-stat-label">Participação de mercado</div>
+                                <div class="metrify-stat-val text-white"><?php echo $c['share']; ?> <span class="small" style="font-size: 11px; font-weight: normal; color: #a4b0be;">%</span></div>
+                            </div>
+                            <div class="metrify-stat-col ps-2">
+                                <div class="metrify-stat-label">Anúncios</div>
+                                <div class="metrify-stat-val text-white"><?php echo $c['ads']; ?></div>
+                            </div>
+                        </div>
+
+                        <!-- Sub-stats pills -->
+                        <div class="metrify-pill-container">
+                            <div class="metrify-pill">
+                                <i class="fa-solid fa-sitemap me-1 text-muted"></i> <strong><?php echo $c['subcategories_count']; ?></strong> subcat.
+                            </div>
+                            <div class="metrify-pill">
+                                <i class="fa-solid fa-layer-group me-1 text-muted"></i> <strong><?php echo $c['avg_ads']; ?></strong> méd.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Category Analysis action button -->
+                    <div style="padding-right: 25px; position: relative;">
+                        <button class="metrify-action-btn" onclick="openCategoryAnalysisModal(<?php echo $c['id']; ?>)">
+                            <i class="fa-solid fa-chart-simple me-2"></i> Análise da Categoria
+                        </button>
+                        <div class="right-bar-line"></div>
+                        <a href="#" class="chevron-right-link" onclick="openCategoryAnalysisModal(<?php echo $c['id']; ?>); return false;">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                    </div>
+
                 </div>
             </div>
-        </div>
-
-        <!-- Tab 3: Ads & Paid Traffic Performance -->
-        <div class="tab-pane fade" id="ads-panel" role="tabpanel" aria-labelledby="ads-tab">
-            <div class="card-premium p-4">
-                <h5 class="fw-bold mb-3 text-white"><i class="fa-solid fa-rectangle-ad text-metrify-cyan me-2"></i> Performance de Campanhas e CPA</h5>
-                
-                <div class="table-responsive">
-                    <table class="table-premium" style="font-size: 13px;">
-                        <thead>
-                            <tr>
-                                <th>Canal de Tráfego</th>
-                                <th>Investido (Ads)</th>
-                                <th>Visualizações</th>
-                                <th>Cliques (CTR)</th>
-                                <th>Conversões</th>
-                                <th>CPC Médio</th>
-                                <th>Faturamento Gerado</th>
-                                <th>ROAS Real</th>
-                                <th>ACOS %</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($adCampaigns as $c): ?>
-                                <tr>
-                                    <td class="fw-bold text-white"><i class="fa-solid fa-bullseye text-accent-purple me-1"></i> <?php echo htmlspecialchars($c['platform']); ?></td>
-                                    <td class="text-danger fw-bold">R$ <?php echo number_format($c['spend'], 2, ',', '.'); ?></td>
-                                    <td><?php echo number_format($c['impressions'], 0, ',', '.'); ?></td>
-                                    <td><?php echo number_format($c['clicks'], 0, ',', '.'); ?> <small class="text-muted">(<?php echo $c['ctr']; ?>%)</small></td>
-                                    <td><?php echo $c['conversions']; ?> vendas</td>
-                                    <td>R$ <?php echo number_format($c['cpc'], 2, ',', '.'); ?></td>
-                                    <td class="text-success fw-bold">R$ <?php echo number_format($c['revenue'], 2, ',', '.'); ?></td>
-                                    <td class="text-warning fw-bold"><?php echo $c['roas']; ?>x</td>
-                                    <td>
-                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle"><?php echo $c['acos']; ?>% ACOS</span>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tab 4: Account Integrator -->
-        <div class="tab-pane fade" id="sync-panel" role="tabpanel" aria-labelledby="sync-tab">
-            <div class="row g-4">
-                <!-- Mercado Livre Integration -->
-                <div class="col-12 col-md-6">
-                    <div class="card-premium p-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <div class="d-flex align-items-center">
-                                <div class="bg-warning text-dark rounded-3 d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px; font-weight: bold; font-size: 20px;">
-                                    ML
-                                </div>
-                                <div>
-                                    <h5 class="fw-bold mb-0 text-white">Mercado Livre API</h5>
-                                    <span class="text-muted small">Sincronização de vendas, tarifas e Product Ads</span>
-                                </div>
-                            </div>
-                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="fa-solid fa-circle-check me-1"></i> Conectado</span>
-                        </div>
-                        <div class="mb-3 text-muted small">
-                            Sua conta está integrada de forma segura. A última sincronização de dados financeiros e anúncios foi concluída há <strong>18 minutos</strong>.
-                        </div>
-                        <button class="btn btn-outline-warning w-100" onclick="alert('ML API: Sincronização manual completada!');">
-                            <i class="fa-solid fa-arrows-rotate me-1"></i> Forçar Sincronização ML
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Shopee Integration -->
-                <div class="col-12 col-md-6">
-                    <div class="card-premium p-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <div class="d-flex align-items-center">
-                                <div class="bg-danger text-white rounded-3 d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px; font-weight: bold; font-size: 20px;">
-                                    SH
-                                </div>
-                                <div>
-                                    <h5 class="fw-bold mb-0 text-white">Shopee API Integrada</h5>
-                                    <span class="text-muted small">Sincronização de pedidos, fretes e Shopee Ads</span>
-                                </div>
-                            </div>
-                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="fa-solid fa-circle-check me-1"></i> Conectado</span>
-                        </div>
-                        <div class="mb-3 text-muted small">
-                            Integração oficial ativa. Todas as taxas de comissão e cupons aplicados a nível de SKU estão sendo baixados em tempo real.
-                        </div>
-                        <button class="btn btn-outline-danger w-100" onclick="alert('Shopee API: Sincronização de vendas e cupons concluída!');">
-                            <i class="fa-solid fa-arrows-rotate me-1"></i> Forçar Sincronização Shopee
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Amazon Integration (Unconnected) -->
-                <div class="col-12 col-md-6">
-                    <div class="card-premium p-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <div class="d-flex align-items-center">
-                                <div class="bg-dark text-warning border border-warning rounded-3 d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px; font-weight: bold; font-size: 16px;">
-                                    AMZ
-                                </div>
-                                <div>
-                                    <h5 class="fw-bold mb-0 text-white">Amazon Seller Central</h5>
-                                    <span class="text-muted small">Sincronização FBA e custos logísticos</span>
-                                </div>
-                            </div>
-                            <span class="badge bg-secondary-subtle text-muted border border-secondary px-2 py-1"><i class="fa-solid fa-circle-xmark me-1"></i> Desconectado</span>
-                        </div>
-                        <div class="mb-3 text-muted small">
-                            A sincronização com a Amazon está inativa. Conecte sua conta Seller Central para rastrear tarifas de envio FBA e cupons promocionais.
-                        </div>
-                        <button class="btn btn-outline-light w-100 border-light-subtle" onclick="alert('Amazon API: Redirecionando para autenticação OAuth Seller Central...');">
-                            <i class="fa-solid fa-link me-1"></i> Conectar Amazon API
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Custom API webhook Integration -->
-                <div class="col-12 col-md-6">
-                    <div class="card-premium p-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <div class="d-flex align-items-center">
-                                <div class="bg-primary text-white rounded-3 d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px; font-weight: bold; font-size: 20px;">
-                                    <i class="fa-solid fa-gears" style="font-size: 18px;"></i>
-                                </div>
-                                <div>
-                                    <h5 class="fw-bold mb-0 text-white">Integração ERP / Bling / Tiny</h5>
-                                    <span class="text-muted small">Sincronização de Notas Fiscais e Emissão</span>
-                                </div>
-                            </div>
-                            <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1"><i class="fa-solid fa-circle-exclamation me-1"></i> Configurar</span>
-                        </div>
-                        <div class="mb-3 text-muted small">
-                            Integre seu ERP Bling ou Tiny via Webhook e chave API para puxar custos reais dos produtos (COGS) baseados nas notas fiscais de entrada.
-                        </div>
-                        <button class="btn btn-outline-primary w-100 border-light-subtle" onclick="alert('ERP Configs: Chave API e Webhooks salvos com sucesso.');">
-                            <i class="fa-solid fa-key me-1"></i> Configurar Chave ERP Bling
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+        <?php endforeach; ?>
     </div>
 </div>
 
-<!-- Chart JS Initialization Script -->
+<!-- Modal: Category Analysis Breakdown -->
+<div class="modal fade" id="categoryAnalysisModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-light-subtle shadow-lg" style="border-radius: 16px; background: #181920;">
+            <div class="modal-header border-bottom border-light-subtle p-4">
+                <h5 class="modal-title fw-bold text-white"><i class="fa-solid fa-chart-simple text-accent-turquoise me-2"></i> Análise de Subcategorias & Mercado</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="d-flex align-items-center mb-4">
+                    <span class="bullet-indicator" id="modal-bullet" style="width: 12px; height: 12px;"></span>
+                    <h4 class="fw-bold text-white mb-0" id="modal-category-name">Categoria</h4>
+                </div>
+
+                <div class="row g-3 mb-4 text-center">
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 rounded border border-light-subtle" style="background: rgba(255,255,255,0.01);">
+                            <div class="text-muted small">Participação Total</div>
+                            <div class="h3 fw-bold text-white mt-1" id="modal-share-val">0.0%</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 rounded border border-light-subtle" style="background: rgba(255,255,255,0.01);">
+                            <div class="text-muted small">Anúncios Totais</div>
+                            <div class="h3 fw-bold text-metrify-cyan mt-1" id="modal-ads-val">0</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 rounded border border-light-subtle" style="background: rgba(255,255,255,0.01);">
+                            <div class="text-muted small">Subcategorias</div>
+                            <div class="h3 fw-bold text-warning mt-1" id="modal-subs-val">0</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 rounded border border-light-subtle" style="background: rgba(255,255,255,0.01);">
+                            <div class="text-muted small">Média de Anúncios</div>
+                            <div class="h3 fw-bold text-accent-purple mt-1" id="modal-avg-val">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subcategories breakdown table -->
+                <h6 class="fw-bold text-white mb-3"><i class="fa-solid fa-list-ul me-2"></i> Distribuição por Subcategoria (Mercado Livre BR):</h6>
+                <div class="table-responsive">
+                    <table class="table-premium" style="font-size: 13px;">
+                        <thead>
+                            <tr>
+                                <th>Subcategoria</th>
+                                <th style="width: 150px;">Participação (%)</th>
+                                <th style="width: 150px;">Anúncios Est.</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modal-subcategories-table-body">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer border-top border-light-subtle">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-let dreData = <?php echo json_encode($monthlyData); ?>;
+const categoriesData = <?php echo json_encode($categoriesData); ?>;
 
-function updateDREMetrics() {
-    const idx = parseInt(document.getElementById('dreMonthSelector').value);
-    const data = dreData[idx];
+function openCategoryAnalysisModal(catId) {
+    const cat = categoriesData.find(c => c.id === catId);
+    if (!cat) return;
 
-    document.getElementById('dre-val-revenue').innerText = 'R$ ' + data.revenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-    document.getElementById('dre-val-cost').innerText = '-R$ ' + data.cost.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-    document.getElementById('dre-val-fee').innerText = '-R$ ' + data.fee.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-    document.getElementById('dre-val-ads').innerText = '-R$ ' + data.ads.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-    document.getElementById('dre-val-tax').innerText = '-R$ ' + data.tax.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-    document.getElementById('dre-val-net').innerText = 'R$ ' + data.net.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-}
+    // Fill details
+    document.getElementById('modal-bullet').style.backgroundColor = cat.color;
+    document.getElementById('modal-category-name').innerText = cat.name;
+    document.getElementById('modal-share-val').innerText = cat.share + '%';
+    document.getElementById('modal-ads-val').innerText = cat.ads;
+    document.getElementById('modal-subs-val').innerText = cat.subcategories_count;
+    document.getElementById('modal-avg-val').innerText = cat.avg_ads;
 
-$(document).ready(function() {
-    // Render Chart.js
-    const ctx = document.getElementById('dreChart').getContext('2d');
-    
-    const labels = dreData.map(d => d.month);
-    const revenues = dreData.map(d => d.revenue);
-    const nets = dreData.map(d => d.net);
+    // Table body
+    const tbody = document.getElementById('modal-subcategories-table-body');
+    tbody.innerHTML = '';
 
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: 'Faturamento Bruto (R$)',
-                    data: revenues,
-                    borderColor: '#00d2ff',
-                    backgroundColor: 'rgba(0, 210, 255, 0.05)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4
-                },
-                {
-                    label: 'Lucro Líquido Real (R$)',
-                    data: nets,
-                    borderColor: '#06d6a0',
-                    backgroundColor: 'rgba(6, 214, 160, 0.05)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    labels: {
-                        color: '#a4b0be',
-                        font: {
-                            family: 'Inter',
-                            size: 11
-                        }
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    grid: {
-                        color: 'rgba(255, 255, 255, 0.05)'
-                    },
-                    ticks: {
-                        color: '#a4b0be',
-                        font: {
-                            family: 'Inter'
-                        }
-                    }
-                },
-                y: {
-                    grid: {
-                        color: 'rgba(255, 255, 255, 0.05)'
-                    },
-                    ticks: {
-                        color: '#a4b0be',
-                        font: {
-                            family: 'Inter'
-                        },
-                        callback: function(value) {
-                            return 'R$ ' + value / 1000 + 'k';
-                        }
-                    }
-                }
-            }
-        }
+    cat.subcategories.forEach(sub => {
+        const tr = `
+            <tr>
+                <td class="fw-semibold text-white">${sub.name}</td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <span class="fw-bold text-white me-2" style="min-width: 45px;">${sub.share}%</span>
+                        <div class="progress w-100" style="height: 4px; background-color: rgba(255,255,255,0.05);">
+                            <div class="progress-bar" role="progressbar" style="width: ${sub.share}%; background-color: ${cat.color};"></div>
+                        </div>
+                    </div>
+                </td>
+                <td class="fw-bold text-metrify-cyan">${sub.ads}</td>
+            </tr>
+        `;
+        tbody.innerHTML += tr;
     });
 
-    // Run initial trigger
-    updateDREMetrics();
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('categoryAnalysisModal'));
+    modal.show();
+}
+
+function filterMetrifyCategories() {
+    const input = document.getElementById('metrifySearchInput');
+    const filter = input.value.toLowerCase().trim();
+    const cols = document.querySelectorAll('.metrify-card-col');
+
+    cols.forEach(col => {
+        const name = col.getAttribute('data-name');
+        if (name.includes(filter)) {
+            col.style.display = '';
+        } else {
+            col.style.display = 'none';
+        }
+    });
+}
+
+function sortCategories(type) {
+    const grid = document.getElementById('metrifyCardsGrid');
+    const cols = Array.from(grid.querySelectorAll('.metrify-card-col'));
+
+    // Highlight active button
+    if (type === 'share') {
+        document.getElementById('btn-sort-share').className = 'btn btn-primary px-3 text-white fw-bold active';
+        document.getElementById('btn-sort-sub').className = 'btn btn-outline-secondary border-light-subtle px-3 text-white';
+        
+        // Sort descending by share
+        cols.sort((a, b) => {
+            return parseFloat(b.getAttribute('data-share')) - parseFloat(a.getAttribute('data-share'));
+        });
+    } else {
+        document.getElementById('btn-sort-share').className = 'btn btn-outline-secondary border-light-subtle px-3 text-white';
+        document.getElementById('btn-sort-sub').className = 'btn btn-primary px-3 text-white fw-bold active';
+        document.getElementById('btn-sort-sub').style.backgroundColor = '#5f27cd';
+        document.getElementById('btn-sort-sub').style.borderColor = '#5f27cd';
+        document.getElementById('btn-sort-share').style.backgroundColor = 'transparent';
+
+        // Sort descending by subcategories count
+        cols.sort((a, b) => {
+            return parseInt(b.getAttribute('data-sub')) - parseInt(a.getAttribute('data-sub'));
+        });
+    }
+
+    // Re-append items in new order
+    cols.forEach(col => grid.appendChild(col));
+}
+
+// Set initial sorted view by share
+$(document).ready(function() {
+    sortCategories('share');
 });
 </script>
 
