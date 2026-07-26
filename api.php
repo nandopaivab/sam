@@ -1751,7 +1751,7 @@ switch ($action) {
         // Log Audit
         try {
             $logStmt = $db->prepare("INSERT INTO activity_logs (user_id, user_name, module, action_type, target_record, new_values, ip_address) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $logStmt->execute([$userId, $user['name'] ?? 'Admin', 'Produtos Oceano Azul', 'CADASTRO', $title, "Novo produto cadastrado no catálogo", $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1']);
+            $logStmt->execute([$userId, $currentUser['name'] ?? 'Admin', 'Produtos Oceano Azul', 'CADASTRO', $title, "Novo produto cadastrado no catálogo", $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1']);
         } catch (\Exception $e) {}
 
         Validator::jsonResponse(200, ['success' => true]);
@@ -1786,7 +1786,7 @@ switch ($action) {
         // Log Audit
         try {
             $logStmt = $db->prepare("INSERT INTO activity_logs (user_id, user_name, module, action_type, target_record, new_values, ip_address) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $logStmt->execute([$userId, $user['name'] ?? 'Admin', 'Nicho de Bebês', 'CADASTRO', $title, "Novo produto infantil cadastrado", $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1']);
+            $logStmt->execute([$userId, $currentUser['name'] ?? 'Admin', 'Nicho de Bebês', 'CADASTRO', $title, "Novo produto infantil cadastrado", $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1']);
         } catch (\Exception $e) {}
 
         Validator::jsonResponse(200, ['success' => true]);

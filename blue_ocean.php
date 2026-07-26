@@ -152,7 +152,7 @@ include __DIR__ . '/templates/header.php';
                                 <span class="text-muted small" style="font-size: 11px;">
                                     <i class="fa-solid fa-truck me-1 text-accent-turquoise"></i> Fornecedor: <strong><?php echo htmlspecialchars($p['related_suppliers'] ?: 'Distribuidor BR'); ?></strong>
                                 </span>
-                                <a href="crm.php?company=<?php echo urlencode(substr($p['related_suppliers'], 0, 15)); ?>" class="btn btn-sm btn-outline-primary border-light-subtle">
+                                <a href="crm.php?company=<?php echo urlencode(substr($p['related_suppliers'] ?? '', 0, 15)); ?>" class="btn btn-sm btn-outline-primary border-light-subtle">
                                     <i class="fa-solid fa-handshake-angle me-1"></i> Abrir Negociação
                                 </a>
                             </div>
