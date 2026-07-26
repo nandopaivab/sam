@@ -115,6 +115,12 @@ $darkMode = $user['dark_mode'] ?? true;
                     <span>Produtos Salvos & IA</span>
                 </a>
             </li>
+            <li class="sidebar-item <?php echo basename($_SERVER['PHP_SELF']) === 'investment_advisor.php' ? 'active' : ''; ?>">
+                <a href="investment_advisor.php" class="sidebar-link">
+                    <i class="fa-solid fa-hand-holding-dollar text-success"></i>
+                    <span>Consultor de Investimento BR</span>
+                </a>
+            </li>
             <li class="sidebar-item">
                 <a href="index.php#alerts-section" class="sidebar-link">
                     <i class="fa-regular fa-bell"></i>
