@@ -118,7 +118,37 @@ $darkMode = $user['dark_mode'] ?? true;
             <li class="sidebar-item <?php echo basename($_SERVER['PHP_SELF']) === 'investment_advisor.php' ? 'active' : ''; ?>">
                 <a href="investment_advisor.php" class="sidebar-link">
                     <i class="fa-solid fa-hand-holding-dollar text-success"></i>
-                    <span>Consultor de Investimento BR</span>
+                    <span>Consultor de Investimento</span>
+                </a>
+            </li>
+            <li class="sidebar-item <?php echo basename($_SERVER['PHP_SELF']) === 'crm.php' ? 'active' : ''; ?>">
+                <a href="crm.php" class="sidebar-link" style="border-left: 3px solid #745df7;">
+                    <i class="fa-solid fa-handshake-angle text-accent-purple"></i>
+                    <span>CRM Comercial & Pipeline</span>
+                </a>
+            </li>
+            <li class="sidebar-item <?php echo basename($_SERVER['PHP_SELF']) === 'blue_ocean.php' ? 'active' : ''; ?>">
+                <a href="blue_ocean.php" class="sidebar-link">
+                    <i class="fa-solid fa-water text-primary"></i>
+                    <span>Produtos Oceano Azul</span>
+                </a>
+            </li>
+            <li class="sidebar-item <?php echo basename($_SERVER['PHP_SELF']) === 'baby_niche.php' ? 'active' : ''; ?>">
+                <a href="baby_niche.php" class="sidebar-link">
+                    <i class="fa-solid fa-baby text-accent-turquoise"></i>
+                    <span>Bebês & Primeira Infância</span>
+                </a>
+            </li>
+            <li class="sidebar-item <?php echo basename($_SERVER['PHP_SELF']) === 'profit_calculator.php' ? 'active' : ''; ?>">
+                <a href="profit_calculator.php" class="sidebar-link">
+                    <i class="fa-solid fa-calculator text-success"></i>
+                    <span>Calculadora de Lucro</span>
+                </a>
+            </li>
+            <li class="sidebar-item <?php echo basename($_SERVER['PHP_SELF']) === 'audit_logs.php' ? 'active' : ''; ?>">
+                <a href="audit_logs.php" class="sidebar-link">
+                    <i class="fa-solid fa-file-shield text-warning"></i>
+                    <span>Log Geral de Auditoria</span>
                 </a>
             </li>
             <li class="sidebar-item">
@@ -176,21 +206,180 @@ $darkMode = $user['dark_mode'] ?? true;
                 </div>
             </div>
             
-            <div class="d-flex align-items-center">
-                <!-- Theme Toggle -->
-                <button id="theme-toggle-btn" class="btn btn-outline-secondary border-light-subtle me-2 me-md-3" style="border-radius: 10px; width: 42px; height: 42px; padding: 0;">
-                    <?php if ($darkMode): ?>
-                        <i class="fa-solid fa-sun"></i>
-                    <?php else: ?>
-                        <i class="fa-solid fa-moon"></i>
-                    <?php endif; ?>
-                </button>
+                <!-- Notification Bell Dropdown -->
+                <div class="dropdown me-2 me-md-3">
+                    <button class="btn btn-outline-secondary border-light-subtle position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 10px; width: 42px; height: 42px; padding: 0;">
+                        <i class="fa-solid fa-bell text-warning"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 10px;">
+                            3
+                        </span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border border-light-subtle p-2" style="width: 320px; border-radius: 14px; z-index: 1050;">
+                        <li class="px-3 py-2 border-bottom border-light-subtle d-flex justify-content-between align-items-center">
+                            <span class="fw-bold small"><i class="fa-solid fa-bell text-warning me-1"></i> Central de Notificações</span>
+                            <span class="badge bg-primary-subtle text-primary small">3 Novos</span>
+                        </li>
+                        <li>
+                            <a class="dropdown-item p-2 rounded my-1" href="crm.php">
+                                <div class="d-flex align-items-center">
+                                    <div class="p-2 rounded bg-purple-glow text-accent-purple me-2"><i class="fa-solid fa-handshake-angle"></i></div>
+                                    <div>
+                                        <div class="fw-bold" style="font-size: 13px;">4 Follow-ups Pendentes</div>
+                                        <div class="text-muted" style="font-size: 11px;">Acesse a agenda de contatos do CRM.</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item p-2 rounded my-1" href="blue_ocean.php">
+                                <div class="d-flex align-items-center">
+                                    <div class="p-2 rounded bg-primary-subtle text-primary me-2"><i class="fa-solid fa-water"></i></div>
+                                    <div>
+                                        <div class="fw-bold" style="font-size: 13px;">Oportunidades Oceano Azul</div>
+                                        <div class="text-muted" style="font-size: 11px;">Organizadores com margem > 140%.</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item p-2 rounded my-1" href="baby_niche.php">
+                                <div class="d-flex align-items-center">
+                                    <div class="p-2 rounded bg-success-subtle text-success me-2"><i class="fa-solid fa-baby"></i></div>
+                                    <div>
+                                        <div class="fw-bold" style="font-size: 13px;">Kits Bebês & Infância</div>
+                                        <div class="text-muted" style="font-size: 11px;">IA gerou 3 novos kits acessíveis.</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
 
                 <div class="border-start border-light-subtle h-25 mx-1 mx-md-2 align-self-center d-none d-sm-block"></div>
-                <span class="badge bg-success-glow text-success border border-success-subtle p-2 ms-1 ms-md-2 d-none d-sm-inline-block"><i class="fa-solid fa-shield-halved me-1"></i> Plesk Compátivel</span>
+
+                <!-- Connected User Profile Panel Dropdown -->
+                <div class="dropdown ms-1 ms-md-2">
+                    <button class="btn btn-outline-secondary border-light-subtle d-flex align-items-center px-3 py-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 12px;">
+                        <div class="rounded-circle bg-purple-glow text-accent-purple d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-weight: 700;">
+                            <?php echo strtoupper(substr($user['name'] ?? 'A', 0, 1)); ?>
+                        </div>
+                        <div class="text-start d-none d-md-block me-2">
+                            <div class="fw-bold lh-1 text-white" style="font-size: 13px;">
+                                <?php echo htmlspecialchars($user['name'] ?? 'Administrador'); ?>
+                            </div>
+                            <div class="text-muted" style="font-size: 11px;">
+                                <?php echo htmlspecialchars(ucfirst($user['role'] ?? 'Administrador')); ?> • SAM BR
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-down small text-muted"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border border-light-subtle p-2" style="width: 280px; border-radius: 14px; z-index: 1050;">
+                        <li class="px-3 py-2 border-bottom border-light-subtle mb-2">
+                            <div class="fw-bold text-white"><?php echo htmlspecialchars($user['name'] ?? 'Administrador'); ?></div>
+                            <div class="text-muted small"><i class="fa-solid fa-building me-1"></i> SAM - E-commerce BR</div>
+                            <div class="text-muted small mt-1" style="font-size: 11px;"><i class="fa-regular fa-clock me-1"></i> Último login: <?php echo date('d/m/Y H:i'); ?></div>
+                        </li>
+                        <li>
+                            <a class="dropdown-item rounded py-2 d-flex align-items-center" href="#" onclick="alert('Perfil de Administrador Ativo: Permissão Total aos Módulos SAM.'); return false;">
+                                <i class="fa-solid fa-user me-2 text-accent-purple"></i> Meu Perfil
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item rounded py-2 d-flex align-items-center" href="#" onclick="alert('Função de Segurança: Utilize o painel administrativo para redefinição de senha.'); return false;">
+                                <i class="fa-solid fa-key me-2 text-info"></i> Alterar Senha
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider border-light-subtle"></li>
+                        <li>
+                            <a class="dropdown-item rounded py-2 d-flex align-items-center text-danger fw-bold" href="logout.php">
+                                <i class="fa-solid fa-right-from-bracket me-2"></i> Sair do Sistema
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </header>
-        
+
+        <!-- 30-Minute Inactivity Session Monitor -->
+        <div class="modal fade" id="sessionExpireModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-light-subtle shadow-lg" style="border-radius: 16px;">
+                    <div class="modal-header border-bottom border-light-subtle">
+                        <h5 class="modal-title text-warning fw-bold"><i class="fa-solid fa-clock-rotate-left me-2"></i> Aviso de Expiração de Sessão</h5>
+                    </div>
+                    <div class="modal-body p-4">
+                        <p class="mb-2">Sua sessão inativa está prestes a expirar em <strong id="sessionCountdown" class="text-danger">2:00</strong> minutos.</p>
+                        <p class="text-muted small mb-0">Para proteger seus dados e manter a auditoria do SAM, a sessão é encerrada após 30 minutos sem interação. Os dados não salvos em formulários abertos serão preservados no armazenamento local.</p>
+                    </div>
+                    <div class="modal-footer border-top border-light-subtle">
+                        <a href="logout.php" class="btn btn-outline-secondary border-light-subtle">Sair Agora</a>
+                        <button type="button" class="btn btn-primary" id="btnRenewSession"><i class="fa-solid fa-arrows-rotate me-1"></i> Continuar Conectado</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        // Automatic Session Expiry Monitor (30 Minutes = 1800s; Warn at 1680s)
+        (function() {
+            let inactiveTime = 0;
+            const WARN_TIME = 28 * 60; // 28 minutes
+            const MAX_TIME = 30 * 60;  // 30 minutes
+            let countdownInterval = null;
+
+            function resetTimer() {
+                if (inactiveTime < WARN_TIME) {
+                    inactiveTime = 0;
+                }
+            }
+
+            window.addEventListener('mousemove', resetTimer);
+            window.addEventListener('keypress', resetTimer);
+            window.addEventListener('click', resetTimer);
+
+            setInterval(function() {
+                inactiveTime++;
+                if (inactiveTime === WARN_TIME) {
+                    const modalEl = document.getElementById('sessionExpireModal');
+                    if (modalEl && typeof bootstrap !== 'undefined') {
+                        const modal = new bootstrap.Modal(modalEl);
+                        modal.show();
+                        let remaining = MAX_TIME - WARN_TIME;
+                        const countEl = document.getElementById('sessionCountdown');
+                        clearInterval(countdownInterval);
+                        countdownInterval = setInterval(() => {
+                            remaining--;
+                            if (countEl) {
+                                let mins = Math.floor(remaining / 60);
+                                let secs = remaining % 60;
+                                countEl.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                            }
+                            if (remaining <= 0) {
+                                clearInterval(countdownInterval);
+                                window.location.href = 'login.php?expired=1';
+                            }
+                        }, 1000);
+                    }
+                } else if (inactiveTime >= MAX_TIME) {
+                    window.location.href = 'login.php?expired=1';
+                }
+            }, 1000);
+
+            const btnRenew = document.getElementById('btnRenewSession');
+            if (btnRenew) {
+                btnRenew.addEventListener('click', function() {
+                    inactiveTime = 0;
+                    clearInterval(countdownInterval);
+                    const modalEl = document.getElementById('sessionExpireModal');
+                    if (modalEl && typeof bootstrap !== 'undefined') {
+                        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                        if (modalInstance) modalInstance.hide();
+                    }
+                });
+            }
+        })();
+        </script>
+
         <main class="content-body">
             <!-- Dynamic Alert banners will slide here if triggered alerts exist -->
             <div id="alert-notification-banners"></div>

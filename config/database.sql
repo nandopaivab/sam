@@ -108,3 +108,92 @@ CREATE TABLE IF NOT EXISTS niche_analysis (
 INSERT INTO users (name, email, password_hash, role) VALUES 
 ('Administrador', 'admin@trendhunter.com.br', '$2y$10$O0HlP452D3kZq91w2vQYSu.W.8W6x9LpZcWf0n2lT4z31vBqKx3iG', 'admin')
 ON DUPLICATE KEY UPDATE id=id;
+
+-- 8. CRM Comercial & Pipeline de Negociação (Histórico Auditável de Atividades)
+CREATE TABLE IF NOT EXISTS crm_activities (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    company_name VARCHAR(255) NOT NULL,
+    contact_type VARCHAR(50) NOT NULL,
+    contact_date DATE NOT NULL,
+    contact_time TIME NOT NULL,
+    responsible_name VARCHAR(100) NOT NULL,
+    objective VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    result_summary TEXT DEFAULT NULL,
+    negotiation_status VARCHAR(50) NOT NULL,
+    interest_level VARCHAR(50) DEFAULT 'Alto',
+    priority VARCHAR(50) DEFAULT 'Média',
+    next_action VARCHAR(255) DEFAULT NULL,
+    followup_date DATE DEFAULT NULL,
+    product_id INT DEFAULT NULL,
+    product_title VARCHAR(255) DEFAULT NULL,
+    marketplace VARCHAR(100) DEFAULT NULL,
+    attachment_url VARCHAR(500) DEFAULT NULL,
+    created_by_name VARCHAR(100) DEFAULT 'Sistema / Usuário',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_crm_date (contact_date),
+    INDEX idx_crm_company (company_name),
+    INDEX idx_crm_status (negotiation_status),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- 9. Log Geral de Atividades (Auditoria Imutável)
+CREATE TABLE IF NOT EXISTS activity_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT DEFAULT NULL,
+    user_name VARCHAR(100) DEFAULT 'Sistema',
+    module VARCHAR(100) NOT NULL,
+    action_type VARCHAR(100) NOT NULL,
+    target_record VARCHAR(255) DEFAULT NULL,
+    old_values TEXT DEFAULT NULL,
+    new_values TEXT DEFAULT NULL,
+    ip_address VARCHAR(50) DEFAULT '127.0.0.1',
+    device_info VARCHAR(255) DEFAULT 'Navegador Web',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_log_module (module),
+    INDEX idx_log_action (action_type),
+    INDEX idx_log_user (user_name)
+) ENGINE=InnoDB;
+
+-- 10. Produtos Oceano Azul
+CREATE TABLE IF NOT EXISTS blue_ocean_products (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    category VARCHAR(100) NOT NULL,
+    niche VARCHAR(100) NOT NULL,
+    target_audience VARCHAR(255) NOT NULL,
+    problem_solved TEXT NOT NULL,
+    avg_price DECIMAL(10,2) NOT NULL,
+    est_cost DECIMAL(10,2) NOT NULL,
+    proj_margin DECIMAL(5,2) NOT NULL,
+    approx_competitors INT DEFAULT 10,
+    trend_score INT DEFAULT 90,
+    seasonality VARCHAR(100) DEFAULT 'Ano Todo',
+    related_suppliers TEXT DEFAULT NULL,
+    suggested_kits TEXT DEFAULT NULL,
+    opportunity_badge VARCHAR(50) DEFAULT 'Alta Oportunidade',
+    investment_recommendation TEXT DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- 11. Nicho Bebês & Primeira Infância
+CREATE TABLE IF NOT EXISTS baby_niche_products (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    sub_category VARCHAR(100) NOT NULL, -- alimentação, banho, higiene, sono, passeio, organização, maternidade, segurança, desenvolvimento infantil, brinquedos educativos, brinquedos sensoriais, Montessori
+    age_range VARCHAR(100) NOT NULL,
+    safety_cert VARCHAR(100) DEFAULT 'INMETRO / Atóxico',
+    material_info VARCHAR(255) DEFAULT 'Livre de BPA',
+    cleaning_ease VARCHAR(100) DEFAULT 'Fácil higienização',
+    small_parts_risk VARCHAR(50) DEFAULT 'Baixo Risco',
+    avg_price DECIMAL(10,2) NOT NULL,
+    est_cost DECIMAL(10,2) NOT NULL,
+    suggested_kits TEXT DEFAULT NULL,
+    income_bracket VARCHAR(100) DEFAULT 'Todas as faixas (Acessível)',
+    ai_analysis TEXT DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+

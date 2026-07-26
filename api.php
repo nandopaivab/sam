@@ -1551,7 +1551,176 @@ switch ($action) {
         }
         break;
 
+    // 14. CRM: Save Activity (Create / Update) + Audit Log
+    case 'save_crm_activity':
+        $id = (int)($_POST['id'] ?? 0);
+        $companyName = trim($_POST['company_name'] ?? '');
+        $contactType = trim($_POST['contact_type'] ?? 'WhatsApp');
+        $contactDate = trim($_POST['contact_date'] ?? date('Y-m-d'));
+        $contactTime = trim($_POST['contact_time'] ?? date('H:i'));
+        $responsibleName = trim($_POST['responsible_name'] ?? ($user['name'] ?? 'Usuário'));
+        $objective = trim($_POST['objective'] ?? '');
+        $description = trim($_POST['description'] ?? '');
+        $resultSummary = trim($_POST['result_summary'] ?? '');
+        $negotiationStatus = trim($_POST['negotiation_status'] ?? 'Descoberta');
+        $interestLevel = trim($_POST['interest_level'] ?? 'Alto');
+        $priority = trim($_POST['priority'] ?? 'Média');
+        $nextAction = trim($_POST['next_action'] ?? '');
+        $followupDate = trim($_POST['followup_date'] ?? null);
+        if (empty($followupDate)) $followupDate = null;
+        $productTitle = trim($_POST['product_title'] ?? '');
+        $marketplace = trim($_POST['marketplace'] ?? '');
+        $attachmentUrl = trim($_POST['attachment_url'] ?? '');
+
+        if (empty($companyName) || empty($objective) || empty($description)) {
+            Validator::jsonResponse(400, ['success' => false, 'error' => 'Preencha todos os campos obrigatórios (*).']);
+        }
+
+        if ($id > 0) {
+            $stmt = $db->prepare("UPDATE crm_activities SET company_name=?, contact_type=?, contact_date=?, contact_time=?, responsible_name=?, objective=?, description=?, result_summary=?, negotiation_status=?, interest_level=?, priority=?, next_action=?, followup_date=?, product_title=?, marketplace=?, attachment_url=? WHERE id=? AND user_id=?");
+            $stmt->execute([
+                $companyName, $contactType, $contactDate, $contactTime, $responsibleName,
+                $objective, $description, $resultSummary, $negotiationStatus, $interestLevel, $priority,
+                $nextAction, $followupDate, $productTitle, $marketplace, $attachmentUrl,
+                $id, $userId
+            ]);
+            // Log Audit
+            try {
+                $logStmt = $db->prepare("INSERT INTO activity_logs (user_id, user_name, module, action_type, target_record, new_values, ip_address) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                $logStmt->execute([$userId, $user['name'] ?? 'Admin', 'CRM Comercial', 'EDIÇÃO', $companyName . ' (' . $productTitle . ')', "Status alterado para $negotiationStatus", $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1']);
+            } catch (\Exception $e) {}
+        } else {
+            $stmt = $db->prepare("INSERT INTO crm_activities (user_id, company_name, contact_type, contact_date, contact_time, responsible_name, objective, description, result_summary, negotiation_status, interest_level, priority, next_action, followup_date, product_title, marketplace, attachment_url, created_by_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([
+                $userId, $companyName, $contactType, $contactDate, $contactTime, $responsibleName,
+                $objective, $description, $resultSummary, $negotiationStatus, $interestLevel, $priority,
+                $nextAction, $followupDate, $productTitle, $marketplace, $attachmentUrl, $user['name'] ?? 'Usuário'
+            ]);
+            // Log Audit
+            try {
+                $logStmt = $db->prepare("INSERT INTO activity_logs (user_id, user_name, module, action_type, target_record, new_values, ip_address) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                $logStmt->execute([$userId, $user['name'] ?? 'Admin', 'CRM Comercial', 'CRIACÃO', $companyName . ' (' . $productTitle . ')', "Novo contato em etapa: $negotiationStatus", $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1']);
+            } catch (\Exception $e) {}
+        }
+
+        Validator::jsonResponse(200, ['success' => true]);
+        break;
+
+    // 15. CRM: Delete Activity + Audit Log
+    case 'delete_crm_activity':
+        $id = (int)($_POST['id'] ?? 0);
+        if ($id <= 0) {
+            Validator::jsonResponse(400, ['success' => false, 'error' => 'ID inválido.']);
+        }
+        $stmt = $db->prepare("DELETE FROM crm_activities WHERE id=? AND user_id=?");
+        $stmt->execute([$id, $userId]);
+
+        try {
+            $logStmt = $db->prepare("INSERT INTO activity_logs (user_id, user_name, module, action_type, target_record, old_values, ip_address) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $logStmt->execute([$userId, $user['name'] ?? 'Admin', 'CRM Comercial', 'EXCLUSÃO', "Atividade ID #$id", "Registro comercial movido para lixeira auditada", $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1']);
+        } catch (\Exception $e) {}
+
+        Validator::jsonResponse(200, ['success' => true]);
+        break;
+
+    // 16. CRM: Update Negotiation Status (Kanban Drag)
+    case 'update_crm_status':
+        $id = (int)($_POST['id'] ?? 0);
+        $newStatus = trim($_POST['status'] ?? '');
+        if ($id <= 0 || empty($newStatus)) {
+            Validator::jsonResponse(400, ['success' => false, 'error' => 'Parâmetros inválidos.']);
+        }
+        $stmt = $db->prepare("UPDATE crm_activities SET negotiation_status=? WHERE id=? AND user_id=?");
+        $stmt->execute([$newStatus, $id, $userId]);
+
+        try {
+            $logStmt = $db->prepare("INSERT INTO activity_logs (user_id, user_name, module, action_type, target_record, new_values, ip_address) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $logStmt->execute([$userId, $user['name'] ?? 'Admin', 'CRM Comercial', 'MOVIMENTAÇÃO KANBAN', "Atividade ID #$id", "Movido para etapa: $newStatus", $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1']);
+        } catch (\Exception $e) {}
+
+        Validator::jsonResponse(200, ['success' => true]);
+        break;
+
+    // 17. CRM: Export to Excel/CSV
+    case 'export_crm_excel':
+        $stmt = $db->prepare("SELECT contact_date as Data, contact_time as Horario, company_name as Empresa, responsible_name as Responsavel, product_title as Produto, marketplace as Marketplace, contact_type as Tipo, objective as Objetivo, negotiation_status as Status, next_action as ProximaAcao, followup_date as DataFollowup FROM crm_activities ORDER BY contact_date DESC");
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        ExportHelper::toCsv($rows, 'crm_atividades_sam_' . date('Ymd_His') . '.csv');
+        break;
+
+    // 18. Advanced Profit Calculator (Full 15 variables)
+    case 'calculate_profit_advanced':
+        $cost = (float)($_POST['cost'] ?? 0);
+        $qty = (int)($_POST['quantity'] ?? 1);
+        if ($qty <= 0) $qty = 1;
+        $shippingIn = (float)($_POST['shipping_in'] ?? 0);
+        $taxPercent = (float)($_POST['tax_rate'] ?? 0); // %
+        $pkgCost = (float)($_POST['packaging'] ?? 0);
+        $labelCost = (float)($_POST['labels'] ?? 0);
+        $commissionPct = (float)($_POST['commission_rate'] ?? 0); // %
+        $fixedFee = (float)($_POST['fixed_fee'] ?? 0); // R$
+        $adsCpa = (float)($_POST['ads_cost'] ?? 0); // R$ per sale
+        $discountPct = (float)($_POST['discount_rate'] ?? 0); // %
+        $returnsPct = (float)($_POST['returns_rate'] ?? 0); // %
+        $subsidyShipping = (float)($_POST['subsidy_shipping'] ?? 0); // R$
+        $price = (float)($_POST['price'] ?? 0);
+
+        if ($price <= 0 || $cost <= 0) {
+            Validator::jsonResponse(400, ['success' => false, 'error' => 'Custo e preço de venda devem ser maiores que zero.']);
+        }
+
+        // Unit real cost = cost + (shipping_in / qty) + pkgCost + labelCost
+        $unitCostReal = $cost + ($shippingIn / $qty) + $pkgCost + $labelCost;
+
+        // Selling price after discounts
+        $netSellingPrice = $price * (1 - ($discountPct / 100));
+
+        // Variable selling costs per unit
+        $commissionVal = $netSellingPrice * ($commissionPct / 100);
+        $taxVal = $netSellingPrice * ($taxPercent / 100);
+        $returnsReserveVal = $netSellingPrice * ($returnsPct / 100);
+
+        $totalVariablePerUnit = $unitCostReal + $commissionVal + $taxVal + $returnsReserveVal + $fixedFee + $adsCpa + $subsidyShipping;
+
+        $netProfitUnit = $netSellingPrice - $totalVariablePerUnit;
+        $grossProfitUnit = $netSellingPrice - $unitCostReal;
+
+        $marginPercent = ($netSellingPrice > 0) ? ($netProfitUnit / $netSellingPrice) * 100 : 0;
+        $markupPercent = ($unitCostReal > 0) ? (($netSellingPrice - $unitCostReal) / $unitCostReal) * 100 : 0;
+        $roiPercent = ($unitCostReal > 0) ? ($netProfitUnit / $unitCostReal) * 100 : 0;
+
+        // Min Selling Price for Break-Even (0 Net Profit)
+        // P = UnitCost + P*Comm% + P*Tax% + P*Ret% + FixedFee + Ads + Subsidy
+        // P * (1 - Comm% - Tax% - Ret%) = UnitCost + FixedFee + Ads + Subsidy
+        $divisor = 1 - (($commissionPct + $taxPercent + $returnsPct + $discountPct) / 100);
+        $minPrice = ($divisor > 0) ? (($unitCostReal + $fixedFee + $adsCpa + $subsidyShipping) / $divisor) : 0;
+
+        // Units needed to recover total capital invested (Total Invested = unitCostReal * qty)
+        $totalCapitalInvested = $unitCostReal * $qty;
+        $unitsToRecover = ($netProfitUnit > 0) ? ceil($totalCapitalInvested / $netProfitUnit) : 0;
+
+        Validator::jsonResponse(200, [
+            'success' => true,
+            'calculation' => [
+                'selling_price' => round($netSellingPrice, 2),
+                'unit_cost_real' => round($unitCostReal, 2),
+                'gross_profit' => round($grossProfitUnit, 2),
+                'net_profit' => round($netProfitUnit, 2),
+                'margin_percent' => round($marginPercent, 1),
+                'markup_percent' => round($markupPercent, 1),
+                'roi_percent' => round($roiPercent, 1),
+                'min_selling_price' => round($minPrice, 2),
+                'units_to_recover_capital' => $unitsToRecover,
+                'total_capital_invested' => round($totalCapitalInvested, 2),
+                'commission_val' => round($commissionVal, 2),
+                'tax_val' => round($taxVal, 2)
+            ]
+        ]);
+        break;
+
     default:
         Validator::jsonResponse(404, ['success' => false, 'error' => 'Ação de API não implementada.']);
         break;
 }
+
