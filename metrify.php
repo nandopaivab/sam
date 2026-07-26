@@ -876,7 +876,7 @@ require __DIR__ . '/templates/header.php';
                 }
                 ?>
                 <div class="table-responsive">
-                    <table class="table-premium" style="font-size: 13px;">
+                    <table id="table-ml-keywords" class="table-premium" style="font-size: 13px;">
                         <thead>
                             <tr>
                                 <th>Palavra-Chave (ML Ads)</th>
@@ -893,8 +893,8 @@ require __DIR__ . '/templates/header.php';
                                 ?>
                                 <tr>
                                     <td class="fw-bold text-white"><i class="fa-solid fa-magnifying-glass me-2 text-muted"></i> <?php echo htmlspecialchars($kw['keyword']); ?></td>
-                                    <td><?php echo number_format($kw['volume'], 0, ',', '.'); ?> buscas</td>
-                                    <td class="fw-bold text-accent-turquoise">R$ <?php echo number_format($kw['cpc'], 2, ',', '.'); ?></td>
+                                    <td data-order="<?php echo $kw['volume']; ?>"><?php echo number_format($kw['volume'], 0, ',', '.'); ?> buscas</td>
+                                    <td class="fw-bold text-accent-turquoise" data-order="<?php echo $kw['cpc']; ?>">R$ <?php echo number_format($kw['cpc'], 2, ',', '.'); ?></td>
                                     <td>
                                         <span class="badge <?php echo $compBadge; ?> border px-2 py-1 small"><?php echo $kw['competition']; ?></span>
                                     </td>
@@ -1207,9 +1207,19 @@ function sortCategories(type) {
     cols.forEach(col => grid.appendChild(col));
 }
 
-// Auto-run initial sorting by share
+// Auto-run initial sorting by share and init DataTable
 $(document).ready(function() {
     sortCategories('share');
+    if ($('#table-ml-keywords').length) {
+        $('#table-ml-keywords').DataTable({
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+            language: {
+                url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json"
+            },
+            order: [[1, 'desc']]
+        });
+    }
 });
 </script>
 

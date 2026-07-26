@@ -576,7 +576,7 @@ require __DIR__ . '/templates/header.php';
                 <h5 class="fw-bold mb-3 text-white"><i class="fa-solid fa-rectangle-ad shopee-orange me-2"></i> Buscas em Alta no Planejador Shopee Ads BR</h5>
                 
                 <div class="table-responsive">
-                    <table class="table-premium" style="font-size: 13px;">
+                    <table id="table-shopee-keywords" class="table-premium" style="font-size: 13px;">
                         <thead>
                             <tr>
                                 <th>Palavra-chave Shopee Ads</th>
@@ -590,8 +590,8 @@ require __DIR__ . '/templates/header.php';
                             <?php foreach ($shopeeKeywords as $kw): ?>
                                 <tr>
                                     <td class="fw-bold text-white"><i class="fa-solid fa-magnifying-glass me-2 text-muted"></i> <?php echo htmlspecialchars($kw['keyword']); ?></td>
-                                    <td><?php echo number_format($kw['volume'], 0, ',', '.'); ?> buscas</td>
-                                    <td class="fw-bold text-warning">R$ <?php echo number_format($kw['cpc'], 2, ',', '.'); ?></td>
+                                    <td data-order="<?php echo $kw['volume']; ?>"><?php echo number_format($kw['volume'], 0, ',', '.'); ?> buscas</td>
+                                    <td class="fw-bold text-warning" data-order="<?php echo $kw['cpc']; ?>">R$ <?php echo number_format($kw['cpc'], 2, ',', '.'); ?></td>
                                     <td class="text-success fw-bold"><i class="fa-solid fa-arrow-trend-up"></i> <?php echo $kw['growth']; ?></td>
                                     <td>
                                         <button class="btn btn-sm btn-primary bg-shopee-orange border-0" onclick="window.location.href='index.php?query='+encodeURIComponent('<?php echo addslashes($kw['keyword']); ?>')">
@@ -946,6 +946,19 @@ function saveShopeeSupplier(name, type, cost, profit, margin, roi, url, address,
         alert('Erro ao conectar-se com o servidor.');
     });
 }
+
+$(document).ready(function() {
+    if ($('#table-shopee-keywords').length) {
+        $('#table-shopee-keywords').DataTable({
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+            language: {
+                url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json"
+            },
+            order: [[1, 'desc']]
+        });
+    }
+});
 </script>
 
 <?php include __DIR__ . '/templates/footer.php'; ?>

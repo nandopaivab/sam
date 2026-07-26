@@ -636,7 +636,7 @@ require __DIR__ . '/templates/header.php';
                 }
                 ?>
                 <div class="table-responsive">
-                    <table class="table-premium" style="font-size: 13px;">
+                    <table id="table-tiktok-keywords" class="table-premium" style="font-size: 13px;">
                         <thead>
                             <tr>
                                 <th>Palavra-Chave / Hashtag (TikTok)</th>
@@ -651,8 +651,8 @@ require __DIR__ . '/templates/header.php';
                             <?php foreach ($tiktokKeywords as $kw): ?>
                                 <tr>
                                     <td class="fw-bold text-white"><i class="fa-brands fa-tiktok me-2 text-muted"></i> <?php echo htmlspecialchars($kw['keyword']); ?></td>
-                                    <td><?php echo number_format($kw['volume'], 0, ',', '.'); ?> views</td>
-                                    <td class="fw-bold text-accent-turquoise">R$ <?php echo number_format((float)($kw['cpm'] ?? 4.0), 2, ',', '.'); ?></td>
+                                    <td data-order="<?php echo $kw['volume']; ?>"><?php echo number_format($kw['volume'], 0, ',', '.'); ?> views</td>
+                                    <td class="fw-bold text-accent-turquoise" data-order="<?php echo (float)($kw['cpm'] ?? 4.0); ?>">R$ <?php echo number_format((float)($kw['cpm'] ?? 4.0), 2, ',', '.'); ?></td>
                                     <td class="text-success fw-bold"><?php echo $kw['ctr']; ?> CTR</td>
                                     <td class="text-muted"><?php echo $kw['category']; ?></td>
                                     <td>
@@ -694,6 +694,16 @@ $(document).ready(function() {
     }
     if ($('#table-shops').length) {
         $('#table-shops').DataTable(dtOptions);
+    }
+    if ($('#table-tiktok-keywords').length) {
+        $('#table-tiktok-keywords').DataTable({
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+            language: {
+                url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json"
+            },
+            order: [[1, 'desc']]
+        });
     }
 });
 

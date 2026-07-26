@@ -203,11 +203,11 @@ $darkMode = $user['dark_mode'] ?? true;
             <div class="d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center text-truncate">
                     <div class="bg-purple-glow text-accent-purple rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-weight: bold;">
-                        <?php echo strtoupper(substr($user['name'], 0, 1)); ?>
+                        <?php echo strtoupper(substr($user['name'] ?? 'U', 0, 1)); ?>
                     </div>
                     <div class="text-truncate">
-                        <div class="fw-semibold text-white small text-truncate"><?php echo htmlspecialchars($user['name']); ?></div>
-                        <small class="text-muted" style="font-size: 10px;"><?php echo htmlspecialchars($user['role']); ?></small>
+                        <div class="fw-semibold text-white small text-truncate"><?php echo htmlspecialchars($user['name'] ?? 'Usuário'); ?></div>
+                        <small class="text-muted" style="font-size: 10px;"><?php echo htmlspecialchars($user['role'] ?? 'user'); ?></small>
                     </div>
                 </div>
                 <a href="login.php?logout=1" class="text-danger ms-2" title="Sair do Sistema"><i class="fa-solid fa-right-from-bracket"></i></a>
