@@ -55,7 +55,7 @@ if (isset($db)) {
 
 // 4. Check Root Files
 echo "\n4. Checking Root Page Files existence:\n";
-$files = ['index.php', 'crm.php', 'blue_ocean.php', 'baby_niche.php', 'profit_calculator.php', 'audit_logs.php', 'metrify.php', 'shopee.php', 'templates/header.php', 'templates/footer.php'];
+$files = ['index.php', 'crm.php', 'blue_ocean.php', 'baby_niche.php', 'profit_calculator.php', 'audit_logs.php', 'metrify.php', 'shopee.php', 'settings.php', 'templates/header.php', 'templates/footer.php'];
 foreach ($files as $f) {
     $path = __DIR__ . '/' . $f;
     if (file_exists($path)) {

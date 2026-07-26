@@ -25,9 +25,10 @@ declare(strict_types=1);
                 </div>
 
                 <!-- Exporters buttons group -->
-                <div id="export-buttons-group" class="d-flex my-2">
+                <div id="export-buttons-group" class="d-flex my-2 align-items-center">
                     <a id="export-csv-btn" href="#" class="btn btn-sm btn-outline-secondary me-2 border-light-subtle" title="Exportar CSV"><i class="fa-solid fa-file-csv text-success me-1"></i> Exportar CSV</a>
                     <a id="export-xls-btn" href="#" class="btn btn-sm btn-outline-secondary me-2 border-light-subtle" title="Exportar Excel"><i class="fa-solid fa-file-excel text-info me-1"></i> Exportar Excel</a>
+                    <button id="generate-ai-report-btn" class="btn btn-sm btn-primary me-2 border-0 bg-gradient" style="background-color: #745df7;" title="Gerar Relatório de IA (Gemini/GPT)" onclick="triggerAiReportGeneration()"><i class="fa-solid fa-robot text-white me-1"></i> Gerar Relatório IA</button>
                     <a id="export-pdf-btn" href="#" target="_blank" class="btn btn-sm btn-outline-secondary border-light-subtle" title="Exportar PDF"><i class="fa-solid fa-file-pdf text-danger me-1"></i> Visualizar Relatório</a>
                 </div>
             </div>
@@ -38,6 +39,17 @@ declare(strict_types=1);
                 <div class="spinner-border text-accent-purple mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
                 <h5>Executando Varredura Multi-Plataforma...</h5>
                 <p class="text-muted">Aguarde enquanto consultamos e analisamos os produtos nas APIs e bancos de dados.</p>
+            </div>
+
+            <!-- AI Report Container -->
+            <div id="ai-report-card" class="p-4 mb-3 mx-3 mt-3 rounded border" style="display: none; background: rgba(116, 93, 247, 0.05); border-color: rgba(116, 93, 247, 0.2) !important;">
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-light-subtle border-opacity-10">
+                    <h6 class="fw-bold text-white mb-0"><i class="fa-solid fa-robot text-info me-2"></i> Relatório de Inteligência Comercial (Gemini / GPT)</h6>
+                    <button type="button" class="btn btn-sm btn-outline-secondary border-light-subtle text-muted px-2 py-1" onclick="$('#ai-report-card').slideUp();" style="font-size: 11px;">Ocultar</button>
+                </div>
+                <div id="ai-report-content" class="text-white lh-lg" style="font-size: 13px;">
+                    <!-- Filled by AJAX -->
+                </div>
             </div>
 
             <!-- Table Container -->

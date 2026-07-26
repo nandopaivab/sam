@@ -46,6 +46,7 @@ class Database {
             self::$driverType = 'mysql';
             self::setupMysqlTables();
             self::checkAndCreateSavedSuppliersTable();
+            self::checkAndCreateApiColumns();
             return self::$pdo;
         } catch (PDOException $e) {
             // Check if connection was refused (code 2002) or operation not permitted
@@ -90,6 +91,7 @@ class Database {
                 self::setupSqliteTables();
             }
             self::checkAndCreateSavedSuppliersTable();
+            self::checkAndCreateApiColumns();
 
             return self::$pdo;
         } catch (PDOException $e) {
@@ -127,6 +129,27 @@ class Database {
             )
         ";
         self::$pdo->exec($query);
+    }
+
+    /**
+     * Check and create API keys columns on users table if missing
+     */
+    private static function checkAndCreateApiColumns(): void {
+        $dbType = self::$driverType;
+        $type = $dbType === 'sqlite' ? 'TEXT' : 'VARCHAR(255)';
+        $providerType = $dbType === 'sqlite' ? 'TEXT' : 'VARCHAR(50)';
+        
+        try {
+            self::$pdo->exec("ALTER TABLE users ADD COLUMN openai_api_key {$type} DEFAULT NULL;");
+        } catch (\Exception $e) {}
+        
+        try {
+            self::$pdo->exec("ALTER TABLE users ADD COLUMN gemini_api_key {$type} DEFAULT NULL;");
+        } catch (\Exception $e) {}
+        
+        try {
+            self::$pdo->exec("ALTER TABLE users ADD COLUMN ai_provider {$providerType} DEFAULT 'local';");
+        } catch (\Exception $e) {}
     }
 
     /**
@@ -329,6 +352,17 @@ class Database {
                 $insBaby->execute(['Prato com Ventosa Silicone BPA Free', 'Alimentação', '6 meses a 3 anos', 'INMETRO / Atóxico', 'Silicone 100% Alimentar Livre de BPA', 'Pode ir à lava-louças', 'Sem peças pequenas', 39.90, 10.00, 'Kit Alimentação Completa (Prato + Babador + Colher de Silicone) | Kit com 2 Pratos Cores Sortidas | Kit Introdução Alimentar Premium', 'Todas as faixas (Acessível)', 'Produto altamente recomendado para introdução alimentar. O diferencial é a ventosa forte que evita quedas e bagunça.']);
                 $insBaby->execute(['Mordedor Sensorial Girafa Antiasfixia', 'Desenvolvimento Infantil', '3 meses a 18 meses', 'INMETRO / Atóxico', 'Silicone Macio BPA Free', 'Esterilizável em água fervente', 'Sem peças pequenas', 29.90, 7.50, 'Kit Mordedor + Preendedor de chupeta | Kit Mordedores Fofos (Girafa + Elefante) | Kit Dentinho Saudável Premium', 'Classe C/D/E (Acessível)', 'Mordedor anatômico que alivia as gengivas do bebê com segurança.']);
             }
+            
+            // Alter users table to add API configuration fields if missing
+            try {
+                self::$pdo->exec("ALTER TABLE users ADD COLUMN openai_api_key VARCHAR(255) DEFAULT NULL;");
+            } catch (\Exception $e) {}
+            try {
+                self::$pdo->exec("ALTER TABLE users ADD COLUMN gemini_api_key VARCHAR(255) DEFAULT NULL;");
+            } catch (\Exception $e) {}
+            try {
+                self::$pdo->exec("ALTER TABLE users ADD COLUMN ai_provider VARCHAR(50) DEFAULT 'local';");
+            } catch (\Exception $e) {}
         } catch (\Exception $e) {
             // Ignore seeding errors
         }
@@ -434,5 +468,16 @@ class Database {
         ";
 
         self::$pdo->exec($schema);
+
+        // Alter users table to add API configuration fields if missing
+        try {
+            self::$pdo->exec("ALTER TABLE users ADD COLUMN openai_api_key TEXT DEFAULT NULL;");
+        } catch (\Exception $e) {}
+        try {
+            self::$pdo->exec("ALTER TABLE users ADD COLUMN gemini_api_key TEXT DEFAULT NULL;");
+        } catch (\Exception $e) {}
+        try {
+            self::$pdo->exec("ALTER TABLE users ADD COLUMN ai_provider TEXT DEFAULT 'local';");
+        } catch (\Exception $e) {}
     }
 }

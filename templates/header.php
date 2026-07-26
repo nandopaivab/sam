@@ -157,6 +157,12 @@ $darkMode = $user['dark_mode'] ?? true;
                     <span>Calculadora de Lucro</span>
                 </a>
             </li>
+            <li class="sidebar-item <?php echo basename($_SERVER['PHP_SELF']) === 'settings.php' ? 'active' : ''; ?>">
+                <a href="settings.php" class="sidebar-link">
+                    <i class="fa-solid fa-gears text-info"></i>
+                    <span>Configuração de APIs</span>
+                </a>
+            </li>
             <li class="sidebar-item <?php echo basename($_SERVER['PHP_SELF']) === 'audit_logs.php' ? 'active' : ''; ?>">
                 <a href="audit_logs.php" class="sidebar-link">
                     <i class="fa-solid fa-file-shield text-warning"></i>

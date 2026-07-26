@@ -780,4 +780,64 @@ $(document).ready(function() {
             $('#search-form').trigger('submit');
         }, 100);
     }
+    window.triggerAiReportGeneration = function() {
+        const query = $('#search-query').val().trim() || 'geral';
+        if (!window.currentSearchResults || window.currentSearchResults.length === 0) {
+            alert('Por favor, realize uma busca antes de gerar o relatório.');
+            return;
+        }
+
+        const reportBtn = $('#generate-ai-report-btn');
+        const reportCard = $('#ai-report-card');
+        const reportContent = $('#ai-report-content');
+
+        reportBtn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin text-white me-1"></i> Analisando...');
+        reportCard.slideDown();
+        reportContent.html(`
+            <div class="text-center py-4 text-muted">
+                <div class="spinner-border spinner-border-sm text-info mb-2" role="status"></div>
+                <div>A IA está analisando os concorrentes e compilando as maiores buscas. Por favor, aguarde...</div>
+            </div>
+        `);
+
+        // Send current search results to API to analyze
+        $.ajax({
+            url: 'api.php?action=generate_ai_report',
+            method: 'POST',
+            data: {
+                query: query,
+                products: JSON.stringify(window.currentSearchResults)
+            },
+            success: function(response) {
+                reportBtn.prop('disabled', false).html('<i class="fa-solid fa-robot text-white me-1"></i> Gerar Relatório IA');
+                if (response.success && response.report) {
+                    reportContent.html(parseMarkdownToHtml(response.report));
+                } else {
+                    reportContent.html('<div class="text-danger"><i class="fa-solid fa-triangle-exclamation"></i> Falha ao gerar relatório de IA.</div>');
+                }
+            },
+            error: function(xhr) {
+                reportBtn.prop('disabled', false).html('<i class="fa-solid fa-robot text-white me-1"></i> Gerar Relatório IA');
+                const errText = xhr.responseJSON ? xhr.responseJSON.error : 'Erro ao conectar-se com a IA.';
+                reportContent.html(`<div class="text-danger"><i class="fa-solid fa-triangle-exclamation"></i> ${errText}</div>`);
+            }
+        });
+    };
+
+    function parseMarkdownToHtml(markdown) {
+        if (!markdown) return '';
+        return markdown
+            // Headers
+            .replace(/^### (.*$)/gim, '<h5 class="fw-bold text-white mt-3 mb-2">$1</h5>')
+            .replace(/^#### (.*$)/gim, '<h6 class="fw-bold text-metrify-cyan mt-3 mb-2">$1</h6>')
+            .replace(/^## (.*$)/gim, '<h4 class="fw-bold text-white mt-4 mb-2">$1</h4>')
+            .replace(/^# (.*$)/gim, '<h3 class="fw-bold text-white mt-4 mb-2">$1</h3>')
+            // Bold
+            .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>')
+            // Bullet lists
+            .replace(/^\* (.*$)/gim, '<li class="ms-3 mb-1 text-muted">$1</li>')
+            .replace(/^\- (.*$)/gim, '<li class="ms-3 mb-1 text-muted">$1</li>')
+            // Line breaks
+            .replace(/\n/g, '<br>');
+    }
 });
