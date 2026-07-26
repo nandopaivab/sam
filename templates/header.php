@@ -206,6 +206,7 @@ $darkMode = $user['dark_mode'] ?? true;
                 </div>
             </div>
             
+            <div class="d-flex align-items-center gap-1 gap-md-2 ms-auto">
                 <!-- Notification Bell Dropdown -->
                 <div class="dropdown me-2 me-md-3">
                     <button class="btn btn-outline-secondary border-light-subtle position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 10px; width: 42px; height: 42px; padding: 0;">
