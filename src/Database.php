@@ -47,6 +47,7 @@ class Database {
             self::setupMysqlTables();
             self::checkAndCreateSavedSuppliersTable();
             self::checkAndCreateApiColumns();
+            self::checkAndCreateErpTables();
             return self::$pdo;
         } catch (PDOException $e) {
             // Check if connection was refused (code 2002) or operation not permitted
@@ -92,6 +93,7 @@ class Database {
             }
             self::checkAndCreateSavedSuppliersTable();
             self::checkAndCreateApiColumns();
+            self::checkAndCreateErpTables();
 
             return self::$pdo;
         } catch (PDOException $e) {
@@ -150,6 +152,50 @@ class Database {
         try {
             self::$pdo->exec("ALTER TABLE users ADD COLUMN ai_provider {$providerType} DEFAULT 'local';");
         } catch (\Exception $e) {}
+    }
+
+    /**
+     * Check and create ERP products and sales tables
+     */
+    private static function checkAndCreateErpTables(): void {
+        $dbType = self::$driverType;
+        $aiKeyType = $dbType === 'sqlite' ? 'INTEGER PRIMARY KEY AUTOINCREMENT' : 'INT AUTO_INCREMENT PRIMARY KEY';
+        $textType = $dbType === 'sqlite' ? 'TEXT' : 'VARCHAR(255)';
+        $longTextType = $dbType === 'sqlite' ? 'TEXT' : 'TEXT';
+        $doubleType = $dbType === 'sqlite' ? 'REAL' : 'DOUBLE';
+        $intType = $dbType === 'sqlite' ? 'INTEGER' : 'INT';
+        $timestampType = $dbType === 'sqlite' ? 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP' : 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP';
+
+        // 1. Create erp_products table
+        $queryProducts = "
+            CREATE TABLE IF NOT EXISTS erp_products (
+                id {$aiKeyType},
+                user_id {$intType} NOT NULL,
+                sku {$textType} NOT NULL,
+                title {$textType} NOT NULL,
+                cost_price {$doubleType} NOT NULL DEFAULT 0.0,
+                selling_price {$doubleType} NOT NULL DEFAULT 0.0,
+                stock_quantity {$intType} NOT NULL DEFAULT 0,
+                min_stock {$intType} NOT NULL DEFAULT 5,
+                created_at {$timestampType}
+            )
+        ";
+        self::$pdo->exec($queryProducts);
+
+        // 2. Create erp_sales table
+        $querySales = "
+            CREATE TABLE IF NOT EXISTS erp_sales (
+                id {$aiKeyType},
+                user_id {$intType} NOT NULL,
+                product_id {$intType} NOT NULL,
+                platform {$textType} NOT NULL,
+                quantity {$intType} NOT NULL DEFAULT 1,
+                sale_price {$doubleType} NOT NULL DEFAULT 0.0,
+                total_amount {$doubleType} NOT NULL DEFAULT 0.0,
+                sale_date {$timestampType}
+            )
+        ";
+        self::$pdo->exec($querySales);
     }
 
     /**

@@ -157,6 +157,12 @@ $darkMode = $user['dark_mode'] ?? true;
                     <span>Calculadora de Lucro</span>
                 </a>
             </li>
+            <li class="sidebar-item <?php echo basename($_SERVER['PHP_SELF']) === 'erp.php' ? 'active' : ''; ?>">
+                <a href="erp.php" class="sidebar-link">
+                    <i class="fa-solid fa-boxes-stacked text-warning"></i>
+                    <span>ERP - Estoque & Vendas</span>
+                </a>
+            </li>
             <li class="sidebar-item <?php echo basename($_SERVER['PHP_SELF']) === 'settings.php' ? 'active' : ''; ?>">
                 <a href="settings.php" class="sidebar-link">
                     <i class="fa-solid fa-gears text-info"></i>

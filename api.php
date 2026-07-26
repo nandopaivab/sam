@@ -2066,6 +2066,159 @@ switch ($action) {
         Validator::jsonResponse(200, ['success' => true]);
         break;
 
+    // 21. ERP: Save Product
+    case 'save_erp_product':
+        $id = (int)($_POST['id'] ?? 0);
+        $sku = trim($_POST['sku'] ?? '');
+        $title = trim($_POST['title'] ?? '');
+        $costPrice = (float)($_POST['cost_price'] ?? 0);
+        $sellingPrice = (float)($_POST['selling_price'] ?? 0);
+        $stockQuantity = (int)($_POST['stock_quantity'] ?? 0);
+        $minStock = (int)($_POST['min_stock'] ?? 5);
+
+        if (empty($sku) || empty($title)) {
+            Validator::jsonResponse(400, ['success' => false, 'error' => 'SKU e título são obrigatórios.']);
+        }
+
+        if ($id > 0) {
+            // Edit Product
+            $stmt = $db->prepare("UPDATE erp_products SET sku = ?, title = ?, cost_price = ?, selling_price = ?, stock_quantity = ?, min_stock = ? WHERE id = ? AND user_id = ?");
+            $stmt->execute([$sku, $title, $costPrice, $sellingPrice, $stockQuantity, $minStock, $id, $userId]);
+            $action = 'EDIÇÃO';
+        } else {
+            // New Product
+            $stmt = $db->prepare("INSERT INTO erp_products (user_id, sku, title, cost_price, selling_price, stock_quantity, min_stock) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$userId, $sku, $title, $costPrice, $sellingPrice, $stockQuantity, $minStock]);
+            $id = (int)$db->lastInsertId();
+            $action = 'CADASTRO';
+        }
+
+        // Log Audit
+        try {
+            $logStmt = $db->prepare("INSERT INTO activity_logs (user_id, user_name, module, action_type, target_record, new_values, ip_address) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $logStmt->execute([$userId, $currentUser['name'] ?? 'Admin', 'ERP Estoque', $action, "Produto: $title (SKU: $sku)", "Estoque: $stockQuantity unidades, Preço Venda: R$$sellingPrice", $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1']);
+        } catch (\Exception $e) {}
+
+        Validator::jsonResponse(200, ['success' => true, 'id' => $id]);
+        break;
+
+    // 22. ERP: Delete Product
+    case 'delete_erp_product':
+        $id = (int)($_POST['id'] ?? 0);
+        if ($id <= 0) {
+            Validator::jsonResponse(400, ['success' => false, 'error' => 'ID do produto inválido.']);
+        }
+
+        // Fetch product info for logging
+        $stmtProd = $db->prepare("SELECT sku, title FROM erp_products WHERE id = ? AND user_id = ?");
+        $stmtProd->execute([$id, $userId]);
+        $prod = $stmtProd->fetch();
+
+        if ($prod) {
+            $stmt = $db->prepare("DELETE FROM erp_products WHERE id = ? AND user_id = ?");
+            $stmt->execute([$id, $userId]);
+            
+            // Delete associated sales as well to maintain DB integrity
+            $stmtSales = $db->prepare("DELETE FROM erp_sales WHERE product_id = ? AND user_id = ?");
+            $stmtSales->execute([$id, $userId]);
+
+            // Log Audit
+            try {
+                $logStmt = $db->prepare("INSERT INTO activity_logs (user_id, user_name, module, action_type, target_record, new_values, ip_address) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                $logStmt->execute([$userId, $currentUser['name'] ?? 'Admin', 'ERP Estoque', 'EXCLUSÃO', "Produto ID #$id", "Excluído SKU: {$prod['sku']} - Título: {$prod['title']}", $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1']);
+            } catch (\Exception $e) {}
+        }
+
+        Validator::jsonResponse(200, ['success' => true]);
+        break;
+
+    // 23. ERP: Emit Sale (Record Sale and decrement stock)
+    case 'emit_erp_sale':
+        $productId = (int)($_POST['product_id'] ?? 0);
+        $platform = trim($_POST['platform'] ?? 'outros'); // mercadolivre, shopee, tiktok, outros
+        $quantity = (int)($_POST['quantity'] ?? 1);
+        $salePrice = (float)($_POST['sale_price'] ?? 0);
+
+        if ($productId <= 0 || $quantity <= 0 || $salePrice <= 0) {
+            Validator::jsonResponse(400, ['success' => false, 'error' => 'Parâmetros de venda inválidos.']);
+        }
+
+        // Fetch product to verify stock
+        $stmtProd = $db->prepare("SELECT title, sku, stock_quantity, cost_price FROM erp_products WHERE id = ? AND user_id = ?");
+        $stmtProd->execute([$productId, $userId]);
+        $prod = $stmtProd->fetch();
+
+        if (!$prod) {
+            Validator::jsonResponse(404, ['success' => false, 'error' => 'Produto não encontrado.']);
+        }
+
+        if ($prod['stock_quantity'] < $quantity) {
+            Validator::jsonResponse(400, ['success' => false, 'error' => "Estoque insuficiente. Estoque disponível: {$prod['stock_quantity']} unidades."]);
+        }
+
+        // Calculate total amount
+        $totalAmount = round($salePrice * $quantity, 2);
+
+        // Record Sale
+        $stmtSale = $db->prepare("INSERT INTO erp_sales (user_id, product_id, platform, quantity, sale_price, total_amount) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmtSale->execute([$userId, $productId, $platform, $quantity, $salePrice, $totalAmount]);
+        $saleId = (int)$db->lastInsertId();
+
+        // Decrement Stock
+        $newStock = $prod['stock_quantity'] - $quantity;
+        $stmtUpdate = $db->prepare("UPDATE erp_products SET stock_quantity = ? WHERE id = ? AND user_id = ?");
+        $stmtUpdate->execute([$newStock, $productId, $userId]);
+
+        // Log Audit
+        try {
+            $logStmt = $db->prepare("INSERT INTO activity_logs (user_id, user_name, module, action_type, target_record, new_values, ip_address) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $logStmt->execute([$userId, $currentUser['name'] ?? 'Admin', 'ERP Vendas', 'EMISSÃO VENDA', "Venda ID #$saleId", "Produto: {$prod['title']} | Qtd: $quantity | Preço: R$$salePrice | Plataforma: $platform", $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1']);
+        } catch (\Exception $e) {}
+
+        Validator::jsonResponse(200, ['success' => true, 'sale_id' => $saleId, 'new_stock' => $newStock]);
+        break;
+
+    // 24. ERP: Cancel/Delete Sale (Delete sale and increment stock back)
+    case 'delete_erp_sale':
+        $saleId = (int)($_POST['id'] ?? 0);
+        if ($saleId <= 0) {
+            Validator::jsonResponse(400, ['success' => false, 'error' => 'ID de venda inválido.']);
+        }
+
+        // Fetch sale info
+        $stmtSale = $db->prepare("SELECT product_id, quantity, platform, total_amount FROM erp_sales WHERE id = ? AND user_id = ?");
+        $stmtSale->execute([$saleId, $userId]);
+        $sale = $stmtSale->fetch();
+
+        if ($sale) {
+            $productId = (int)$sale['product_id'];
+            $quantity = (int)$sale['quantity'];
+
+            // Delete sale record
+            $stmtDel = $db->prepare("DELETE FROM erp_sales WHERE id = ? AND user_id = ?");
+            $stmtDel->execute([$saleId, $userId]);
+
+            // Increment Stock back
+            $stmtProd = $db->prepare("SELECT title, stock_quantity FROM erp_products WHERE id = ? AND user_id = ?");
+            $stmtProd->execute([$productId, $userId]);
+            $prod = $stmtProd->fetch();
+
+            if ($prod) {
+                $newStock = $prod['stock_quantity'] + $quantity;
+                $stmtUpdate = $db->prepare("UPDATE erp_products SET stock_quantity = ? WHERE id = ? AND user_id = ?");
+                $stmtUpdate->execute([$newStock, $productId, $userId]);
+
+                // Log Audit
+                try {
+                    $logStmt = $db->prepare("INSERT INTO activity_logs (user_id, user_name, module, action_type, target_record, new_values, ip_address) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                    $logStmt->execute([$userId, $currentUser['name'] ?? 'Admin', 'ERP Vendas', 'CANCELAMENTO VENDA', "Venda ID #$saleId", "Venda de {$prod['title']} cancelada. $quantity unidades devolvidas ao estoque.", $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1']);
+                } catch (\Exception $e) {}
+            }
+        }
+
+        Validator::jsonResponse(200, ['success' => true]);
+        break;
+
     default:
         Validator::jsonResponse(404, ['success' => false, 'error' => 'Ação de API não implementada.']);
         break;
