@@ -770,10 +770,10 @@ $(document).ready(function() {
         });
     };
 
-    // Auto-trigger search if 'query' param is present in URL
+    // Auto-trigger search if 'query' or 'q' param is present in URL
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('query')) {
-        const q = urlParams.get('query');
+    const q = urlParams.get('query') || urlParams.get('q');
+    if (q) {
         $('#search-query').val(q);
         // Add a small delay to ensure UI is ready
         setTimeout(function() {
