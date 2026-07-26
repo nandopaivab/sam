@@ -1112,53 +1112,149 @@ switch ($action) {
             $dbProducts = [];
         }
 
-        // Curated Brazilian Wholesale & High-Margin Catalog
-        $curatedCatalog = [
-            [
-                'title' => 'Mini Liquidificador Portátil USB 6 Lâminas (Suco/Shake)',
-                'category' => 'casa',
-                'unit_cost' => 38.50,
-                'suggested_price' => 89.90,
-                'supplier_name' => 'Atacadão dos Eletrônicos SP',
-                'supplier_location' => 'São Paulo / SP (Brás)',
-                'shipping_time' => '2 a 3 dias úteis (Frete Expresso BR)',
-                'why_buy' => 'Alta rotatividade no TikTok Shop e Shopee. Apelo visual forte em vídeos rápidos de receita e fitness.',
-                'tag' => 'Carro-Chefe (Alto Giro)'
+        // Distinct, specialized wholesale catalogs for Conservador, Equilibrado, and Agressivo profiles
+        $catalogsByProfile = [
+            'conservador' => [
+                [
+                    'title' => 'Fone de Ouvido Sem Fio Bluetooth 5.3 TWS c/ Case Carregador',
+                    'category' => 'eletronicos',
+                    'unit_cost' => 29.90,
+                    'suggested_price' => 69.90,
+                    'supplier_name' => 'Mega Eletrônicos Distribuidora SP',
+                    'supplier_location' => 'São Paulo / SP (Brás)',
+                    'shipping_time' => '2 a 3 dias úteis',
+                    'why_buy' => 'Produto essencial com demanda estável o ano inteiro no Mercado Livre. Baixíssimo índice de devolução.',
+                    'tag' => 'Giro Previsível (Demanda Contínua)'
+                ],
+                [
+                    'title' => 'Kit 4 Potes Herméticos Organizadores de Alimentos p/ Cozinha',
+                    'category' => 'casa',
+                    'unit_cost' => 35.00,
+                    'suggested_price' => 79.90,
+                    'supplier_name' => 'Utilidades Brasil Atacado SP',
+                    'supplier_location' => 'Guarulhos / SP',
+                    'shipping_time' => '2 a 4 dias úteis',
+                    'why_buy' => 'Líder consistente na categoria Casa & Decoração. Excelente ticket médio para venda em kits.',
+                    'tag' => 'Carro-Chefe Doméstico'
+                ],
+                [
+                    'title' => 'Cabo USB-C Carregamento Rápido Reforçado (1,5 metro)',
+                    'category' => 'acessorios',
+                    'unit_cost' => 7.50,
+                    'suggested_price' => 24.90,
+                    'supplier_name' => 'Distribuidora Paulista de Acessórios PR',
+                    'supplier_location' => 'Curitiba / PR',
+                    'shipping_time' => '2 a 4 dias úteis (Envio Full)',
+                    'why_buy' => 'Acessório de compra por necessidade com giro diário e margem líquida superior a 200%.',
+                    'tag' => 'Caixa Rápido (Alto Volume)'
+                ],
+                [
+                    'title' => 'Balança Digital de Cozinha Alta Precisão 10kg',
+                    'category' => 'casa',
+                    'unit_cost' => 18.50,
+                    'suggested_price' => 49.90,
+                    'supplier_name' => 'SulAtacado E-commerce SC',
+                    'supplier_location' => 'Joinville / SC',
+                    'shipping_time' => '3 a 5 dias úteis',
+                    'why_buy' => 'Baixo custo de frete, caixa compacta e venda constante para públicos fitness e culinário.',
+                    'tag' => 'Estabilidade & Retorno'
+                ]
             ],
-            [
-                'title' => 'Escova Alisadora Secadora 5 em 1 Modeladora Ion',
-                'category' => 'beleza',
-                'unit_cost' => 52.00,
-                'suggested_price' => 129.90,
-                'supplier_name' => 'Distribuidora Beleza Express SC',
-                'supplier_location' => 'Itajaí / SC',
-                'shipping_time' => '3 a 5 dias úteis (Estoque Nacional)',
-                'why_buy' => 'Produto viral líder de buscas feminina. Excelente margem de lucro e taxa de conversão em anúncios.',
-                'tag' => 'Tendência Viral (Alta Margem)'
+            'equilibrado' => [
+                [
+                    'title' => 'Mini Liquidificador Portátil USB 6 Lâminas (Suco/Shake)',
+                    'category' => 'casa',
+                    'unit_cost' => 38.50,
+                    'suggested_price' => 89.90,
+                    'supplier_name' => 'Atacadão dos Eletrônicos SP',
+                    'supplier_location' => 'São Paulo / SP (Brás)',
+                    'shipping_time' => '2 a 3 dias úteis (Frete Expresso BR)',
+                    'why_buy' => 'Alta rotatividade no TikTok Shop e Shopee. Apelo visual forte em vídeos rápidos de receita e fitness.',
+                    'tag' => 'Carro-Chefe (Alto Giro)'
+                ],
+                [
+                    'title' => 'Escova Alisadora Secadora 5 em 1 Modeladora Ion',
+                    'category' => 'beleza',
+                    'unit_cost' => 52.00,
+                    'suggested_price' => 129.90,
+                    'supplier_name' => 'Distribuidora Beleza Express SC',
+                    'supplier_location' => 'Itajaí / SC',
+                    'shipping_time' => '3 a 5 dias úteis (Estoque Nacional)',
+                    'why_buy' => 'Produto viral líder de buscas feminina. Excelente margem de lucro e taxa de conversão em anúncios.',
+                    'tag' => 'Tendência Viral (Alta Margem)'
+                ],
+                [
+                    'title' => 'Suporte Articulado de Mesa para Celular/Tablet 360º',
+                    'category' => 'eletronicos',
+                    'unit_cost' => 14.00,
+                    'suggested_price' => 39.90,
+                    'supplier_name' => 'Mega Atacado Acessórios PR',
+                    'supplier_location' => 'Curitiba / PR',
+                    'shipping_time' => '2 a 4 dias úteis (Envio Full)',
+                    'why_buy' => 'Ticket de entrada baixo com mais de 150% de markup. Perfeito para venda casada e compra de impulso.',
+                    'tag' => 'Caixa Rápido (Baixo Custo)'
+                ],
+                [
+                    'title' => 'Mini Impressora Térmica Sem Fio Portátil Bluetooth',
+                    'category' => 'eletronicos',
+                    'unit_cost' => 45.00,
+                    'suggested_price' => 119.00,
+                    'supplier_name' => 'TechAtacado Brasil MG',
+                    'supplier_location' => 'Belo Horizonte / MG',
+                    'shipping_time' => '2 a 4 dias úteis',
+                    'why_buy' => 'Febre entre estudantes e organizadores domésticos. Demanda crescente e baixa concorrência qualificada.',
+                    'tag' => 'Aposta Inovadora'
+                ]
             ],
-            [
-                'title' => 'Suporte Articulado de Mesa para Celular/Tablet 360º',
-                'category' => 'eletronicos',
-                'unit_cost' => 14.00,
-                'suggested_price' => 39.90,
-                'supplier_name' => 'Mega Atacado Acessórios PR',
-                'supplier_location' => 'Curitiba / PR',
-                'shipping_time' => '2 a 4 dias úteis (Envio Full)',
-                'why_buy' => 'Ticket de entrada baixo com mais de 150% de markup. Perfeito para venda casada e compra de impulso.',
-                'tag' => 'Caixa Rápido (Baixo Custo)'
-            ],
-            [
-                'title' => 'Mini Impressora Térmica Sem Fio Portátil Bluetooth',
-                'category' => 'eletronicos',
-                'unit_cost' => 45.00,
-                'suggested_price' => 119.00,
-                'supplier_name' => 'TechAtacado Brasil MG',
-                'supplier_location' => 'Belo Horizonte / MG',
-                'shipping_time' => '2 a 4 dias úteis',
-                'why_buy' => 'Febre entre estudantes e organizadores domésticos. Demanda crescente e baixa concorrência qualificada.',
-                'tag' => 'Aposta Inovadora'
+            'agressivo' => [
+                [
+                    'title' => 'Projetor Inteligente HD Portátil 4K Android TV Wi-Fi 6',
+                    'category' => 'eletronicos',
+                    'unit_cost' => 165.00,
+                    'suggested_price' => 389.90,
+                    'supplier_name' => 'Importadora SP Tech Express',
+                    'supplier_location' => 'São Paulo / SP (Santo Amaro)',
+                    'shipping_time' => '1 a 2 dias úteis (Envio Imediato)',
+                    'why_buy' => 'O item mais viralizado de tecnologia no TikTok BR. Altíssimo ticket médio e margem bruta por venda.',
+                    'tag' => 'Viral Explosivo (TikTok Nº1)'
+                ],
+                [
+                    'title' => 'Depilador Luz Pulsada IPL Indolor Portátil Estética',
+                    'category' => 'beleza',
+                    'unit_cost' => 88.00,
+                    'suggested_price' => 229.90,
+                    'supplier_name' => 'Estética Brasil Atacadista SC',
+                    'supplier_location' => 'Florianópolis / SC',
+                    'shipping_time' => '2 a 4 dias úteis',
+                    'why_buy' => 'CPA extremamente baixo em anúncios do Instagram/TikTok. Público feminino altamente comprador.',
+                    'tag' => 'Febre Estética (Alta Conversão)'
+                ],
+                [
+                    'title' => 'Garrafa Térmica Inteligente c/ Display LED de Temperatura 500ml',
+                    'category' => 'casa',
+                    'unit_cost' => 19.90,
+                    'suggested_price' => 59.90,
+                    'supplier_name' => 'Atacadão Importados PR',
+                    'supplier_location' => 'Londrina / PR',
+                    'shipping_time' => '2 a 3 dias úteis',
+                    'why_buy' => 'Produto com demonstração em vídeo altamente viciante. Gera compras instantâneas em Spark Ads.',
+                    'tag' => 'Impulso Viral (Vídeo UGC)'
+                ],
+                [
+                    'title' => 'Luminária G-Speaker RGB Carregador Indução Som Bluetooth',
+                    'category' => 'eletronicos',
+                    'unit_cost' => 49.00,
+                    'suggested_price' => 129.90,
+                    'supplier_name' => 'Mega Eletrônicos MG',
+                    'supplier_location' => 'Belo Horizonte / MG',
+                    'shipping_time' => '2 a 4 dias úteis',
+                    'why_buy' => 'Sucesso de vendas em lives de e-commerce e vídeos de setup gamer e decoração moderna.',
+                    'tag' => 'Aposta Alta Margem'
+                ]
             ]
         ];
+
+        $curatedCatalog = $catalogsByProfile[$profile] ?? $catalogsByProfile['equilibrado'];
 
         // Allocate budget percentages: 40%, 30%, 20%, 10%
         $allocations = [0.40, 0.30, 0.20, 0.10];
@@ -1209,16 +1305,28 @@ switch ($action) {
         $turnoverDays = '15 a 25 dias';
         if ($profile === 'conservador') {
             $turnoverDays = '25 a 35 dias';
+            $strategyTips = [
+                "Foco em Palavras-Chave de Cauda Longa: No Mercado Livre e Shopee, utilize títulos descritivos com marca e especificação técnica para atrair compradores decididos.",
+                "Reposição Programada: Como o giro é previsível (25 a 35 dias), mantenha estoque mínimo de 20% para evitar ruptura nos anúncios campeões.",
+                "Mercado Livre Full: Envie os itens 1 e 2 diretamente para o centro de distribuição Full para ganhar selo de entrega no dia seguinte.",
+                "Kit Desconto Progressivo: Ofereça leve 2 com 10% OFF no Cabo USB-C para elevar o ticket médio sem custo adicional de frete."
+            ];
         } elseif ($profile === 'agressivo') {
             $turnoverDays = '10 a 20 dias';
+            $strategyTips = [
+                "Escala Rápida em Spark Ads: Aloque 25% da receita diária em campanhas de vídeo nativo (UGC) no TikTok focando no Projetor e no Depilador IPL.",
+                "Lives Diárias de Venda: Faça transmissões ao vivo demonstrando a Garrafa Térmica e a Luminária RGB para gerar escassez e compras por impulso.",
+                "Giro Ultra Rápido (10 a 20 dias): Não acumule estoque parado. Se um item vender 70% em 5 dias, triplique o pedido seguinte com o fornecedor SP/SC.",
+                "Página de Vendas de Alta Conversão: Utilize landing pages exclusivas com vídeos de demonstração e depoimentos para os itens de maior valor."
+            ];
+        } else {
+            $strategyTips = [
+                "Diversificação Balanceada: Seu capital de R$ " . number_format($budget, 2, ',', '.') . " foi alocado em 4 categorias complementares para mitigar risco e garantir giro contínuo.",
+                "Estoque Nacional (BR): Todos os fornecedores recomendados estão em SP, SC, PR ou MG, permitindo reposição ágil (2 a 5 dias úteis) sem risco de taxação alfandegária.",
+                "Escala com Anúncios: Utilize cerca de 15% do lucro projetado (R$ " . number_format($totalProfit * 0.15, 2, ',', '.') . ") no TikTok Ads e Mercado Livre Ads focado no item Carro-Chefe.",
+                "Recompra Automática: Assim que o primeiro item vender 50% do lote, acione a recompra com o fornecedor para não perder relevância nos algoritmos."
+            ];
         }
-
-        $strategyTips = [
-            "Diversificação Balanceada: Seu capital de R$ " . number_format($budget, 2, ',', '.') . " foi alocado em 4 categorias complementares para mitigar risco e garantir giro contínuo.",
-            "Estoque Nacional (BR): Todos os fornecedores recomendados estão em SP, SC, PR ou MG, permitindo reposição ágil (2 a 5 dias úteis) sem risco de taxação alfandegária.",
-            "Escala com Anúncios: Utilize cerca de 15% do lucro projetado (R$ " . number_format($totalProfit * 0.15, 2, ',', '.') . ") no TikTok Ads e Mercado Livre Ads focado no item Carro-Chefe.",
-            "Recompra Automática: Assim que o primeiro item vender 50% do lote, acione a recompra com o fornecedor para não perder relevância nos algoritmos."
-        ];
 
         Validator::jsonResponse(200, [
             'success' => true,
