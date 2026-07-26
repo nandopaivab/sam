@@ -73,13 +73,12 @@ $darkMode = $user['dark_mode'] ?? true;
 <div id="wrapper">
     <!-- Sidebar Navigation -->
     <aside id="sidebar">
-        <div class="sidebar-header">
-            <a href="index.php" class="sidebar-logo">
-                <div class="sidebar-logo-icon">
-                    <i class="fa-solid fa-square-trend-up"></i>
-                </div>
-                <div class="sidebar-logo-text">
-                    SAM <span style="font-size: 10px; color: var(--accent-turquoise); display: block; letter-spacing: 1px; font-weight: 800;">Análise de MarketPlace</span>
+        <div class="sidebar-header" style="padding: 12px 18px;">
+            <a href="index.php" class="sidebar-logo d-flex align-items-center gap-2 text-decoration-none">
+                <img src="/assets/logo.png" alt="SAM Logo" style="width: 38px; height: 38px; border-radius: 8px; object-fit: contain;">
+                <div class="sidebar-logo-text" style="line-height: 1.1;">
+                    <span style="font-weight: 800; font-size: 16px; color: #fff; letter-spacing: 0.5px;">SAM</span>
+                    <span style="font-size: 9px; color: var(--accent-turquoise); display: block; letter-spacing: 0.5px; font-weight: 700;">Análise de MarketPlace</span>
                 </div>
             </a>
         </div>
@@ -231,6 +230,14 @@ $darkMode = $user['dark_mode'] ?? true;
             </div>
             
             <div class="d-flex align-items-center gap-1 gap-md-2 ms-auto">
+                <!-- Theme Toggle Button -->
+                <button class="btn btn-outline-secondary border-light-subtle me-2" onclick="toggleThemeMode()" id="theme-toggle-btn" style="border-radius: 10px; width: 42px; height: 42px; padding: 0;" title="Alternar Tema Claro/Escuro">
+                    <?php if ($darkMode): ?>
+                        <i class="fa-solid fa-sun text-warning"></i>
+                    <?php else: ?>
+                        <i class="fa-solid fa-moon text-primary"></i>
+                    <?php endif; ?>
+                </button>
                 <!-- Notification Bell Dropdown -->
                 <div class="dropdown me-2 me-md-3">
                     <button class="btn btn-outline-secondary border-light-subtle position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 10px; width: 42px; height: 42px; padding: 0;">
@@ -345,6 +352,21 @@ $darkMode = $user['dark_mode'] ?? true;
         </div>
 
         <script>
+        // Theme Toggle Mode Function
+        function toggleThemeMode() {
+            const isDark = $('html').attr('data-bs-theme') === 'dark';
+            const newMode = isDark ? 0 : 1;
+            $.post('api.php?action=toggle_theme', { dark_mode: newMode }, function(res) {
+                if (res.success) {
+                    window.location.reload();
+                } else {
+                    alert('Não foi possível alterar o tema.');
+                }
+            }).fail(function() {
+                alert('Erro ao conectar com o servidor.');
+            });
+        }
+
         // Automatic Session Expiry Monitor (30 Minutes = 1800s; Warn at 1680s)
         (function() {
             let inactiveTime = 0;
