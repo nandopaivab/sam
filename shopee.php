@@ -38,13 +38,32 @@ $flashDeals = [
     ['title' => 'Tripé de Celular Ring Light com Controle', 'price' => 24.90, 'original_price' => 59.90, 'claimed' => 48, 'velocity' => 'Média', 'badge' => 'Oferta do Dia']
 ];
 
-$shopeeKeywords = [
-    ['keyword' => 'achadinhos da shopee', 'volume' => 450000, 'cpc' => 0.12, 'growth' => '+180%'],
-    ['keyword' => 'organizador de maquiagem', 'volume' => 120000, 'cpc' => 0.25, 'growth' => '+95%'],
-    ['keyword' => 'fone bluetooth sem fio', 'volume' => 350000, 'cpc' => 0.32, 'growth' => '+110%'],
-    ['keyword' => 'garrafa motivacional 2l', 'volume' => 180000, 'cpc' => 0.18, 'growth' => '+140%'],
-    ['keyword' => 'mini processador usb', 'volume' => 140000, 'cpc' => 0.15, 'growth' => '+85%']
+$baseShopeeKeywords = [
+    'achadinhos da shopee', 'organizador de maquiagem', 'fone bluetooth sem fio', 'garrafa motivacional 2l', 'mini processador usb', 
+    'copo stanley termico', 'relogio masculino smart', 'mochila escolar impermeavel', 'luminaria led decorativa', 'tapete para banheiro', 
+    'escova secadora rotativa', 'maquina de cortar cabelo', 'meia sapatilha antiderrapante', 'bolsa feminina transversal', 'capinha de iphone', 
+    'pelicula de vidro temperado', 'kit pincel maquiagem', 'colar feminino prata', 'brinco de argola', 'anel regulavel', 
+    'carteira masculina couro', 'cinto masculino social', 'oculos de sol quadrado', 'corrente de prata masculina', 'pulseira inteligente fit', 
+    'carregador portatil powerbank', 'suporte de celular carro', 'cabo usb tipo c', 'adaptador tomada universal', 'fone de ouvido com fio', 
+    'mouse sem fio recarregavel', 'teclado mecanico gamer', 'pad mouse grande', 'caixa de som bluetooth bluetooth', 'microfone lapela sem fio', 
+    'tripod celular selfie', 'anel de luz ring light', 'camera de segurança wifi', 'lampada inteligente rgb', 'difusor de aromas ultrassonico', 
+    'mini ventilador portatil', 'esponja eletrica limpeza', 'massageador corporal eletrico', 'balança digital cozinha', 'garrafa termica inox', 
+    'marmita termica eletrica', 'escorredor de pratos pia', 'cabide de veludo fino', 'organizador de sapatos', 'caixa organizadora plastico'
 ];
+$shopeeKeywords = [];
+foreach ($baseShopeeKeywords as $idx => $kw) {
+    $seed = strlen($kw) + $idx;
+    $volume = 10000 + (($seed * 3479) % 480000);
+    $cpc = 0.05 + (($seed * 17) % 85) / 100;
+    $growth = '+' . (20 + (($seed * 43) % 230)) . '%';
+    
+    $shopeeKeywords[] = [
+        'keyword' => $kw,
+        'volume' => $volume,
+        'cpc' => $cpc,
+        'growth' => $growth
+    ];
+}
 
 require __DIR__ . '/templates/header.php';
 ?>

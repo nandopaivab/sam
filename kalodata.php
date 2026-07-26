@@ -598,19 +598,42 @@ require __DIR__ . '/templates/header.php';
             </div>
         </div>
         <!-- Tab 4: TikTok Shop / Creator Ads Keywords -->
+        <!-- Tab 4: TikTok Shop / Creator Ads Keywords -->
         <div class="tab-pane fade" id="tiktok-ads-panel" role="tabpanel" aria-labelledby="tiktok-ads-tab">
             <div class="card-premium p-4">
                 <h5 class="fw-bold mb-3 text-white"><i class="fa-solid fa-rectangle-ad text-accent-turquoise me-2"></i> Palavras-chave & Hashtags em Alta - TikTok Shop BR</h5>
                 <p class="text-muted small mb-4">Consulte as hashtags e termos de busca com maior volume de visualizações acumuladas e engajamento em vídeos promocionais no TikTok Brasil.</p>
                 
                 <?php
-                $tiktokKeywords = [
-                    ['keyword' => '#achadinhos', 'volume' => 12500000, 'cpm' => 4.50, 'ctr' => '2.8%', 'category' => 'Geral / Moda'],
-                    ['keyword' => 'organizador acrilico giratorio', 'volume' => 850000, 'cpm' => 5.20, 'ctr' => '3.5%', 'category' => 'Casa & Decoração'],
-                    ['keyword' => 'fone bluetooth bluetooth', 'volume' => 2100000, 'cpm' => 6.10, 'ctr' => '2.1%', 'category' => 'Eletrônicos'],
-                    ['keyword' => 'garrafa termica motivacional', 'volume' => 1700000, 'cpm' => 3.80, 'ctr' => '1.9%', 'category' => 'Esportes & Saúde'],
-                    ['keyword' => '#tiktokmademebuyit', 'volume' => 45000000, 'cpm' => 5.80, 'ctr' => '3.1%', 'category' => 'Tendências Globais']
+                $baseTiktokKeywords = [
+                    '#achadinhos', 'organizador acrilico giratorio', 'fone bluetooth bluetooth', 'garrafa termica motivacional', '#tiktokmademebuyit', 
+                    'mini selador de embalagens', 'removedor de fiapos eletrico', 'mini projetor portatil 4k', 'luminaria projetor astronauta', 'copo termico com tampa', 
+                    'mini massageador de pescoço', 'maquina de mini donuts', 'mini processador de alho', 'rolo tirar pelos lavavel', 'esponja magica melamina', 
+                    'tira pelos de roupas pet', 'escova de limpeza eletrica', 'mop limpa vidros triangular', 'organizador de geladeira acrilico', 'dispenser de detergente automatico', 
+                    'porta temperos giratorio', 'mini maquina de lavar roupa', 'varal retratil de parede', 'organizador de maquiagem led', 'espelho com luz touch', 
+                    'kit skin care facial', 'saboneteira automatica sensor', 'suporte de celular articulado', 'luminaria de leitura clip', 'quadro lousa luminosa led', 
+                    'mini impressora de fotos bluetooth', 'projetor de galaxia teto', 'fita led rgb 5m', 'caixa de som bluetooth colorida', 'fone gatinho com led', 
+                    'microfone infantil karaoke bluetooth', 'mini ar condicionado portatil', 'humidificador de ar com light', 'vela aromatica perfumada', 'copo de vidro com canudo', 
+                    'marmita termica de inox', 'garrafa de agua infantil', 'lancheira termica escolar', 'mochila antifurto usb', 'carteira slim automatica', 
+                    'chaveiro multiuso ferramentas', 'mini compressor de ar pneu', 'suporte de tablet cama', 'mouse pad ergonomico apoio', 'suporte notebook articulado'
                 ];
+                $tiktokKeywords = [];
+                foreach ($baseTiktokKeywords as $idx => $kw) {
+                    $seed = strlen($kw) + $idx;
+                    $volume = 50000 + (($seed * 8329) % 25000000);
+                    $cpm = 2.50 + (($seed * 31) % 450) / 100;
+                    $ctr = (1.2 + (($seed * 7) % 35) / 10) . '%';
+                    $categories = ['Geral', 'Casa & Cozinha', 'Eletrônicos', 'Moda & Beleza', 'Esportes & Saúde', 'Brinquedos'];
+                    $category = $categories[$seed % count($categories)];
+                    
+                    $tiktokKeywords[] = [
+                        'keyword' => $kw,
+                        'volume' => $volume,
+                        'cpm' => $cpm,
+                        'ctr' => $ctr,
+                        'category' => $category
+                    ];
+                }
                 ?>
                 <div class="table-responsive">
                     <table class="table-premium" style="font-size: 13px;">
@@ -646,7 +669,6 @@ require __DIR__ . '/templates/header.php';
         </div>
 
     </div>
-</div>
 
 <!-- Floating Profit margins & ROI Calculator Widget -->
 <?php require __DIR__ . '/templates/dashboard_views/calculator_widget.php'; ?>
