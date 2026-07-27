@@ -48,6 +48,7 @@ class Database {
             self::checkAndCreateSavedSuppliersTable();
             self::checkAndCreateApiColumns();
             self::checkAndCreateErpTables();
+            self::checkAndSeedNicheProducts(self::$pdo);
             return self::$pdo;
         } catch (PDOException $e) {
             // Check if connection was refused (code 2002) or operation not permitted
@@ -94,6 +95,7 @@ class Database {
             self::checkAndCreateSavedSuppliersTable();
             self::checkAndCreateApiColumns();
             self::checkAndCreateErpTables();
+            self::checkAndSeedNicheProducts(self::$pdo);
 
             return self::$pdo;
         } catch (PDOException $e) {
@@ -382,22 +384,6 @@ class Database {
                 $insCrm->execute([1, 'Forn. Bebê Feliz Atacado', 'WhatsApp', $today, '14:00:00', 'Fernando Paiva', 'Amostra de Prato Ventosa Silicone', 'Solicitado envio de amostra nas cores azul e rosa para testes de durabilidade e aderência.', 'Amostra Solicitada', 'Alto', 'Alta', 'Verificar código de rastreio da amostra', $tomorrow, 'Prato com Ventosa Silicone', 'Shopee', 'Sistema']);
                 $insCrm->execute([1, 'Atacadista MegaUtil BR', 'E-mail', $today, '09:15:00', 'Fernando Paiva', 'Cotação de Organizadores de Temperos', 'Recebida cotação inicial de R$ 12,50/unidade. Negociando para R$ 10,00.', 'Negociação', 'Médio', 'Média', 'Aguardar resposta sobre lote de 500 un.', $tomorrow, 'Organizador de Temperos', 'Mercado Livre', 'Sistema']);
             }
-
-            $cntBlue = (int)self::$pdo->query("SELECT COUNT(*) FROM blue_ocean_products")->fetchColumn();
-            if ($cntBlue === 0) {
-                $insBlue = self::$pdo->prepare("INSERT INTO blue_ocean_products (title, category, niche, target_audience, problem_solved, avg_price, est_cost, proj_margin, approx_competitors, trend_score, seasonality, related_suppliers, suggested_kits, opportunity_badge, investment_recommendation) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                
-                $insBlue->execute(['Organizador de Temperos para Gaveta', 'Organização', 'Cozinha', 'Donas de casa e entusiastas de culinária', 'Organização e facilidade de visualização de potes de condimento em gavetas padrão.', 59.90, 15.00, 299.3, 4, 94, 'Ano Todo', 'Atacadista MegaUtil BR', 'Kit com 4 Organizadores | Kit Completo com 12 potes de vidro incluídos | Kit Duplo Organizador + Etiquetas de Identificação', 'Alta Oportunidade', 'Excelente para anúncios segmentados no TikTok focados em organização.']);
-                $insBlue->execute(['Suporte Organizador de Tampas de Panela', 'Organização', 'Cozinha', 'Pessoas com cozinhas compactas', 'Otimização de espaço em armários de cozinha ao organizar tampas verticalmente.', 45.00, 12.00, 275.0, 8, 88, 'Ano Todo', 'Mega Importadora SP', 'Kit Organizador de Tampas + Organizador de Panelas | Kit Duplo para armários grandes', 'Média Oportunidade', 'Bom para cross-sell com o Organizador de Gavetas.']);
-            }
-
-            $cntBaby = (int)self::$pdo->query("SELECT COUNT(*) FROM baby_niche_products")->fetchColumn();
-            if ($cntBaby === 0) {
-                $insBaby = self::$pdo->prepare("INSERT INTO baby_niche_products (title, sub_category, age_range, safety_cert, material_info, cleaning_ease, small_parts_risk, avg_price, est_cost, suggested_kits, income_bracket, ai_analysis) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                
-                $insBaby->execute(['Prato com Ventosa Silicone BPA Free', 'Alimentação', '6 meses a 3 anos', 'INMETRO / Atóxico', 'Silicone 100% Alimentar Livre de BPA', 'Pode ir à lava-louças', 'Sem peças pequenas', 39.90, 10.00, 'Kit Alimentação Completa (Prato + Babador + Colher de Silicone) | Kit com 2 Pratos Cores Sortidas | Kit Introdução Alimentar Premium', 'Todas as faixas (Acessível)', 'Produto altamente recomendado para introdução alimentar. O diferencial é a ventosa forte que evita quedas e bagunça.']);
-                $insBaby->execute(['Mordedor Sensorial Girafa Antiasfixia', 'Desenvolvimento Infantil', '3 meses a 18 meses', 'INMETRO / Atóxico', 'Silicone Macio BPA Free', 'Esterilizável em água fervente', 'Sem peças pequenas', 29.90, 7.50, 'Kit Mordedor + Preendedor de chupeta | Kit Mordedores Fofos (Girafa + Elefante) | Kit Dentinho Saudável Premium', 'Classe C/D/E (Acessível)', 'Mordedor anatômico que alivia as gengivas do bebê com segurança.']);
-            }
             
             // Alter users table to add API configuration fields if missing
             try {
@@ -409,6 +395,103 @@ class Database {
             try {
                 self::$pdo->exec("ALTER TABLE users ADD COLUMN ai_provider VARCHAR(50) DEFAULT 'local';");
             } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+            // Ignore seeding errors
+        }
+    }
+
+    /**
+     * Unified seeder for Blue Ocean and Baby Niche tables on both SQLite & MySQL.
+     * Ensures at least 10 high-quality products are present in each.
+     */
+    public static function checkAndSeedNicheProducts(PDO $db): void {
+        $dbType = self::$driverType;
+        $aiKeyType = $dbType === 'sqlite' ? 'INTEGER PRIMARY KEY AUTOINCREMENT' : 'INT AUTO_INCREMENT PRIMARY KEY';
+        $textType = $dbType === 'sqlite' ? 'TEXT' : 'VARCHAR(255)';
+        $longTextType = $dbType === 'sqlite' ? 'TEXT' : 'TEXT';
+        $doubleType = $dbType === 'sqlite' ? 'REAL' : 'DECIMAL(10,2)';
+        $decimal52Type = $dbType === 'sqlite' ? 'REAL' : 'DECIMAL(5,2)';
+        $intType = $dbType === 'sqlite' ? 'INTEGER' : 'INT';
+        $timestampType = $dbType === 'sqlite' ? 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP' : 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP';
+
+        // Ensure tables exist
+        try {
+            $db->exec("CREATE TABLE IF NOT EXISTS blue_ocean_products (
+                id {$aiKeyType},
+                title {$textType} NOT NULL,
+                category {$textType} NOT NULL,
+                niche {$textType} NOT NULL,
+                target_audience {$textType} NOT NULL,
+                problem_solved {$longTextType} NOT NULL,
+                avg_price {$doubleType} NOT NULL,
+                est_cost {$doubleType} NOT NULL,
+                proj_margin {$decimal52Type} NOT NULL,
+                approx_competitors {$intType} DEFAULT 10,
+                trend_score {$intType} DEFAULT 90,
+                seasonality {$textType} DEFAULT 'Ano Todo',
+                related_suppliers {$longTextType} DEFAULT NULL,
+                suggested_kits {$longTextType} DEFAULT NULL,
+                opportunity_badge {$textType} DEFAULT 'Alta Oportunidade',
+                investment_recommendation {$longTextType} DEFAULT NULL,
+                created_at {$timestampType}
+            )");
+        } catch (\Exception $e) {}
+
+        try {
+            $db->exec("CREATE TABLE IF NOT EXISTS baby_niche_products (
+                id {$aiKeyType},
+                title {$textType} NOT NULL,
+                sub_category {$textType} NOT NULL,
+                age_range {$textType} NOT NULL,
+                safety_cert {$textType} DEFAULT 'INMETRO / Atóxico',
+                material_info {$textType} DEFAULT 'Livre de BPA',
+                cleaning_ease {$textType} DEFAULT 'Fácil higienização',
+                small_parts_risk {$textType} DEFAULT 'Baixo Risco',
+                avg_price {$doubleType} NOT NULL,
+                est_cost {$doubleType} NOT NULL,
+                suggested_kits {$longTextType} DEFAULT NULL,
+                income_bracket {$textType} DEFAULT 'Todas as faixas (Acessível)',
+                ai_analysis {$longTextType} DEFAULT NULL,
+                created_at {$timestampType}
+            )");
+        } catch (\Exception $e) {}
+
+        try {
+            // Seed Blue Ocean
+            $cntBlue = (int)$db->query("SELECT COUNT(*) FROM blue_ocean_products")->fetchColumn();
+            if ($cntBlue < 10) {
+                $db->exec("DELETE FROM blue_ocean_products");
+                $insBlue = $db->prepare("INSERT INTO blue_ocean_products (title, category, niche, target_audience, problem_solved, avg_price, est_cost, proj_margin, approx_competitors, trend_score, seasonality, related_suppliers, suggested_kits, opportunity_badge, investment_recommendation) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                
+                $insBlue->execute(['Organizador de Temperos para Gaveta', 'Organização', 'Cozinha', 'Donas de casa e entusiastas de culinária', 'Organização e facilidade de visualização de potes de condimento em gavetas padrão.', 59.90, 15.00, 299.30, 4, 94, 'Ano Todo', 'Atacadista MegaUtil BR', 'Kit com 4 Organizadores | Kit Completo com 12 potes de vidro incluídos | Kit Duplo Organizador + Etiquetas de Identificação', 'Alta Oportunidade', 'Excelente para anúncios segmentados no TikTok focados em organização.']);
+                $insBlue->execute(['Suporte Organizador de Tampas de Panela', 'Organização', 'Cozinha', 'Pessoas com cozinhas compactas', 'Otimização de espaço em armários de cozinha ao organizar tampas verticalmente.', 45.00, 12.00, 275.00, 8, 88, 'Ano Todo', 'Mega Importadora SP', 'Kit Organizador de Tampas + Organizador de Panelas | Kit Duplo para armários grandes', 'Média Oportunidade', 'Bom para cross-sell com o Organizador de Gavetas.']);
+                $insBlue->execute(['Mini Selador de Embalagens Portátil', 'Utensílios Domésticos', 'Cozinha & Organização', 'Donas de casa e pessoas que moram sozinhas', 'Preserva alimentos abertos vedando embalagens plásticas instantaneamente por calor.', 24.90, 5.00, 398.00, 12, 95, 'Ano Todo', 'Lojas 10 BR Atacado', 'Kit com 2 Seladores (Cores Sortidas) | Kit Selador + 4 Pilhas Recarregáveis | Lote com 5 Seladores Família', 'Alta Oportunidade', 'Excelente apelo visual para vídeos rápidos demonstrativos no Instagram Reels.']);
+                $insBlue->execute(['Espelho de Maquiagem com Luz LED Touch', 'Beleza & Organização', 'Quarto & Closet', 'Jovens e blogueiras de maquiagem', 'Iluminação ideal e ajuste de ângulo para maquiagem em ambientes escuros.', 79.90, 22.00, 263.18, 7, 91, 'Ano Todo', 'Atacadista ImportaExpress', 'Kit Espelho LED + Organizador Acrílico | Kit Viagem Espelho + Necessaire | Kit Duplo Espelho Maquiagem', 'Alta Oportunidade', 'Alto valor percebido, ideal para criativos de antes e depois (make).']);
+                $insBlue->execute(['Organizador Acrílico de Maquiagem Giratório 360°', 'Beleza & Organização', 'Quarto & Banheiro', 'Mulheres com foco em organização de cosméticos', 'Otimiza espaço na penteadeira organizando dezenas de cosméticos em base giratória de fácil acesso.', 89.90, 24.00, 274.58, 6, 93, 'Ano Todo', 'Mega Importadora SP', 'Organizador 360 + Espelho Maquiagem | Kit Duplo Organizador Giratório | Organizador com Conjunto de Pincéis', 'Alta Oportunidade', 'Produto muito procurado para presentes de fim de ano.']);
+                $insBlue->execute(['Lixeira Automática com Sensor de Presença', 'Tecnologia & Casa', 'Banheiro & Cozinha', 'Pessoas focadas em higiene e casas inteligentes', 'Abertura sem toque físico, prevenindo contaminação por germes e odores desagradáveis.', 129.90, 38.00, 241.84, 5, 96, 'Ano Todo', 'Atacadista TechUtil BR', 'Kit Lixeira Automática Banheiro + Cozinha | Lixeira Automática + Pilhas Premium | Kit Lixeiras Inteligentes Triplo', 'Alta Oportunidade', 'Alta taxa de cliques com anúncios em formato unboxing.']);
+                $insBlue->execute(['Mini Triturador de Alho Elétrico Sem Fio', 'Utensílios Domésticos', 'Cozinha', 'Cozinheiros iniciantes e experientes', 'Tritura temperos em 5 segundos, poupando tempo e evitando cheiro forte nas mãos.', 39.90, 9.50, 320.00, 14, 92, 'Ano Todo', 'Atacadista MegaUtil BR', 'Kit Triturador + Mini Selador de Embalagens | Triturador Duplo (Cozinha e Churrasqueira) | Triturador + Escova de Limpeza', 'Média Oportunidade', 'Volume gigante de buscas no TikTok Shop. Focar em precificação agressiva.']);
+                $insBlue->execute(['Removedor de Fiapos de Roupas Elétrico Recarregável', 'Lavanderia & Utilidades', 'Casa & Roupas', 'Pessoas com pets ou casacos de lã', 'Remove bolinhas e fiapos de tecidos antigos, devolvendo o aspecto de novo às roupas.', 49.90, 12.50, 299.20, 9, 89, 'Inverno', 'Lojas 10 BR Atacado', 'Removedor de Fiapos + 2 Lâminas Extras | Removedor + Rolo Lavável Tirar Pelos | Kit Lavanderia Premium', 'Alta Oportunidade', 'Sazonalidade forte no outono e inverno, excelente conversão orgânica.']);
+                $insBlue->execute(['Mop de Limpeza Triangular Articulado', 'Limpeza & Utilidades', 'Casa & Limpeza', 'Diaristas e donos de casa práticos', 'Limpa cantos de difícil acesso em paredes e tetos sem necessidade de escadas.', 69.90, 18.00, 288.33, 5, 94, 'Ano Todo', 'Mega Importadora SP', 'Mop Triangular + 2 Panos Microfibra Reservas | Kit Mop Triangular + Mop Spray | Kit Limpeza Geral 360', 'Alta Oportunidade', 'Vídeos demonstrativos de limpeza extrema geram enorme viralização.']);
+                $insBlue->execute(['Luminária Projetor de Astronauta Galáxia LED', 'Decoração & Infantil', 'Quarto & Decoração', 'Pais com crianças pequenas ou jovens geeks', 'Ajuda crianças a dormir simulando constelações e nebulosas no teto do quarto.', 119.90, 32.00, 274.68, 11, 97, 'Ano Todo', 'Atacadista ImportaExpress', 'Projetor Astronauta + Fita LED RGB | Astronauta Duplo (Quarto das Crianças) | Projetor Astronauta + Luminária Lua', 'Alta Oportunidade', 'Forte apelo visual para anúncios noturnos e presentes infantis.']);
+            }
+
+            // Seed Baby Niche
+            $cntBaby = (int)$db->query("SELECT COUNT(*) FROM baby_niche_products")->fetchColumn();
+            if ($cntBaby < 10) {
+                $db->exec("DELETE FROM baby_niche_products");
+                $insBaby = $db->prepare("INSERT INTO baby_niche_products (title, sub_category, age_range, safety_cert, material_info, cleaning_ease, small_parts_risk, avg_price, est_cost, suggested_kits, income_bracket, ai_analysis) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                
+                $insBaby->execute(['Prato com Ventosa Silicone BPA Free', 'Alimentação', '6 meses a 3 anos', 'INMETRO / Atóxico', 'Silicone 100% Alimentar Livre de BPA', 'Pode ir à lava-louças', 'Sem peças pequenas', 39.90, 10.00, 'Kit Alimentação Completa (Prato + Babador + Colher de Silicone) | Kit com 2 Pratos Cores Sortidas | Kit Introdução Alimentar Premium', 'Todas as faixas (Acessível)', 'Produto altamente recomendado para introdução alimentar. O diferencial é a ventosa forte que evita quedas e bagunça.']);
+                $insBaby->execute(['Mordedor Sensorial Girafa Antiasfixia', 'Desenvolvimento Infantil', '3 meses a 18 meses', 'INMETRO / Atóxico', 'Silicone Macio BPA Free', 'Esterilizável em água fervente', 'Sem peças pequenas', 29.90, 7.50, 'Kit Mordedor + Preendedor de chupeta | Kit Mordedores Fofos (Girafa + Elefante) | Kit Dentinho Saudável Premium', 'Todas as faixas (Acessível)', 'Mordedor anatômico que alivia as gengivas do bebê com segurança.']);
+                $insBaby->execute(['Alimentador Alimentar de Silicone para Frutas', 'Alimentação', '6 meses a 12 meses', 'INMETRO / Atóxico', 'Bico de Silicone e Alça Plástica BPA Free', 'Fácil desmontagem e lavagem', 'Sem peças pequenas', 19.90, 4.50, 'Alimentador de Frutas + 2 Bicos Reservas | Kit Alimentador + Babador Impermeável | Kit Lanche Prático Bebê', 'Todas as faixas (Acessível)', 'Permite ao bebê experimentar frutas e legumes sólidos com segurança, sem risco de asfixia.']);
+                $insBaby->execute(['Babador de Silicone com Coletor de Migalhas', 'Alimentação', '4 meses a 3 anos', 'INMETRO / Atóxico', 'Silicone Impermeável Livre de BPA', 'Limpeza simples com pano ou água', 'Sem peças pequenas', 24.90, 6.00, 'Kit com 2 Babadores Silicone Cores Sortidas | Kit Alimentação (Babador + Prato Ventosa) | Kit Passeio Sem Sujeira', 'Todas as faixas (Acessível)', 'Ajuda a manter as roupas limpas durante as refeições. O coletor frontal de migalhas evita sujeira no chão.']);
+                $insBaby->execute(['Ninho Redutor de Berço Algodão Macio', 'Sono', 'Recém-nascido a 6 meses', 'Tecido Hipoalergênico', 'Algodão 100% com enchimento de Poliéster', 'Capa removível e lavável', 'Baixo Risco', 99.90, 32.00, 'Ninho Redutor + Almofada Amamentação | Ninho Redutor + Manta Microfibra Macia | Kit Sono Seguro Recém-nascido', 'Todas as faixas (Acessível)', 'Simula o ambiente do útero materno, acalmando o bebê e garantindo um sono mais longo e tranquilo.']);
+                $insBaby->execute(['Almofada de Banho para Bebê Ergonômica', 'Banho', 'Recém-nascido a 10 meses', 'Hipoalergênica / Segura', 'Enchimento EPS Microesferas e Lycra', 'Secagem rápida por pendurar', 'Sem peças pequenas', 79.90, 24.00, 'Almofada de Banho + Brinquedos Ventosa | Kit Banho Feliz (Almofada + Toalha com Capuz) | Almofada Banho + Termômetro Água', 'Todas as faixas (Acessível)', 'Mantém a cabeça do bebê acima da água de forma estável, permitindo que a mãe fique com as manos livres.']);
+                $insBaby->execute(['Protetor de Quinas de Silicone Transparente (Kit)', 'Segurança', '9 meses a 4 anos', 'Adesivo 3M Extra Forte', 'Silicone Flexível Hipoalergênico', 'Pano úmido', 'Atenção no encaixe', 15.90, 3.00, 'Kit com 8 Protetores de Quina | Kit Segurança Casa (8 Protetores + 2 Travas de Gaveta) | Kit Segurança Max (20 peças)', 'Todas as faixas (Acessível)', 'Essencial para a fase em que o bebê começa a engatinhar e andar. Evita acidentes graves em móveis pontiagudos.']);
+                $insBaby->execute(['Organizador de Brinquedos de Banho com Ventosa', 'Organização', '6 meses a 4 anos', 'Ventosas Reforçadas', 'Rede de Nylon de alta resistência', 'Lavável em máquina', 'Sem peças pequenas', 29.90, 7.00, 'Organizador Rede + 3 Brinquedos de Água | Kit Organizadores Banheiro Duplo | Organizador Banho + Toalha Infantil', 'Todas as faixas (Acessível)', 'Evita mofo nos brinquedos mantendo-os escorridos e guardados de forma organizada na parede do banheiro.']);
+                $insBaby->execute(['Copo de Treinamento com Alças 360° Antivazamento', 'Alimentação', '6 meses a 2 anos', 'INMETRO / Atóxico', 'Silicone e Plástico Livre de BPA', 'Desmontável para higienização', 'Sem peças pequenas', 34.90, 8.50, 'Copo 360 + Copo Canudo | Kit Transição de Mamadeira Completo | Kit Copo 360 Cores Gêmeos', 'Todas as faixas (Acessível)', 'Permite beber de qualquer lado da borda sem derramar, auxiliando no desenvolvimento motor oral da criança.']);
+                $insBaby->execute(['Espelho Retrovisor para Banco Traseiro de Carro', 'Passeio', 'Recém-nascido a 3 anos', 'Ajuste 360° Anticaída', 'Plástico ABS e Espelho Acrílico Inquebrável', 'Pano seco', 'Sem peças pequenas', 49.90, 14.00, 'Espelho Carro + Protetor Solar Janela | Kit Viagem Bebê (Espelho + Organizador de Banco) | Espelho Carro Duplo', 'Todas as faixas (Acessível)', 'Permite monitorar o bebê no bebê conforto de costas para os pais enquanto dirigem, com total segurança e sem distrações.']);
+            }
         } catch (\Exception $e) {
             // Ignore seeding errors
         }
