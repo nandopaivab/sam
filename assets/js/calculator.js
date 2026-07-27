@@ -93,6 +93,9 @@ $(document).ready(function() {
  * Global helper to fill product values directly into the calculator from search result tables
  */
 function openCalculatorWithProduct(title, price, estimatedCost = null) {
+    if (window.event) {
+        window.event.stopPropagation();
+    }
     $('#calculator-panel').fadeIn(200);
     $('#calc-price').val(price);
     

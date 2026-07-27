@@ -289,7 +289,7 @@ $(document).ready(function() {
                     <td>
                         <div class="btn-group">
                             <button onclick="lookupSuppliers(${p.id}, '${cleanTitle}', ${p.price})" class="btn btn-sm btn-outline-turquoise" title="Buscar Fornecedores"><i class="fa-solid fa-truck-ramp-box"></i></button>
-                            <button onclick="openCalculatorWithProduct('${cleanTitle}', ${p.price})" class="btn btn-sm btn-outline-info" title="Calcular Lucro"><i class="fa-solid fa-calculator"></i></button>
+                            <button onclick="openCalculatorWithProduct('${cleanTitle}', ${p.price}); event.stopPropagation();" class="btn btn-sm btn-outline-info" title="Calcular Lucro"><i class="fa-solid fa-calculator"></i></button>
                             <button onclick="triggerAiAdvisor(${p.id}, '${cleanTitle}')" class="btn btn-sm btn-outline-purple" title="Analise Inteligência Artificial"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
                             <button onclick="openPriceHistory(${p.id}, '${cleanTitle}')" class="btn btn-sm btn-outline-warning" title="Histórico de Preços"><i class="fa-solid fa-chart-line"></i></button>
                             <button onclick="toggleFavorite(${p.id}, this)" class="btn btn-sm btn-outline-danger" title="Favoritar"><i class="fa-regular fa-heart"></i></button>
