@@ -405,9 +405,11 @@ $(document).ready(function() {
                     list.append(`
                         <div class="d-flex align-items-center justify-content-between p-2 mb-2 rounded border border-light-subtle" style="background-color: rgba(255,255,255,0.01)">
                             <div class="d-flex align-items-center text-truncate">
-                                <img src="${f.image_url}" class="rounded me-2" style="width:36px;height:36px;object-fit:cover;">
+                                <a href="saved_products.php?highlight=${f.id}">
+                                    <img src="${f.image_url}" class="rounded me-2" style="width:36px;height:36px;object-fit:cover;" title="Ver todas as opções">
+                                </a>
                                 <div class="text-truncate" style="max-width: 140px;">
-                                    <div class="fw-semibold text-truncate small">${f.title}</div>
+                                    <a href="saved_products.php?highlight=${f.id}" class="fw-semibold text-truncate small text-white text-decoration-none hover-underline d-block" title="Ver todas as opções">${f.title}</a>
                                     <small class="text-uppercase text-accent-turquoise fw-bold" style="font-size:10px;">${f.marketplace}</small>
                                 </div>
                             </div>

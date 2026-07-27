@@ -119,8 +119,8 @@ $favorites = $stmt->fetchAll();
                                      alt="Thumb" class="rounded shadow-sm" style="width: 50px; height: 50px; object-fit: cover;">
                             </td>
                             <td>
-                                <div class="fw-bold text-white text-truncate" style="max-width: 260px;" title="<?php echo htmlspecialchars($p['title']); ?>">
-                                    <?php echo htmlspecialchars($p['title']); ?>
+                                <div class="fw-bold text-white text-truncate" style="max-width: 260px; cursor: pointer;" title="Clique para abrir todas as opções" onclick="toggleSavedProductDetail(<?php echo (int)$p['id']; ?>)">
+                                    <i class="fa-solid fa-chevron-right me-1 text-muted transition-transform" id="chevron-saved-<?php echo (int)$p['id']; ?>" style="font-size: 11px; transition: transform 0.2s;"></i> <?php echo htmlspecialchars($p['title']); ?>
                                 </div>
                                 <small class="text-muted d-block">
                                     <i class="fa-solid fa-store me-1"></i> <?php echo htmlspecialchars($p['store_name'] ?: 'Loja Verificada'); ?>
@@ -180,6 +180,45 @@ $favorites = $stmt->fetchAll();
                                         class="btn btn-sm btn-outline-danger" title="Remover dos Salvos">
                                     <i class="fa-regular fa-trash-can"></i>
                                 </button>
+                            </td>
+                        </tr>
+                        <tr id="detail-saved-<?php echo (int)$p['id']; ?>" class="detail-saved-row d-none" style="background-color: rgba(255,255,255,0.015); border-left: 3px solid #745df7;">
+                            <td></td>
+                            <td colspan="7">
+                                <div class="p-3 text-start">
+                                    <div class="row g-3">
+                                        <!-- Option 1: AI options -->
+                                        <div class="col-12 col-md-4">
+                                            <div class="card bg-dark border-light-subtle p-3 h-100" style="border-radius: 10px;">
+                                                <h6 class="fw-bold text-white mb-2"><i class="fa-solid fa-wand-magic-sparkles text-accent-purple me-2"></i> Anúncios & Copys IA</h6>
+                                                <p class="text-muted small mb-3">Gere títulos SEO, copys com gatilhos mentais (AIDA) e roteiros de vídeo para conversão:</p>
+                                                <button onclick="generateAdForSingle(<?php echo (int)$p['id']; ?>, '<?php echo addslashes($p['title']); ?>')" class="btn btn-sm btn-primary bg-gradient border-0 fw-bold w-100 py-2" style="background-color: #745df7;"><i class="fa-solid fa-wand-magic-sparkles me-1"></i> Criar Anúncio com IA</button>
+                                            </div>
+                                        </div>
+                                        <!-- Option 2: Price stats & margin calc -->
+                                        <div class="col-12 col-md-4">
+                                            <div class="card bg-dark border-light-subtle p-3 h-100" style="border-radius: 10px;">
+                                                <h6 class="fw-bold text-white mb-2"><i class="fa-solid fa-calculator text-success me-2"></i> Finanças & Tendências</h6>
+                                                <p class="text-muted small mb-3">Calcule a margem líquida real de lucro após taxas de marketplace e veja histórico de preço:</p>
+                                                <div class="d-flex flex-column gap-2">
+                                                    <button onclick="openCalculatorWithProduct('<?php echo addslashes($p['title']); ?>', <?php echo (float)$p['price']; ?>)" class="btn btn-sm btn-success bg-gradient border-0 fw-bold w-100 py-2"><i class="fa-solid fa-calculator me-1"></i> Calculadora de Lucro</button>
+                                                    <button onclick="openPriceHistory(<?php echo (int)$p['id']; ?>, '<?php echo addslashes($p['title']); ?>')" class="btn btn-sm btn-outline-warning fw-bold w-100 py-2"><i class="fa-solid fa-chart-line me-1"></i> Ver Histórico de Preços</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Option 3: Suppliers & Alerts -->
+                                        <div class="col-12 col-md-4">
+                                            <div class="card bg-dark border-light-subtle p-3 h-100" style="border-radius: 10px;">
+                                                <h6 class="fw-bold text-white mb-2"><i class="fa-solid fa-truck-ramp-box text-info me-2"></i> Abastecimento & Alertas</h6>
+                                                <p class="text-muted small mb-3">Localize parceiros de atacado nacionais recomendados e crie alertas de preço:</p>
+                                                <div class="d-flex flex-column gap-2">
+                                                    <button onclick="lookupSuppliers(<?php echo (int)$p['id']; ?>, '<?php echo addslashes($p['title']); ?>', <?php echo (float)$p['price']; ?>)" class="btn btn-sm btn-info bg-gradient border-0 text-white fw-bold w-100 py-2"><i class="fa-solid fa-truck me-1"></i> Buscar Fornecedores</button>
+                                                    <button onclick="openAlertModal(<?php echo (int)$p['id']; ?>, '<?php echo addslashes($p['title']); ?>', <?php echo (float)$p['price']; ?>)" class="btn btn-sm btn-outline-success fw-bold w-100 py-2"><i class="fa-regular fa-bell me-1"></i> Configurar Alerta</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -462,6 +501,7 @@ function removeSelectedFavorites() {
         $.post('api.php?action=remove_favorite', { product_id: id }, function() {
             completed++;
             $('#row-saved-' + id).remove();
+            $('#detail-saved-' + id).remove();
             if (completed === ids.length) {
                 if ($('.saved-row').length === 0) {
                     location.reload();
@@ -470,6 +510,40 @@ function removeSelectedFavorites() {
         });
     });
 }
+
+function toggleSavedProductDetail(id) {
+    const detailRow = $('#detail-saved-' + id);
+    const chevron = $('#chevron-saved-' + id);
+    if (detailRow.hasClass('d-none')) {
+        detailRow.removeClass('d-none');
+        chevron.css('transform', 'rotate(90deg)');
+    } else {
+        detailRow.addClass('d-none');
+        chevron.css('transform', 'rotate(0deg)');
+    }
+}
+
+$(document).ready(function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const highlightId = urlParams.get('highlight');
+    if (highlightId) {
+        setTimeout(() => {
+            toggleSavedProductDetail(highlightId);
+            const targetRow = $('#row-saved-' + highlightId);
+            if (targetRow.length) {
+                $('html, body').animate({
+                    scrollTop: targetRow.offset().top - 120
+                }, 600);
+            }
+        }, 300);
+    }
+});
 </script>
+
+<!-- Floating Profit margins & ROI Calculator Widget -->
+<?php require __DIR__ . '/templates/dashboard_views/calculator_widget.php'; ?>
+
+<!-- Modals wrapper templates -->
+<?php require __DIR__ . '/templates/dashboard_views/modals.php'; ?>
 
 <?php require_once __DIR__ . '/templates/footer.php'; ?>
