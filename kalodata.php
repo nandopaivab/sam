@@ -597,9 +597,9 @@ require __DIR__ . '/templates/header.php';
                 </div>
             </div>
         </div>
-        <!-- Tab 4: TikTok Shop / Creator Ads Keywords -->
-        <!-- Tab 4: TikTok Shop / Creator Ads Keywords -->
-        <div class="tab-pane fade" id="tiktok-ads-panel" role="tabpanel" aria-labelledby="tiktok-ads-tab">
+    </div>
+    <!-- Tab 4: TikTok Shop / Creator Ads Keywords -->
+    <div class="tab-pane fade" id="tiktok-ads-panel" role="tabpanel" aria-labelledby="tiktok-ads-tab">
             <div class="card-premium p-4">
                 <h5 class="fw-bold mb-3 text-white"><i class="fa-solid fa-rectangle-ad text-accent-turquoise me-2"></i> Palavras-chave & Hashtags em Alta - TikTok Shop BR</h5>
                 <p class="text-muted small mb-4">Consulte as hashtags e termos de busca com maior volume de visualizações acumuladas e engajamento em vídeos promocionais no TikTok Brasil.</p>
@@ -656,8 +656,8 @@ require __DIR__ . '/templates/header.php';
                                     <td class="text-success fw-bold"><?php echo $kw['ctr']; ?> CTR</td>
                                     <td class="text-muted"><?php echo $kw['category']; ?></td>
                                     <td>
-                                        <button class="btn btn-sm btn-outline-info" onclick="$('#search-query').val('<?php echo addslashes($kw['keyword']); ?>'); window.scrollTo({top: 0, behavior: 'smooth'}); setTimeout(() => {$('#search-form').submit();}, 300);">
-                                            <i class="fa-solid fa-search me-1"></i> Analisar Termo
+                                        <button class="btn btn-sm btn-outline-info" onclick="searchKeywordFromAd('<?php echo addslashes($kw['keyword']); ?>')">
+                                            <i class="fa-solid fa-magnifying-glass me-1"></i> Analisar Termo
                                         </button>
                                     </td>
                                 </tr>
@@ -734,5 +734,19 @@ function saveTkProduct(id, title, price, category, img, sales, btn) {
     }).fail(function() {
         alert('Erro de conexão ao salvar produto.');
     });
+}
+function searchKeywordFromAd(kw) {
+    const input = $('input[name="keyword"]');
+    if (input.length) {
+        input.val(kw);
+        const form = input.closest('form');
+        if (form.length) {
+            form.submit();
+            // Scroll to the search bar smoothly
+            $('html, body').animate({
+                scrollTop: input.offset().top - 120
+            }, 500);
+        }
+    }
 }
 </script>
