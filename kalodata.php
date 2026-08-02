@@ -15,6 +15,13 @@ spl_autoload_register(function ($class) {
     if (file_exists($file)) require $file;
 });
 
+use TrendHunter\Auth;
+use TrendHunter\Database;
+
+Auth::requireLogin();
+$user = Auth::getCurrentUser();
+$db = Database::getConnection();
+
 require __DIR__ . '/templates/header.php';
 ?>
 
