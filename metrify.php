@@ -222,6 +222,8 @@ $categoriesData = [
 $regionalTrends = [
     'SP' => [
         'name' => 'São Paulo',
+        'region' => 'Sudeste',
+        'region_trend' => 'Região Sudeste: Alta demanda por organizadores residenciais, kits domésticos e eletrônicos importados devido ao alto volume de entregas rápidas e hubs logísticos.',
         'top_searches' => [
             ['keyword' => 'Copo Stanley 1.2L', 'volume' => 100, 'growth' => '+320%', 'badge' => 'Explosivo'],
             ['keyword' => 'Mini Projetor Smart Wifi', 'volume' => 92, 'growth' => '+180%', 'badge' => 'Alta Demanda'],
@@ -233,6 +235,8 @@ $regionalTrends = [
     ],
     'RJ' => [
         'name' => 'Rio de Janeiro',
+        'region' => 'Sudeste',
+        'region_trend' => 'Região Sudeste: Forte apelo para acessórios pessoais, vestuário de praia/esportes e gadgets portáteis para atividades ao ar livre.',
         'top_searches' => [
             ['keyword' => 'Garrafa Térmica Academia', 'volume' => 100, 'growth' => '+210%', 'badge' => 'Alta Demanda'],
             ['keyword' => 'Óculos de Sol Cat Eye Vintage', 'volume' => 89, 'growth' => '+150%', 'badge' => 'Crescente'],
@@ -244,6 +248,8 @@ $regionalTrends = [
     ],
     'MG' => [
         'name' => 'Minas Gerais',
+        'region' => 'Sudeste',
+        'region_trend' => 'Região Sudeste: Grande foco em utilidades domésticas e nicho de maternidade/bebê (silicone e segurança do sono).',
         'top_searches' => [
             ['keyword' => 'Mop Giratório Balde Limpeza', 'volume' => 100, 'growth' => '+140%', 'badge' => 'Estável'],
             ['keyword' => 'Organizador de Temperos Cozinha', 'volume' => 94, 'growth' => '+280%', 'badge' => 'Explosivo'],
@@ -255,6 +261,8 @@ $regionalTrends = [
     ],
     'BA' => [
         'name' => 'Bahia',
+        'region' => 'Nordeste',
+        'region_trend' => 'Região Nordeste: Forte interesse por acessórios de iluminação e áudio para criação de conteúdo (redes sociais/influenciadores) e beleza.',
         'top_searches' => [
             ['keyword' => 'Ring Light Tripé Iluminação', 'volume' => 100, 'growth' => '+120%', 'badge' => 'Estável'],
             ['keyword' => 'Microfone Lapela Sem Fio USB', 'volume' => 91, 'growth' => '+200%', 'badge' => 'Alta Demanda'],
@@ -266,6 +274,8 @@ $regionalTrends = [
     ],
     'PR' => [
         'name' => 'Paraná',
+        'region' => 'Sul',
+        'region_trend' => 'Região Sul: Destaque para forte sazonalidade de clima frio, com aumento repentino em vestuário térmico, cobertores e aquecimento residencial.',
         'top_searches' => [
             ['keyword' => 'Moletom Canguru com Capuz', 'volume' => 100, 'growth' => '+310%', 'badge' => 'Sazonal Explosivo'],
             ['keyword' => 'Jaqueta Corta Vento Impermeável', 'volume' => 93, 'growth' => '+240%', 'badge' => 'Sazonal Alta'],
@@ -277,6 +287,8 @@ $regionalTrends = [
     ],
     'RS' => [
         'name' => 'Rio Grande do Sul',
+        'region' => 'Sul',
+        'region_trend' => 'Região Sul: Tendência focada em calçados, jaquetas pesadas e utilidades domésticas refinadas de cozinha para inverno.',
         'top_searches' => [
             ['keyword' => 'Calça Alfaiataria Masculina', 'volume' => 100, 'growth' => '+180%', 'badge' => 'Alta Demanda'],
             ['keyword' => 'Jaqueta Forrada Pelúcia Masculina', 'volume' => 95, 'growth' => '+390%', 'badge' => 'Sazonal Explosivo'],
@@ -285,6 +297,32 @@ $regionalTrends = [
             ['keyword' => 'Luminária de Mesa Monitor Barra', 'volume' => 71, 'growth' => '+110%', 'badge' => 'Estável']
         ],
         'hot_category' => 'Moda Masculina & Cozinha'
+    ],
+    'DF' => [
+        'name' => 'Distrito Federal',
+        'region' => 'Centro-Oeste',
+        'region_trend' => 'Região Centro-Oeste: Alta procura por ergonomia de escritório, iluminação de mesa e organizadores corporativos para Home Office.',
+        'top_searches' => [
+            ['keyword' => 'Organizador de Cabos de Mesa', 'volume' => 100, 'growth' => '+150%', 'badge' => 'Alta Demanda'],
+            ['keyword' => 'Luminária de Monitor LED USB', 'volume' => 90, 'growth' => '+110%', 'badge' => 'Crescente'],
+            ['keyword' => 'Suporte de Tablet para Cama', 'volume' => 85, 'growth' => '+80%', 'badge' => 'Estável'],
+            ['keyword' => 'Teclado Mecânico Compacto', 'volume' => 74, 'growth' => '+140%', 'badge' => 'Crescente'],
+            ['keyword' => 'Garrafa Térmica Digital Inox', 'volume' => 69, 'growth' => '+90%', 'badge' => 'Estável']
+        ],
+        'hot_category' => 'Escritório & Tech'
+    ],
+    'AM' => [
+        'name' => 'Amazonas',
+        'region' => 'Norte',
+        'region_trend' => 'Região Norte: Grande volume voltado para climatização individual, energia portátil (solar) e hidratação térmica devido a altas temperaturas.',
+        'top_searches' => [
+            ['keyword' => 'Mini Ventilador Portátil USB', 'volume' => 100, 'growth' => '+380%', 'badge' => 'Explosivo'],
+            ['keyword' => 'Climatizador de Ar de Mesa', 'volume' => 95, 'growth' => '+410%', 'badge' => 'Explosivo'],
+            ['keyword' => 'Umidificador Ultrassônico Luz', 'volume' => 84, 'growth' => '+120%', 'badge' => 'Estável'],
+            ['keyword' => 'Garrafa Squeeze Térmica 1L', 'volume' => 80, 'growth' => '+150%', 'badge' => 'Crescente'],
+            ['keyword' => 'Carregador Solar Powerbank Qi', 'volume' => 71, 'growth' => '+95%', 'badge' => 'Estável']
+        ],
+        'hot_category' => 'Climatização & Energia'
     ]
 ];
 
@@ -815,7 +853,15 @@ require __DIR__ . '/templates/header.php';
                                 <h4 class="fw-bold text-white mb-0" id="state-title-label">Tendências SP</h4>
                                 <p class="text-muted small mb-0">Produtos e palavras-chave que mais cresceram em buscas nas últimas 72 horas.</p>
                             </div>
-                            <span class="badge bg-metrify-glow text-metrify-cyan border border-metrify-cyan px-3 py-2" id="state-hot-category-badge">Eletrônicos</span>
+                        </div>
+
+                        <!-- Region Trend Card -->
+                        <div class="mb-4 p-3 rounded border border-light-subtle" style="background-color: rgba(255, 255, 255, 0.02);" id="region-trend-card">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fa-solid fa-earth-americas text-accent-turquoise me-2"></i>
+                                <span class="text-white small fw-bold">Tendência por Região Geográfica: <span class="badge bg-dark border text-metrify-cyan ms-1" id="region-name-label">Sudeste</span></span>
+                            </div>
+                            <p class="text-muted small mb-0" id="region-trend-text">Região Sudeste: Alta demanda por organizadores residenciais, kits domésticos e eletrônicos importados devido ao alto volume de entregas rápidas e hubs logísticos.</p>
                         </div>
 
                         <!-- Progress indicators for searches -->
@@ -1127,6 +1173,8 @@ function selectTrendsState(uf) {
     // Fill state trends data
     document.getElementById('state-title-label').innerText = 'Tendências no Google Trends - ' + data.name;
     document.getElementById('state-hot-category-badge').innerText = data.hot_category;
+    document.getElementById('region-name-label').innerText = data.region || 'N/A';
+    document.getElementById('region-trend-text').innerText = data.region_trend || 'N/A';
 
     const container = document.getElementById('trends-progress-container');
     container.innerHTML = '';
