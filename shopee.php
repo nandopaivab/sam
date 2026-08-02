@@ -404,11 +404,19 @@ require __DIR__ . '/templates/header.php';
                         <tbody>
                             <?php foreach ($shopeeVirals as $v): ?>
                                 <tr>
-                                    <td class="fw-bold text-white"><i class="fa-solid fa-bag-shopping shopee-orange me-2"></i> <?php echo htmlspecialchars($v['title']); ?></td>
+                                    <td class="fw-bold text-white">
+                                        <a href="https://shopee.com.br/search?keyword=<?php echo urlencode($v['title']); ?>" target="_blank" rel="noopener noreferrer" class="text-white hover-accent text-decoration-none" title="Ver Produto na Shopee">
+                                            <i class="fa-solid fa-bag-shopping shopee-orange me-2"></i><?php echo htmlspecialchars($v['title']); ?> <i class="fa-solid fa-up-right-from-square ms-1" style="font-size: 8px; opacity: 0.7;"></i>
+                                        </a>
+                                    </td>
                                     <td class="fw-semibold">R$ <?php echo number_format($v['price'], 2, ',', '.'); ?></td>
                                     <td class="text-success fw-semibold"><?php echo number_format($v['sales'], 0, ',', '.'); ?>/mês</td>
                                     <td class="fw-bold text-white">R$ <?php echo number_format($v['revenue'], 2, ',', '.'); ?></td>
-                                    <td><span class="badge bg-purple-subtle text-accent-purple px-2 py-1"><i class="fa-brands fa-tiktok me-1"></i> <?php echo $v['video_views']; ?></span></td>
+                                    <td>
+                                        <a href="https://www.tiktok.com/search?q=<?php echo urlencode($v['title']); ?>" target="_blank" rel="noopener noreferrer" class="badge bg-purple-subtle text-accent-purple px-2 py-1 text-decoration-none hover-scale d-inline-flex align-items-center gap-1" title="Ver Vídeo Viral no TikTok">
+                                            <i class="fa-brands fa-tiktok"></i> <span><?php echo $v['video_views']; ?></span> <i class="fa-solid fa-play" style="font-size: 9px; opacity: 0.8;"></i>
+                                        </a>
+                                    </td>
                                     <td>
                                         <span class="badge bg-success-subtle text-success border border-success-subtle"><?php echo $v['score']; ?> pts</span>
                                     </td>
