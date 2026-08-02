@@ -162,6 +162,12 @@ $darkMode = $user['dark_mode'] ?? true;
                     <span>ERP - Estoque & Vendas</span>
                 </a>
             </li>
+            <li class="sidebar-item <?php echo basename($_SERVER['PHP_SELF']) === 'database_sync.php' ? 'active' : ''; ?>">
+                <a href="database_sync.php" class="sidebar-link">
+                    <i class="fa-solid fa-cloud-arrow-down text-accent-turquoise"></i>
+                    <span>Sincronização & Backup</span>
+                </a>
+            </li>
             <li class="sidebar-item <?php echo basename($_SERVER['PHP_SELF']) === 'settings.php' ? 'active' : ''; ?>">
                 <a href="settings.php" class="sidebar-link">
                     <i class="fa-solid fa-gears text-info"></i>
