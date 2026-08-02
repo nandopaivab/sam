@@ -37,10 +37,8 @@ class TrendsClient {
             curl_close($ch);
 
             if ($httpCode === 200 && !empty($xmlString)) {
-                // Disable entity loader for security (XML External Entity injection prevention)
-                $previousEntityState = libxml_disable_entity_loader(true);
+                // Parse XML feed safely
                 $xml = simplexml_load_string($xmlString);
-                libxml_disable_entity_loader($previousEntityState);
 
                 if ($xml !== false && isset($xml->channel->item)) {
                     foreach ($xml->channel->item as $item) {
