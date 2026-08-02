@@ -55,23 +55,21 @@ class TrendsClient {
 
         // Fallback trending terms if the RSS feed is blocked/rate-limited by Google
         if (empty($trends)) {
-            $trends = [
-                'Garrafa Térmica Stanley',
-                'Fone Bluetooth Redmi Airdots',
-                'Air Fryer Mondial 4L',
-                'Smartwatch Watch 9 Ultra',
-                'Mini Projetor Portátil',
-                'Luminária de Mesa Inteligente',
-                'Maquiagem Lip Tint',
-                'Organizador de Acrílico',
-                'Mochila Impermeável USB',
-                'Kit Camisetas Masculinas Premium',
-                'Ring Light de Mesa USB',
-                'Umidificador de Ar Ultrassônico',
-                'Escova Secadora Modeladora',
-                'Suporte Articulado Monitor',
-                'Teclado Mecânico RGB'
+            $pool = [
+                'Garrafa Térmica Stanley', 'Fone Bluetooth Redmi Airdots', 'Air Fryer Mondial 4L',
+                'Smartwatch Watch 9 Ultra', 'Mini Projetor Portátil 4K', 'Luminária de Mesa Inteligente',
+                'Maquiagem Lip Tint', 'Organizador de Acrílico', 'Mochila Impermeável USB',
+                'Kit Camisetas Masculinas Premium', 'Ring Light de Mesa USB', 'Umidificador de Ar Ultrassônico',
+                'Escova Secadora Modeladora', 'Suporte Articulado Monitor', 'Teclado Mecânico RGB',
+                'Suporte Notebook Articulado', 'Mini Processador Portátil USB', 'Copo Stanley com Tampa',
+                'Microfone de Lapela Sem Fio', 'Tripé para Celular Profissional', 'Saboneteira Automática com Sensor',
+                'Removedor de Fiapos Elétrico', 'Escova de Limpeza Giratória', 'Balança Digital de Bioimpedância',
+                'Kit Organizador de Gavetas', 'Mini Liquidificador Portátil', 'Suporte Veicular Magnético',
+                'Carregador Sem Fio por Indução', 'Cameras de Segurança Wi-Fi', 'Lixeira Inteligente com Sensor',
+                'Fone de Ouvido Gatinho com LED', 'Organizador de Maquiagem Giratório'
             ];
+            shuffle($pool);
+            $trends = array_slice($pool, 0, 15);
         }
 
         // Save to cache
