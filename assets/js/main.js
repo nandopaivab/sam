@@ -277,7 +277,7 @@ $(document).ready(function() {
                         <a href="${p.url}" target="_blank" class="text-white hover-accent fw-semibold text-truncate d-block text-decoration-none" style="max-width: 220px;" title="${p.title}">
                             ${p.title} <i class="fa-solid fa-up-right-from-square ms-1" style="font-size: 8px; opacity: 0.7;"></i>
                         </a>
-                        <small class="text-muted">${p.store_name} | <span class="text-uppercase fw-bold text-accent-turquoise">${p.marketplace}</span></small>
+                        <small class="text-muted">${p.store_name} | <span class="text-uppercase fw-bold text-accent-turquoise">${p.marketplace}</span> | <i class="fa-regular fa-clock me-1" style="font-size: 10px;"></i> ${formatCaptureDate(p.last_updated || '')}</small>
                     </td>
                     <td class="fw-bold">R$ ${priceFormatted}</td>
                     <td>${salesFormatted}/mês</td>
@@ -825,6 +825,26 @@ $(document).ready(function() {
             }
         });
     };
+
+    function formatCaptureDate(dateStr) {
+        if (!dateStr) {
+            const now = new Date();
+            return now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        }
+        try {
+            // Replace space with T for browser ISO compatibility
+            const normalized = dateStr.replace(' ', 'T');
+            const d = new Date(normalized);
+            if (isNaN(d.getTime())) {
+                const fallbackDate = new Date(dateStr);
+                if (isNaN(fallbackDate.getTime())) return dateStr;
+                return fallbackDate.toLocaleDateString('pt-BR') + ' ' + fallbackDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            }
+            return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        } catch (e) {
+            return dateStr;
+        }
+    }
 
     function parseMarkdownToHtml(markdown) {
         if (!markdown) return '';

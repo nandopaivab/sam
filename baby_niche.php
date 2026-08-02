@@ -120,8 +120,9 @@ include __DIR__ . '/templates/header.php';
                                     </span>
                                 </div>
                                 <h4 class="fw-bold text-white mb-1"><?php echo htmlspecialchars((string)($p['title'] ?? '')); ?></h4>
-                                <div class="text-muted small" style="font-size: 12px;">
-                                    <i class="fa-solid fa-wallet me-1 text-accent-turquoise"></i> Faixa Econômica: <strong><?php echo htmlspecialchars((string)($p['income_bracket'] ?? '')); ?></strong>
+                                <div class="text-muted small d-flex flex-wrap gap-3" style="font-size: 11px; margin-top: 4px;">
+                                    <span><i class="fa-solid fa-wallet me-1 text-accent-turquoise"></i> Faixa Econômica: <strong><?php echo htmlspecialchars((string)($p['income_bracket'] ?? '')); ?></strong></span>
+                                    <span><i class="fa-solid fa-calendar-days me-1 text-accent-purple"></i> Sincronizado em: <strong><?php echo date('d/m/Y H:i', strtotime($p['created_at'])); ?></strong></span>
                                 </div>
                             </div>
                             <div class="text-end">

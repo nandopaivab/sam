@@ -89,8 +89,9 @@ include __DIR__ . '/templates/header.php';
                                 </span>
                             </div>
                             <h4 class="fw-bold text-white mb-1"><?php echo htmlspecialchars((string)($p['title'] ?? '')); ?></h4>
-                            <div class="text-muted small" style="font-size: 12px;">
-                                <i class="fa-solid fa-users me-1 text-accent-turquoise"></i> Público-alvo: <strong><?php echo htmlspecialchars((string)($p['target_audience'] ?? '')); ?></strong>
+                            <div class="text-muted small d-flex flex-wrap gap-3 mt-1" style="font-size: 11px;">
+                                <span><i class="fa-solid fa-users me-1 text-accent-turquoise"></i> Público-alvo: <strong><?php echo htmlspecialchars((string)($p['target_audience'] ?? '')); ?></strong></span>
+                                <span><i class="fa-solid fa-calendar-days me-1 text-accent-purple"></i> Sincronizado em: <strong><?php echo date('d/m/Y H:i', strtotime($p['created_at'])); ?></strong></span>
                             </div>
                         </div>
                         <div class="text-end">
