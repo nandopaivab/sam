@@ -336,9 +336,14 @@ function renderInvestmentPlan(plan) {
     plan.portfolio.forEach(item => {
         const tagClass = getTagBadgeClass(item.tag);
         const tr = document.createElement('tr');
+        const cleanTitle = item.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        const itemId = item.id || 0;
+
         tr.innerHTML = `
             <td class="ps-4 py-3">
-                <div class="fw-bold text-white mb-1">${item.title}</div>
+                <a href="index.php?query=${encodeURIComponent(item.title)}" class="text-white hover-accent fw-bold mb-1 d-block text-decoration-none" title="Buscar no painel principal">
+                    ${item.title} <i class="fa-solid fa-up-right-from-square ms-1" style="font-size: 8px; opacity: 0.7;"></i>
+                </a>
                 <div class="d-flex align-items-center gap-2">
                     <span class="tag-badge ${tagClass}">${item.tag}</span>
                     <span class="badge bg-dark border text-muted">${item.allocation_percent}% do Orçamento</span>
@@ -358,6 +363,10 @@ function renderInvestmentPlan(plan) {
                 <div class="fw-bold text-white small"><i class="fa-solid fa-building text-success me-1"></i>${item.supplier_name}</div>
                 <div class="small text-muted"><i class="fa-solid fa-location-dot me-1"></i>${item.supplier_location}</div>
                 <div class="small text-accent-turquoise" style="font-size: 11px;"><i class="fa-solid fa-truck me-1"></i>${item.shipping_time}</div>
+                <div class="mt-2 d-flex gap-1">
+                    <button onclick="lookupSuppliers(${itemId}, '${cleanTitle}', ${item.suggested_price})" class="btn btn-xs btn-outline-turquoise text-nowrap" style="font-size: 10px; padding: 2px 6px;" title="Ver Fornecedores"><i class="fa-solid fa-truck-ramp-box me-1"></i>Fornecedores</button>
+                    <button onclick="openCalculatorWithProduct('${cleanTitle}', ${item.suggested_price}); event.stopPropagation();" class="btn btn-xs btn-outline-info text-nowrap" style="font-size: 10px; padding: 2px 6px;" title="Calcular Margem"><i class="fa-solid fa-calculator me-1"></i>Calculadora</button>
+                </div>
             </td>
         `;
         tbody.appendChild(tr);
@@ -423,5 +432,11 @@ $(document).ready(function() {
     generateInvestmentPlan();
 });
 </script>
+
+<!-- Floating Profit margins & ROI Calculator Widget -->
+<?php require __DIR__ . '/templates/dashboard_views/calculator_widget.php'; ?>
+
+<!-- Modals wrapper templates -->
+<?php require __DIR__ . '/templates/dashboard_views/modals.php'; ?>
 
 <?php require_once __DIR__ . '/templates/footer.php'; ?>

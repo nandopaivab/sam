@@ -1592,7 +1592,7 @@ switch ($action) {
         // 1. QUERY REAL-TIME PRODUCTS FROM DATABASE (ON-THE-FLY AI ANALYSIS)
         $dbProducts = [];
         try {
-            $sql = "SELECT title, price, marketplace, trend_score, category, sales_count_est, store_name, shipping_type FROM products WHERE price >= 5";
+            $sql = "SELECT id, title, price, marketplace, trend_score, category, sales_count_est, store_name, shipping_type FROM products WHERE price >= 5";
             $params = [];
             if ($category !== 'todas' && !empty($category)) {
                 $sql .= " AND (category LIKE ? OR title LIKE ?)";
@@ -1652,6 +1652,7 @@ switch ($action) {
                 $salesVal = !empty($row['sales_count_est']) && $row['sales_count_est'] > 0 ? number_format((int)$row['sales_count_est'], 0, '', '.') : rand(300, 1500);
 
                 $selectedItems[] = [
+                    'id' => (int)$row['id'],
                     'title' => $row['title'],
                     'category' => !empty($row['category']) ? ucfirst($row['category']) : 'Geral',
                     'unit_cost' => $unitCost,
