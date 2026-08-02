@@ -298,7 +298,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 })
                 .catch(err => {
-                    progressBar.classList.replace('bg-success', 'bg-danger');
+                    progressBar.classList.remove('bg-success');
+                    progressBar.classList.add('bg-danger');
                     indicator.textContent = 'Erro';
                     indicator.className = 'badge bg-danger px-2 py-1';
                     appendLog(`[FALHA] Erro de rede ou servidor ao sincronizar: ${err.message}`);

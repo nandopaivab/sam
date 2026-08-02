@@ -267,7 +267,7 @@ switch ($action) {
 
         // Log sync activity
         $stmtLog = $db->prepare("INSERT INTO activity_logs (user_id, action, target_table, record_id, details) VALUES (?, ?, ?, ?, ?)");
-        $stmtLog->execute([$user['id'], 'Sincronização Banco de Dados', 'products', 0, "Sincronização global concluída com sucesso. {$count} produtos atualizados via crawler/IA."]);
+        $stmtLog->execute([$currentUser['id'], 'Sincronização Banco de Dados', 'products', 0, "Sincronização global concluída com sucesso. {$count} produtos atualizados via crawler/IA."]);
 
         Validator::jsonResponse(200, [
             'success' => true,
