@@ -267,34 +267,49 @@ document.addEventListener('DOMContentLoaded', function() {
                     method: 'POST',
                     body: formData
                 })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        progressBar.style.width = '100%';
-                        indicator.textContent = 'Sucesso';
-                        indicator.className = 'badge bg-success px-2 py-1';
-                        
-                        appendLog(`[DATABASE] Transação concluída com sucesso.`);
-                        appendLog(`[SUCESSO] Sincronização global finalizada.`);
-                        appendLog(`[SUCESSO] ${data.count} produtos de alta conversão atualizados/sincronizados.`);
-                        
-                        // Update badge counts and local storage
-                        const now = new Date();
-                        const formattedDate = now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-                        localStorage.setItem('sam_last_sync_date', formattedDate);
-                        document.getElementById('last-sync-badge').textContent = formattedDate;
-                        
-                        // Fetch new database count dynamically
-                        dbCountBadge.textContent = '1.770'; // fallback estimation or refresh
-                        
-                        // Re-enable controls
-                        setTimeout(() => {
-                            btnSync.disabled = false;
-                            syncIcon.classList.remove('fa-spin');
-                            alert('Base de dados sincronizada com sucesso por IA!');
-                        }, 500);
-                    } else {
-                        throw new Error(data.error || 'Erro na requisição');
+                .then(res => {
+                    if (!res.ok) {
+                        return res.text().then(text => {
+                            throw new Error(`HTTP ${res.status}: ${text.substring(0, 100)}`);
+                        });
+                    }
+                    return res.text();
+                })
+                .then(text => {
+                    try {
+                        const data = JSON.parse(text);
+                        if (data.success) {
+                            progressBar.style.width = '100%';
+                            indicator.textContent = 'Sucesso';
+                            indicator.className = 'badge bg-success px-2 py-1';
+                            
+                            appendLog(`[DATABASE] Transação concluída com sucesso.`);
+                            appendLog(`[SUCESSO] Sincronização global finalizada.`);
+                            appendLog(`[SUCESSO] ${data.count} produtos de alta conversão atualizados/sincronizados.`);
+                            
+                            // Update badge counts and local storage
+                            const now = new Date();
+                            const formattedDate = now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                            localStorage.setItem('sam_last_sync_date', formattedDate);
+                            document.getElementById('last-sync-badge').textContent = formattedDate;
+                            
+                            // Fetch new database count dynamically
+                            dbCountBadge.textContent = '1.770'; // fallback estimation or refresh
+                            
+                            // Re-enable controls
+                            setTimeout(() => {
+                                btnSync.disabled = false;
+                                syncIcon.classList.remove('fa-spin');
+                                alert('Base de dados sincronizada com sucesso por IA!');
+                            }, 500);
+                        } else {
+                            throw new Error(data.error || 'Erro na requisição');
+                        }
+                    } catch (jsonErr) {
+                        console.error('Server response was not JSON:', text);
+                        // Clean HTML tags from output for clean terminal display
+                        const cleanText = text.replace(/<[^>]*>/g, '').trim().substring(0, 150);
+                        throw new Error(`Resposta inválida do servidor: ${cleanText || 'resposta vazia'}`);
                     }
                 })
                 .catch(err => {
@@ -302,7 +317,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     progressBar.classList.add('bg-danger');
                     indicator.textContent = 'Erro';
                     indicator.className = 'badge bg-danger px-2 py-1';
-                    appendLog(`[FALHA] Erro de rede ou servidor ao sincronizar: ${err.message}`);
+                    appendLog(`[FALHA] Erro: ${err.message}`);
                     btnSync.disabled = false;
                     syncIcon.classList.remove('fa-spin');
                 });
