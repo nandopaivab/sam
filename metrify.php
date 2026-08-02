@@ -853,6 +853,7 @@ require __DIR__ . '/templates/header.php';
                                 <h4 class="fw-bold text-white mb-0" id="state-title-label">Tendências SP</h4>
                                 <p class="text-muted small mb-0">Produtos e palavras-chave que mais cresceram em buscas nas últimas 72 horas.</p>
                             </div>
+                            <span class="badge bg-metrify-glow text-metrify-cyan border border-metrify-cyan px-3 py-2" id="state-hot-category-badge">Eletrônicos</span>
                         </div>
 
                         <!-- Region Trend Card -->
