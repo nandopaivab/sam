@@ -22,6 +22,20 @@ Auth::requireLogin();
 $user = Auth::getCurrentUser();
 $db = Database::getConnection();
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (isset($_GET['refresh_regional_trends'])) {
+    $_SESSION['regional_trends_sync'] = time();
+    $_SESSION['regional_trends_updated_at'] = date('d/m/Y H:i');
+    header("Location: metrify.php#regional-panel");
+    exit;
+}
+
+$regionalTrendsSync = $_SESSION['regional_trends_sync'] ?? null;
+$regionalTrendsUpdatedAt = $_SESSION['regional_trends_updated_at'] ?? date('d/m/Y H:i', time() - 3600);
+
 // Detailed category database mirroring Metrify & screenshot analytics
 $categoriesData = [
     [
@@ -297,7 +311,7 @@ foreach ($statesList as $uf => $info) {
     $pool = $regionData['pool'];
     
     $topSearches = [];
-    $seed = strlen($stateName);
+    $seed = strlen($stateName) + ($regionalTrendsSync ? (int)$regionalTrendsSync : 0);
     for ($i = 0; $i < 5; $i++) {
         $kw = $pool[($seed + $i) % count($pool)];
         $vol = 60 + (($seed * ($i + 3)) % 41);
@@ -824,6 +838,19 @@ require __DIR__ . '/templates/header.php';
 
         <!-- Tab 2: Google Trends Regional (States of Brazil Analyzer) -->
         <div class="tab-pane fade" id="regional-panel" role="tabpanel" aria-labelledby="regional-tab">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2 p-3 rounded" style="background-color: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);">
+                <div>
+                    <h5 class="text-white fw-bold mb-1" style="font-size: 14px;"><i class="fa-solid fa-earth-americas text-accent-purple me-2"></i> Macrotendências e Buscas Regionais</h5>
+                    <p class="text-muted small mb-0">Análise de interesse geográfico por estado e região do país baseado em consultas de e-commerce.</p>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="text-muted small"><i class="fa-regular fa-clock me-1 text-metrify-cyan"></i> Atualizado em: <strong><?php echo htmlspecialchars($regionalTrendsUpdatedAt); ?></strong></span>
+                    <a href="metrify.php?refresh_regional_trends=1" class="btn btn-sm btn-primary text-white fw-bold" style="background-color: #5f27cd; border-color: #5f27cd; border-radius: 8px;">
+                        <i class="fa-solid fa-arrows-rotate me-1"></i> Atualizar Dados
+                    </a>
+                </div>
+            </div>
+
             <div class="row g-4">
                 <!-- State Selector List -->
                 <div class="col-12 col-lg-4">
