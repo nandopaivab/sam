@@ -48,6 +48,7 @@ class Database {
             self::checkAndCreateSavedSuppliersTable();
             self::checkAndCreateApiColumns();
             self::checkAndCreateErpTables();
+            self::checkAndCreateKeywordTrendsTable(self::$pdo);
             self::checkAndSeedNicheProducts(self::$pdo);
             return self::$pdo;
         } catch (PDOException $e) {
@@ -95,6 +96,7 @@ class Database {
             self::checkAndCreateSavedSuppliersTable();
             self::checkAndCreateApiColumns();
             self::checkAndCreateErpTables();
+            self::checkAndCreateKeywordTrendsTable(self::$pdo);
             self::checkAndSeedNicheProducts(self::$pdo);
 
             return self::$pdo;
@@ -608,5 +610,215 @@ class Database {
         try {
             self::$pdo->exec("ALTER TABLE users ADD COLUMN ai_provider TEXT DEFAULT 'local';");
         } catch (\Exception $e) {}
+    }
+
+    /**
+     * Creates keyword_trends table if not exist and seeds initial keywords.
+     */
+    public static function checkAndCreateKeywordTrendsTable(PDO $db): void {
+        $dbType = self::$driverType;
+        $aiKeyType = $dbType === 'sqlite' ? 'INTEGER PRIMARY KEY AUTOINCREMENT' : 'INT AUTO_INCREMENT PRIMARY KEY';
+        $textType = $dbType === 'sqlite' ? 'TEXT' : 'VARCHAR(255)';
+        $doubleType = $dbType === 'sqlite' ? 'REAL' : 'DOUBLE';
+        $timestampType = $dbType === 'sqlite' ? 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP' : 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP';
+
+        // 1. Create table
+        $db->exec("CREATE TABLE IF NOT EXISTS keyword_trends (
+            id {$aiKeyType},
+            marketplace {$textType} NOT NULL,
+            keyword {$textType} NOT NULL,
+            volume INTEGER DEFAULT 0,
+            cpc_cpm {$doubleType} DEFAULT 0.0,
+            growth {$textType} DEFAULT '+0%',
+            competition_ctr {$textType} DEFAULT 'Média',
+            category {$textType} DEFAULT 'Geral',
+            last_updated {$timestampType},
+            UNIQUE(marketplace, keyword)
+        )");
+
+        // 2. Check if table is empty
+        $count = (int)$db->query("SELECT COUNT(*) FROM keyword_trends")->fetchColumn();
+        if ($count > 0) {
+            return;
+        }
+
+        // 3. Seed initial keywords (150 keywords total - 50 per marketplace)
+        $mlKeywords = [
+            'garrafa termica stanley' => [12000, 1.25, '+45%', 'Alta', 'Casa & Cozinha'],
+            'mini liquidificador portatil' => [35000, 0.45, '+120%', 'Média', 'Casa & Cozinha'],
+            'organizador de gavetas' => [15000, 0.25, '+35%', 'Baixa', 'Casa & Cozinha'],
+            'fone de ouvido bluetooth sem fio' => [95000, 1.80, '+65%', 'Alta', 'Eletrônicos'],
+            'ring light de mesa led' => [25000, 0.65, '-10%', 'Média', 'Eletrônicos'],
+            'smartwatch relogio inteligente' => [75000, 1.40, '+80%', 'Alta', 'Eletrônicos'],
+            'suporte veicular magnético' => [18000, 0.35, '+25%', 'Baixa', 'Eletrônicos'],
+            'carregador sem fio inducao' => [22000, 0.85, '+50%', 'Média', 'Eletrônicos'],
+            'kit ferramentas completo profissional' => [8000, 1.20, '+15%', 'Alta', 'Geral'],
+            'central multimidia universal android' => [12000, 1.50, '+30%', 'Alta', 'Eletrônicos'],
+            'cameras de seguranca wifi kit' => [14000, 1.10, '+40%', 'Média', 'Eletrônicos'],
+            'lampada led automotiva par' => [9000, 0.40, '+10%', 'Baixa', 'Geral'],
+            'par de palhetas limpador' => [5000, 0.20, '+5%', 'Baixa', 'Geral'],
+            'capa de chuva motoqueiro moto' => [11000, 0.30, '+15%', 'Baixa', 'Geral'],
+            'luva de academia musculacao' => [7000, 0.25, '+12%', 'Baixa', 'Esportes & Saúde'],
+            'colchonete ginastica fitness' => [6000, 0.35, '+8%', 'Baixa', 'Esportes & Saúde'],
+            'roda abdominal exercicio' => [4000, 0.30, '+5%', 'Baixa', 'Esportes & Saúde'],
+            'faixa elastica mini band' => [9000, 0.18, '+22%', 'Média', 'Esportes & Saúde'],
+            'corda de pular rolamento' => [5000, 0.22, '+10%', 'Baixa', 'Esportes & Saúde'],
+            'balança de bioimpedancia digital' => [16000, 0.60, '+55%', 'Média', 'Esportes & Saúde'],
+            'tensimetro aparelho pressao' => [12000, 0.70, '+20%', 'Média', 'Esportes & Saúde'],
+            'termometro digital infravermelho' => [6000, 0.45, '-5%', 'Baixa', 'Esportes & Saúde'],
+            'oximetro de pulso portatil' => [8000, 0.50, '+10%', 'Baixa', 'Esportes & Saúde'],
+            'nebulizador inalador portatil' => [14000, 0.65, '+85%', 'Média', 'Esportes & Saúde'],
+            'escova de dentes eletrica' => [15000, 0.75, '+35%', 'Média', 'Moda & Beleza'],
+            'barbeador eletrico recarregavel' => [28000, 0.55, '+60%', 'Média', 'Moda & Beleza'],
+            'aparador de pelos nariz' => [12000, 0.20, '+18%', 'Baixa', 'Moda & Beleza'],
+            'secador de cabelo profissional' => [24000, 1.10, '+25%', 'Alta', 'Moda & Beleza'],
+            'chapinha de cabelo ceramica' => [18000, 0.95, '+15%', 'Média', 'Moda & Beleza'],
+            'maquina de costura portatil' => [7000, 0.60, '+8%', 'Baixa', 'Casa & Cozinha'],
+            'ferro de passar a vapor' => [13000, 0.40, '+5%', 'Baixa', 'Casa & Cozinha'],
+            'aspirador de po vertical' => [32000, 0.85, '+75%', 'Alta', 'Casa & Cozinha'],
+            'robo aspirador inteligente' => [45000, 1.30, '+110%', 'Alta', 'Eletrônicos'],
+            'mop giratorio com balde' => [27000, 0.50, '+50%', 'Média', 'Casa & Cozinha'],
+            'vaporizador de roupas portatil' => [19000, 0.75, '+90%', 'Média', 'Casa & Cozinha'],
+            'balança comercial 40kg' => [5000, 0.80, '+10%', 'Média', 'Geral'],
+            'maquina de cartao mercado' => [15000, 1.40, '+20%', 'Alta', 'Eletrônicos'],
+            'impressora termica etiqueta' => [11000, 0.90, '+65%', 'Média', 'Eletrônicos'],
+            'leitor codigo de barras' => [4000, 0.55, '+8%', 'Baixa', 'Eletrônicos'],
+            'gaveta de dinheiro organizadora' => [3000, 0.45, '+5%', 'Baixa', 'Geral'],
+            'bobina termica 80x40' => [8000, 0.15, '+12%', 'Baixa', 'Geral'],
+            'etiqueta adesiva termica' => [9000, 0.18, '+25%', 'Baixa', 'Geral'],
+            'envelope de segurança correios' => [15000, 0.22, '+30%', 'Média', 'Geral'],
+            'fita adesiva larga transparente' => [7000, 0.12, '+8%', 'Baixa', 'Geral'],
+            'plastico bolha rolo 50m' => [6000, 0.30, '+10%', 'Baixa', 'Geral'],
+            'caixa de papelão mudança' => [12000, 0.28, '+15%', 'Baixa', 'Geral'],
+            'organizador de cabos velcro' => [8000, 0.15, '+20%', 'Baixa', 'Eletrônicos'],
+            'filtro de linha 6 tomadas' => [14000, 0.35, '+18%', 'Baixa', 'Eletrônicos'],
+            'extensão eletrica 5 metros' => [9000, 0.25, '+12%', 'Baixa', 'Geral'],
+            'adaptador HDMI para VGA' => [16000, 0.30, '+15%', 'Média', 'Eletrônicos']
+        ];
+
+        $shopeeKeywords = [
+            'achadinhos da shopee' => [250000, 0.12, '+180%', 'Alta', 'Geral'],
+            'organizador de maquiagem' => [45000, 0.18, '+65%', 'Média', 'Moda & Beleza'],
+            'fone bluetooth sem fio' => [180000, 0.45, '+120%', 'Alta', 'Eletrônicos'],
+            'garrafa motivacional 2l' => [95000, 0.08, '+250%', 'Alta', 'Casa & Cozinha'],
+            'mini processador usb' => [55000, 0.15, '+95%', 'Média', 'Casa & Cozinha'],
+            'copo stanley termico' => [120000, 0.35, '+150%', 'Alta', 'Casa & Cozinha'],
+            'relogio masculino smart' => [85000, 0.28, '+75%', 'Média', 'Eletrônicos'],
+            'mochila escolar impermeavel' => [65000, 0.22, '+110%', 'Alta', 'Geral'],
+            'luminaria led decorativa' => [38000, 0.14, '+45%', 'Baixa', 'Casa & Cozinha'],
+            'tapete para banheiro' => [28000, 0.09, '+20%', 'Baixa', 'Casa & Cozinha'],
+            'escova secadora rotativa' => [42000, 0.32, '+55%', 'Média', 'Moda & Beleza'],
+            'maquina de cortar cabelo' => [58000, 0.18, '+40%', 'Média', 'Moda & Beleza'],
+            'meia sapatilha antiderrapante' => [15000, 0.08, '+15%', 'Baixa', 'Moda & Beleza'],
+            'bolsa feminina transversal' => [110000, 0.25, '+85%', 'Alta', 'Moda & Beleza'],
+            'capinha de iphone' => [190000, 0.15, '+90%', 'Alta', 'Eletrônicos'],
+            'pelicula de vidro temperado' => [45000, 0.08, '+25%', 'Média', 'Eletrônicos'],
+            'kit pincel maquiagem' => [38000, 0.10, '+35%', 'Baixa', 'Moda & Beleza'],
+            'colar feminino prata' => [62000, 0.18, '+50%', 'Média', 'Moda & Beleza'],
+            'brinco de argola' => [25000, 0.09, '+15%', 'Baixa', 'Moda & Beleza'],
+            'anel regulavel' => [18000, 0.07, '+22%', 'Baixa', 'Moda & Beleza'],
+            'carteira masculina couro' => [32000, 0.16, '+30%', 'Média', 'Moda & Beleza'],
+            'cinto masculino social' => [14000, 0.11, '+10%', 'Baixa', 'Moda & Beleza'],
+            'oculos de sol quadrado' => [48000, 0.18, '+45%', 'Média', 'Moda & Beleza'],
+            'corrente de prata masculina' => [29000, 0.20, '+35%', 'Média', 'Moda & Beleza'],
+            'pulseira inteligente fit' => [35000, 0.22, '+50%', 'Média', 'Eletrônicos'],
+            'carregador portatil powerbank' => [78000, 0.30, '+85%', 'Média', 'Eletrônicos'],
+            'suporte de celular carro' => [29000, 0.12, '+25%', 'Baixa', 'Eletrônicos'],
+            'cabo usb tipo c' => [88000, 0.08, '+40%', 'Média', 'Eletrônicos'],
+            'adaptador tomada universal' => [18000, 0.15, '+18%', 'Baixa', 'Geral'],
+            'fone de ouvido com fio' => [42000, 0.09, '+10%', 'Baixa', 'Eletrônicos'],
+            'mouse sem fio recarregavel' => [52000, 0.18, '+70%', 'Média', 'Eletrônicos'],
+            'teclado mecanico gamer' => [45000, 0.32, '+95%', 'Alta', 'Eletrônicos'],
+            'pad mouse grande' => [28000, 0.14, '+40%', 'Baixa', 'Eletrônicos'],
+            'caixa de som bluetooth bluetooth' => [72000, 0.28, '+60%', 'Média', 'Eletrônicos'],
+            'microfone lapela sem fio' => [39000, 0.25, '+110%', 'Média', 'Eletrônicos'],
+            'tripod celular selfie' => [22000, 0.12, '+30%', 'Baixa', 'Eletrônicos'],
+            'anel de luz ring light' => [34000, 0.16, '-15%', 'Média', 'Eletrônicos'],
+            'camera de segurança wifi' => [27000, 0.35, '+45%', 'Média', 'Eletrônicos'],
+            'lampada inteligente rgb' => [31000, 0.24, '+70%', 'Média', 'Eletrônicos'],
+            'difusor de aromas ultrassonico' => [46000, 0.18, '+80%', 'Média', 'Casa & Cozinha'],
+            'mini ventilador portatil' => [39000, 0.11, '+120%', 'Média', 'Casa & Cozinha'],
+            'esponja eletrica limpeza' => [19000, 0.13, '+35%', 'Baixa', 'Moda & Beleza'],
+            'massageador corporal eletrico' => [28000, 0.16, '+50%', 'Baixa', 'Esportes & Saúde'],
+            'balança digital cozinha' => [24000, 0.09, '+15%', 'Baixa', 'Casa & Cozinha'],
+            'garrafa termica inox' => [33000, 0.15, '+30%', 'Baixa', 'Casa & Cozinha'],
+            'marmita termica eletrica' => [16000, 0.22, '+45%', 'Baixa', 'Casa & Cozinha'],
+            'escorredor de pratos pia' => [12000, 0.18, '+12%', 'Baixa', 'Casa & Cozinha'],
+            'cabide de veludo fino' => [28000, 0.08, '+25%', 'Baixa', 'Geral'],
+            'organizador de sapatos' => [19000, 0.14, '+18%', 'Baixa', 'Casa & Cozinha'],
+            'caixa organizadora plastico' => [34000, 0.16, '+30%', 'Média', 'Casa & Cozinha']
+        ];
+
+        $tiktokKeywords = [
+            '#achadinhos' => [12500000, 2.50, '1.8%', 'Alta', 'Geral'],
+            'organizador acrilico giratorio' => [185000, 3.20, '1.5%', 'Média', 'Casa & Cozinha'],
+            'fone bluetooth bluetooth' => [450000, 4.10, '1.3%', 'Alta', 'Eletrônicos'],
+            'garrafa termica motivacional' => [680000, 2.20, '2.1%', 'Alta', 'Casa & Cozinha'],
+            '#tiktokmademebuyit' => [18900000, 3.50, '2.4%', 'Alta', 'Geral'],
+            'mini selador de embalagens' => [320000, 1.80, '1.9%', 'Média', 'Casa & Cozinha'],
+            'removedor de fiapos eletrico' => [240000, 2.10, '1.6%', 'Baixa', 'Casa & Cozinha'],
+            'mini projetor portatil 4k' => [890000, 4.80, '2.6%', 'Alta', 'Eletrônicos'],
+            'luminaria projetor astronauta' => [540000, 3.10, '2.2%', 'Média', 'Decoração'],
+            'copo termico com tampa' => [380000, 2.90, '1.4%', 'Média', 'Casa & Cozinha'],
+            'mini massageador de pescoço' => [410000, 2.40, '1.7%', 'Média', 'Esportes & Saúde'],
+            'maquina de mini donuts' => [295000, 3.50, '2.3%', 'Média', 'Casa & Cozinha'],
+            'mini processador de alho' => [180000, 1.50, '1.3%', 'Baixa', 'Casa & Cozinha'],
+            'rolo tirar pelos lavavel' => [120000, 1.60, '1.2%', 'Baixa', 'Pet'],
+            'esponja magica melamina' => [95000, 1.40, '1.1%', 'Baixa', 'Casa & Cozinha'],
+            'tira pelos de roupas pet' => [135000, 1.80, '1.4%', 'Baixa', 'Pet'],
+            'escova de limpeza eletrica' => [460000, 2.80, '1.8%', 'Média', 'Casa & Cozinha'],
+            'mop limpa vidros triangular' => [210000, 2.10, '1.5%', 'Baixa', 'Casa & Cozinha'],
+            'organizador de geladeira acrilico' => [165000, 2.40, '1.3%', 'Baixa', 'Casa & Cozinha'],
+            'dispenser de detergente automatico' => [140000, 2.20, '1.4%', 'Baixa', 'Casa & Cozinha'],
+            'porta temperos giratorio' => [115000, 1.90, '1.2%', 'Baixa', 'Casa & Cozinha'],
+            'mini maquina de lavar roupa' => [380000, 3.10, '2.0%', 'Média', 'Casa & Cozinha'],
+            'varal retratil de parede' => [125000, 1.80, '1.3%', 'Baixa', 'Casa & Cozinha'],
+            'organizador de maquiagem led' => [195000, 2.70, '1.6%', 'Média', 'Moda & Beleza'],
+            'espelho com luz touch' => [280000, 3.40, '1.9%', 'Média', 'Moda & Beleza'],
+            'kit skin care facial' => [720000, 4.20, '2.1%', 'Alta', 'Moda & Beleza'],
+            'saboneteira automatica sensor' => [110000, 2.10, '1.2%', 'Baixa', 'Casa & Cozinha'],
+            'suporte de celular articulado' => [160000, 1.80, '1.3%', 'Baixa', 'Eletrônicos'],
+            'luminaria de leitura clip' => [90000, 1.50, '1.1%', 'Baixa', 'Decoração'],
+            'quadro lousa luminosa led' => [145000, 2.30, '1.5%', 'Baixa', 'Decoração'],
+            'mini impressora de fotos bluetooth' => [340000, 3.80, '1.8%', 'Média', 'Eletrônicos'],
+            'projetor de galaxia teto' => [480000, 3.40, '2.0%', 'Média', 'Decoração'],
+            'fita led rgb 5m' => [230000, 2.20, '1.4%', 'Baixa', 'Eletrônicos'],
+            'caixa de som bluetooth colorida' => [310000, 2.80, '1.7%', 'Média', 'Eletrônicos'],
+            'fone gatinho com led' => [180000, 2.10, '1.3%', 'Baixa', 'Infantil'],
+            'microfone infantil karaoke bluetooth' => [195000, 2.50, '1.5%', 'Baixa', 'Infantil'],
+            'mini ar condicionado portatil' => [620000, 3.80, '2.2%', 'Média', 'Casa & Cozinha'],
+            'humidificador de ar com light' => [340000, 2.40, '1.6%', 'Baixa', 'Decoração'],
+            'vela aromatica perfumada' => [125000, 2.10, '1.2%', 'Baixa', 'Decoração'],
+            'copo de vidro com canudo' => [280000, 1.90, '1.5%', 'Baixa', 'Casa & Cozinha'],
+            'marmita termica de inox' => [160000, 2.60, '1.3%', 'Baixa', 'Casa & Cozinha'],
+            'garrafa de agua infantil' => [220000, 2.10, '1.7%', 'Baixa', 'Infantil'],
+            'lancheira termica escolar' => [180000, 2.30, '1.4%', 'Baixa', 'Infantil'],
+            'mochila antifurto usb' => [420000, 3.20, '1.9%', 'Média', 'Geral'],
+            'carteira slim automatica' => [190000, 2.40, '1.5%', 'Baixa', 'Geral'],
+            'chaveiro multiuso ferramentas' => [75000, 1.60, '1.1%', 'Baixa', 'Geral'],
+            'mini compressor de ar pneu' => [185000, 2.90, '1.4%', 'Baixa', 'Geral'],
+            'suporte de tablet cama' => [140000, 2.10, '1.3%', 'Baixa', 'Eletrônicos'],
+            'mouse pad ergonomico apoio' => [95000, 1.80, '1.2%', 'Baixa', 'Eletrônicos'],
+            'suporte notebook articulado' => [28000, 2.40, '1.3%', 'Baixa', 'Eletrônicos']
+        ];
+
+        // 4. Batch Insert
+        $db->beginTransaction();
+        try {
+            $stmt = $db->prepare("INSERT INTO keyword_trends (marketplace, keyword, volume, cpc_cpm, growth, competition_ctr, category) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            
+            foreach ($mlKeywords as $kw => $data) {
+                $stmt->execute(['mercadolivre', $kw, $data[0], $data[1], $data[2], $data[3], $data[4]]);
+            }
+            foreach ($shopeeKeywords as $kw => $data) {
+                $stmt->execute(['shopee', $kw, $data[0], $data[1], $data[2], $data[3], $data[4]]);
+            }
+            foreach ($tiktokKeywords as $kw => $data) {
+                $stmt->execute(['tiktok', $kw, $data[0], $data[1], $data[2], $data[3], $data[4]]);
+            }
+            $db->commit();
+        } catch (\Exception $e) {
+            $db->rollBack();
+        }
     }
 }

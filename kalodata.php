@@ -602,39 +602,33 @@ require __DIR__ . '/templates/header.php';
     <div class="tab-pane fade" id="tiktok-ads-panel" role="tabpanel" aria-labelledby="tiktok-ads-tab">
             <div class="card-premium p-4">
                 <h5 class="fw-bold mb-3 text-white"><i class="fa-solid fa-rectangle-ad text-accent-turquoise me-2"></i> Palavras-chave & Hashtags em Alta - TikTok Shop BR</h5>
-                <p class="text-muted small mb-4">Consulte as hashtags e termos de busca com maior volume de visualizações acumuladas e engajamento em vídeos promocionais no TikTok Brasil.</p>
                 
                 <?php
-                $baseTiktokKeywords = [
-                    '#achadinhos', 'organizador acrilico giratorio', 'fone bluetooth bluetooth', 'garrafa termica motivacional', '#tiktokmademebuyit', 
-                    'mini selador de embalagens', 'removedor de fiapos eletrico', 'mini projetor portatil 4k', 'luminaria projetor astronauta', 'copo termico com tampa', 
-                    'mini massageador de pescoço', 'maquina de mini donuts', 'mini processador de alho', 'rolo tirar pelos lavavel', 'esponja magica melamina', 
-                    'tira pelos de roupas pet', 'escova de limpeza eletrica', 'mop limpa vidros triangular', 'organizador de geladeira acrilico', 'dispenser de detergente automatico', 
-                    'porta temperos giratorio', 'mini maquina de lavar roupa', 'varal retratil de parede', 'organizador de maquiagem led', 'espelho com luz touch', 
-                    'kit skin care facial', 'saboneteira automatica sensor', 'suporte de celular articulado', 'luminaria de leitura clip', 'quadro lousa luminosa led', 
-                    'mini impressora de fotos bluetooth', 'projetor de galaxia teto', 'fita led rgb 5m', 'caixa de som bluetooth colorida', 'fone gatinho com led', 
-                    'microfone infantil karaoke bluetooth', 'mini ar condicionado portatil', 'humidificador de ar com light', 'vela aromatica perfumada', 'copo de vidro com canudo', 
-                    'marmita termica de inox', 'garrafa de agua infantil', 'lancheira termica escolar', 'mochila antifurto usb', 'carteira slim automatica', 
-                    'chaveiro multiuso ferramentas', 'mini compressor de ar pneu', 'suporte de tablet cama', 'mouse pad ergonomico apoio', 'suporte notebook articulado'
-                ];
-                $tiktokKeywords = [];
-                foreach ($baseTiktokKeywords as $idx => $kw) {
-                    $seed = strlen($kw) + $idx;
-                    $volume = 50000 + (($seed * 8329) % 25000000);
-                    $cpm = 2.50 + (($seed * 31) % 450) / 100;
-                    $ctr = (1.2 + (($seed * 7) % 35) / 10) . '%';
-                    $categories = ['Geral', 'Casa & Cozinha', 'Eletrônicos', 'Moda & Beleza', 'Esportes & Saúde', 'Brinquedos'];
-                    $category = $categories[$seed % count($categories)];
-                    
-                    $tiktokKeywords[] = [
-                        'keyword' => $kw,
-                        'volume' => $volume,
-                        'cpm' => $cpm,
-                        'ctr' => $ctr,
-                        'category' => $category
-                    ];
+                $stmtTk = $db->prepare("SELECT * FROM keyword_trends WHERE marketplace = 'tiktok' ORDER BY volume DESC");
+                $stmtTk->execute();
+                $tiktokKeywords = $stmtTk->fetchAll();
+                
+                // If DB is empty, run seeder
+                if (empty($tiktokKeywords)) {
+                    TrendHunter\Database::checkAndCreateKeywordTrendsTable($db);
+                    $stmtTk->execute();
+                    $tiktokKeywords = $stmtTk->fetchAll();
                 }
+
+                $lastUpdatedTk = !empty($tiktokKeywords) ? $tiktokKeywords[0]['last_updated'] : date('Y-m-d H:i:s');
+                $lastUpdatedFormatted = date('d/m/Y H:i', strtotime($lastUpdatedTk));
                 ?>
+
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <p class="text-muted small mb-0">Consulte as hashtags e termos de busca com maior volume de visualizações acumuladas e engajamento em vídeos promocionais no TikTok Brasil.</p>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="text-muted small"><i class="fa-regular fa-clock me-1 text-accent-purple"></i> Atualizado em: <strong><?php echo $lastUpdatedFormatted; ?></strong></span>
+                        <button type="button" class="btn btn-sm btn-outline-purple" onclick="refreshMarketplaceKeywords('tiktok', this)">
+                            <i class="fa-solid fa-arrows-rotate me-1 icon-spin"></i> Atualizar Dados
+                        </button>
+                    </div>
+                </div>
+                
                 <div class="table-responsive">
                     <table id="table-tiktok-keywords" class="table-premium" style="font-size: 13px;">
                         <thead>
@@ -652,9 +646,9 @@ require __DIR__ . '/templates/header.php';
                                 <tr>
                                     <td class="fw-bold text-white"><i class="fa-brands fa-tiktok me-2 text-muted"></i> <?php echo htmlspecialchars($kw['keyword']); ?></td>
                                     <td data-order="<?php echo $kw['volume']; ?>"><?php echo number_format($kw['volume'], 0, ',', '.'); ?> views</td>
-                                    <td class="fw-bold text-accent-turquoise" data-order="<?php echo (float)($kw['cpm'] ?? 4.0); ?>">R$ <?php echo number_format((float)($kw['cpm'] ?? 4.0), 2, ',', '.'); ?></td>
-                                    <td class="text-success fw-bold"><?php echo $kw['ctr']; ?> CTR</td>
-                                    <td class="text-muted"><?php echo $kw['category']; ?></td>
+                                    <td class="fw-bold text-accent-turquoise" data-order="<?php echo (float)($kw['cpc_cpm'] ?? 4.0); ?>">R$ <?php echo number_format((float)($kw['cpc_cpm'] ?? 4.0), 2, ',', '.'); ?></td>
+                                    <td class="text-success fw-bold"><?php echo htmlspecialchars($kw['growth']); ?></td>
+                                    <td class="text-muted"><?php echo htmlspecialchars($kw['category']); ?></td>
                                     <td>
                                         <button class="btn btn-sm btn-outline-info" onclick="searchKeywordFromAd('<?php echo addslashes($kw['keyword']); ?>')">
                                             <i class="fa-solid fa-magnifying-glass me-1"></i> Analisar Termo
@@ -748,5 +742,31 @@ function searchKeywordFromAd(kw) {
             }, 500);
         }
     }
+}
+function refreshMarketplaceKeywords(marketplace, btn) {
+    const icon = $(btn).find('.icon-spin');
+    icon.addClass('fa-spin');
+    $(btn).prop('disabled', true);
+    
+    $.ajax({
+        url: 'api.php?action=sync_keywords',
+        method: 'POST',
+        data: { marketplace: marketplace },
+        success: function(response) {
+            if (response.success) {
+                alert(response.message);
+                location.reload();
+            } else {
+                alert('Erro ao atualizar: ' + (response.error || 'Erro desconhecido'));
+                icon.removeClass('fa-spin');
+                $(btn).prop('disabled', false);
+            }
+        },
+        error: function() {
+            alert('Erro de rede ou servidor ao atualizar palavras-chave.');
+            icon.removeClass('fa-spin');
+            $(btn).prop('disabled', false);
+        }
+    });
 }
 </script>

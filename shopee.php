@@ -38,32 +38,19 @@ $flashDeals = [
     ['title' => 'Tripé de Celular Ring Light com Controle', 'price' => 24.90, 'original_price' => 59.90, 'claimed' => 48, 'velocity' => 'Média', 'badge' => 'Oferta do Dia']
 ];
 
-$baseShopeeKeywords = [
-    'achadinhos da shopee', 'organizador de maquiagem', 'fone bluetooth sem fio', 'garrafa motivacional 2l', 'mini processador usb', 
-    'copo stanley termico', 'relogio masculino smart', 'mochila escolar impermeavel', 'luminaria led decorativa', 'tapete para banheiro', 
-    'escova secadora rotativa', 'maquina de cortar cabelo', 'meia sapatilha antiderrapante', 'bolsa feminina transversal', 'capinha de iphone', 
-    'pelicula de vidro temperado', 'kit pincel maquiagem', 'colar feminino prata', 'brinco de argola', 'anel regulavel', 
-    'carteira masculina couro', 'cinto masculino social', 'oculos de sol quadrado', 'corrente de prata masculina', 'pulseira inteligente fit', 
-    'carregador portatil powerbank', 'suporte de celular carro', 'cabo usb tipo c', 'adaptador tomada universal', 'fone de ouvido com fio', 
-    'mouse sem fio recarregavel', 'teclado mecanico gamer', 'pad mouse grande', 'caixa de som bluetooth bluetooth', 'microfone lapela sem fio', 
-    'tripod celular selfie', 'anel de luz ring light', 'camera de segurança wifi', 'lampada inteligente rgb', 'difusor de aromas ultrassonico', 
-    'mini ventilador portatil', 'esponja eletrica limpeza', 'massageador corporal eletrico', 'balança digital cozinha', 'garrafa termica inox', 
-    'marmita termica eletrica', 'escorredor de pratos pia', 'cabide de veludo fino', 'organizador de sapatos', 'caixa organizadora plastico'
-];
-$shopeeKeywords = [];
-foreach ($baseShopeeKeywords as $idx => $kw) {
-    $seed = strlen($kw) + $idx;
-    $volume = 10000 + (($seed * 3479) % 480000);
-    $cpc = 0.05 + (($seed * 17) % 85) / 100;
-    $growth = '+' . (20 + (($seed * 43) % 230)) . '%';
-    
-    $shopeeKeywords[] = [
-        'keyword' => $kw,
-        'volume' => $volume,
-        'cpc' => $cpc,
-        'growth' => $growth
-    ];
+$stmtSh = $db->prepare("SELECT * FROM keyword_trends WHERE marketplace = 'shopee' ORDER BY volume DESC");
+$stmtSh->execute();
+$shopeeKeywords = $stmtSh->fetchAll();
+
+// If DB is empty, run seeder
+if (empty($shopeeKeywords)) {
+    TrendHunter\Database::checkAndCreateKeywordTrendsTable($db);
+    $stmtSh->execute();
+    $shopeeKeywords = $stmtSh->fetchAll();
 }
+
+$lastUpdatedSh = !empty($shopeeKeywords) ? $shopeeKeywords[0]['last_updated'] : date('Y-m-d H:i:s');
+$lastUpdatedShFormatted = date('d/m/Y H:i', strtotime($lastUpdatedSh));
 
 require __DIR__ . '/templates/header.php';
 ?>
@@ -575,6 +562,16 @@ require __DIR__ . '/templates/header.php';
             <div class="card-premium p-4">
                 <h5 class="fw-bold mb-3 text-white"><i class="fa-solid fa-rectangle-ad shopee-orange me-2"></i> Buscas em Alta no Planejador Shopee Ads BR</h5>
                 
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <p class="text-muted small mb-0">Consulte os termos com maior volume de buscas internas no Shopee Ads BR, concorrência estimada e custo por clique médio sugerido.</p>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="text-muted small"><i class="fa-regular fa-clock me-1 text-accent-purple"></i> Atualizado em: <strong><?php echo $lastUpdatedShFormatted; ?></strong></span>
+                        <button type="button" class="btn btn-sm btn-outline-purple" onclick="refreshMarketplaceKeywords('shopee', this)">
+                            <i class="fa-solid fa-arrows-rotate me-1 icon-spin"></i> Atualizar Dados
+                        </button>
+                    </div>
+                </div>
+
                 <div class="table-responsive">
                     <table id="table-shopee-keywords" class="table-premium" style="font-size: 13px;">
                         <thead>
@@ -591,8 +588,8 @@ require __DIR__ . '/templates/header.php';
                                 <tr>
                                     <td class="fw-bold text-white"><i class="fa-solid fa-magnifying-glass me-2 text-muted"></i> <?php echo htmlspecialchars($kw['keyword']); ?></td>
                                     <td data-order="<?php echo $kw['volume']; ?>"><?php echo number_format($kw['volume'], 0, ',', '.'); ?> buscas</td>
-                                    <td class="fw-bold text-warning" data-order="<?php echo $kw['cpc']; ?>">R$ <?php echo number_format($kw['cpc'], 2, ',', '.'); ?></td>
-                                    <td class="text-success fw-bold"><i class="fa-solid fa-arrow-trend-up"></i> <?php echo $kw['growth']; ?></td>
+                                    <td class="fw-bold text-warning" data-order="<?php echo $kw['cpc_cpm']; ?>">R$ <?php echo number_format($kw['cpc_cpm'], 2, ',', '.'); ?></td>
+                                    <td class="text-success fw-bold"><i class="fa-solid fa-arrow-trend-up"></i> <?php echo htmlspecialchars($kw['growth']); ?></td>
                                     <td>
                                         <button class="btn btn-sm btn-primary bg-shopee-orange border-0" onclick="window.location.href='index.php?query='+encodeURIComponent('<?php echo addslashes($kw['keyword']); ?>')">
                                             <i class="fa-solid fa-circle-play me-1"></i> Varrer Termo
@@ -959,6 +956,33 @@ $(document).ready(function() {
         });
     }
 });
+
+function refreshMarketplaceKeywords(marketplace, btn) {
+    const icon = $(btn).find('.icon-spin');
+    icon.addClass('fa-spin');
+    $(btn).prop('disabled', true);
+    
+    $.ajax({
+        url: 'api.php?action=sync_keywords',
+        method: 'POST',
+        data: { marketplace: marketplace },
+        success: function(response) {
+            if (response.success) {
+                alert(response.message);
+                location.reload();
+            } else {
+                alert('Erro ao atualizar: ' + (response.error || 'Erro desconhecido'));
+                icon.removeClass('fa-spin');
+                $(btn).prop('disabled', false);
+            }
+        },
+        error: function() {
+            alert('Erro de rede ou servidor ao atualizar palavras-chave.');
+            icon.removeClass('fa-spin');
+            $(btn).prop('disabled', false);
+        }
+    });
+}
 </script>
 
 <?php include __DIR__ . '/templates/footer.php'; ?>

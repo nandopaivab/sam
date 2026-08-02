@@ -846,35 +846,31 @@ require __DIR__ . '/templates/header.php';
                 <p class="text-muted small mb-4">Consulte os termos com maior volume de buscas internas no Mercado Livre BR, concorrência estimada e custo por clique médio sugerido.</p>
                 
                 <?php
-                $baseMlKeywords = [
-                    'garrafa termica stanley', 'mini liquidificador portatil', 'organizador de gavetas', 'fone de ouvido bluetooth sem fio', 'ring light de mesa led', 
-                    'smartwatch relogio inteligente', 'suporte veicular magnético', 'carregador sem fio inducao', 'kit ferramentas completo profissional', 'central multimidia universal android', 
-                    'cameras de seguranca wifi kit', 'lampada led automotiva par', 'par de palhetas limpador', 'capa de chuva motoqueiro moto', 'luva de academia musculacao', 
-                    'colchonete ginastica fitness', 'roda abdominal exercicio', 'faixa elastica mini band', 'corda de pular rolamento', 'balança de bioimpedancia digital', 
-                    'tensimetro aparelho pressao', 'termometro digital infravermelho', 'oximetro de pulso portatil', 'nebulizador inalador portatil', 'escova de dentes eletrica', 
-                    'barbeador eletrico recarregavel', 'aparador de pelos nariz', 'secador de cabelo profissional', 'chapinha de cabelo ceramica', 'maquina de costura portatil', 
-                    'ferro de passar a vapor', 'aspirador de po vertical', 'robo aspirador inteligente', 'mop giratorio com balde', 'vaporizador de roupas portatil', 
-                    'balança comercial 40kg', 'maquina de cartao mercado', 'impressora termica etiqueta', 'leitor codigo de barras', 'gaveta de dinheiro organizadora', 
-                    'bobina termica 80x40', 'etiqueta adesiva termica', 'envelope de segurança correios', 'fita adesiva larga transparente', 'plastico bolha rolo 50m', 
-                    'caixa de papelão mudança', 'organizador de cabos velcro', 'filtro de linha 6 tomadas', 'extensão eletrica 5 metros', 'adaptador HDMI para VGA'
-                ];
-                $mlKeywords = [];
-                foreach ($baseMlKeywords as $idx => $kw) {
-                    $seed = strlen($kw) + $idx;
-                    $volume = 15000 + (($seed * 4127) % 520000);
-                    $cpc = 0.08 + (($seed * 19) % 95) / 100;
-                    $growth = '+' . (15 + (($seed * 37) % 210)) . '%';
-                    $competition = (($seed * 13) % 3 === 0) ? 'Alta' : ((($seed * 13) % 3 === 1) ? 'Média' : 'Baixa');
-                    
-                    $mlKeywords[] = [
-                        'keyword' => $kw,
-                        'volume' => $volume,
-                        'cpc' => $cpc,
-                        'growth' => $growth,
-                        'competition' => $competition
-                    ];
+                $stmtMl = $db->prepare("SELECT * FROM keyword_trends WHERE marketplace = 'mercadolivre' ORDER BY volume DESC");
+                $stmtMl->execute();
+                $mlKeywords = $stmtMl->fetchAll();
+                
+                // If DB is empty, run seeder
+                if (empty($mlKeywords)) {
+                    TrendHunter\Database::checkAndCreateKeywordTrendsTable($db);
+                    $stmtMl->execute();
+                    $mlKeywords = $stmtMl->fetchAll();
                 }
+
+                $lastUpdatedMl = !empty($mlKeywords) ? $mlKeywords[0]['last_updated'] : date('Y-m-d H:i:s');
+                $lastUpdatedFormatted = date('d/m/Y H:i', strtotime($lastUpdatedMl));
                 ?>
+
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <p class="text-muted small mb-0">Consulte os termos com maior volume de buscas internas no Mercado Livre BR, concorrência estimada e custo por clique médio sugerido.</p>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="text-muted small"><i class="fa-regular fa-clock me-1 text-accent-purple"></i> Atualizado em: <strong><?php echo $lastUpdatedFormatted; ?></strong></span>
+                        <button type="button" class="btn btn-sm btn-outline-purple" onclick="refreshMarketplaceKeywords('mercadolivre', this)">
+                            <i class="fa-solid fa-arrows-rotate me-1 icon-spin"></i> Atualizar Dados
+                        </button>
+                    </div>
+                </div>
+                
                 <div class="table-responsive">
                     <table id="table-ml-keywords" class="table-premium" style="font-size: 13px;">
                         <thead>
@@ -889,16 +885,17 @@ require __DIR__ . '/templates/header.php';
                         </thead>
                         <tbody>
                             <?php foreach ($mlKeywords as $kw): 
-                                $compBadge = $kw['competition'] === 'Alta' ? 'bg-danger-subtle text-danger border-danger-subtle' : ($kw['competition'] === 'Média' ? 'bg-warning-subtle text-warning border-warning-subtle' : 'bg-success-subtle text-success border-success-subtle');
+                                $competition = $kw['competition_ctr'] ?? 'Média';
+                                $compBadge = $competition === 'Alta' ? 'bg-danger-subtle text-danger border-danger-subtle' : ($competition === 'Média' ? 'bg-warning-subtle text-warning border-warning-subtle' : 'bg-success-subtle text-success border-success-subtle');
                                 ?>
                                 <tr>
                                     <td class="fw-bold text-white"><i class="fa-solid fa-magnifying-glass me-2 text-muted"></i> <?php echo htmlspecialchars($kw['keyword']); ?></td>
                                     <td data-order="<?php echo $kw['volume']; ?>"><?php echo number_format($kw['volume'], 0, ',', '.'); ?> buscas</td>
-                                    <td class="fw-bold text-accent-turquoise" data-order="<?php echo $kw['cpc']; ?>">R$ <?php echo number_format($kw['cpc'], 2, ',', '.'); ?></td>
+                                    <td class="fw-bold text-accent-turquoise" data-order="<?php echo $kw['cpc_cpm']; ?>">R$ <?php echo number_format($kw['cpc_cpm'], 2, ',', '.'); ?></td>
                                     <td>
-                                        <span class="badge <?php echo $compBadge; ?> border px-2 py-1 small"><?php echo $kw['competition']; ?></span>
+                                        <span class="badge <?php echo $compBadge; ?> border px-2 py-1 small"><?php echo htmlspecialchars($competition); ?></span>
                                     </td>
-                                    <td class="text-success fw-bold"><i class="fa-solid fa-arrow-trend-up"></i> <?php echo $kw['growth']; ?></td>
+                                    <td class="text-success fw-bold"><i class="fa-solid fa-arrow-trend-up"></i> <?php echo htmlspecialchars($kw['growth']); ?></td>
                                     <td>
                                         <button class="btn btn-sm btn-outline-info" onclick="$('#search-query').val('<?php echo addslashes($kw['keyword']); ?>'); window.scrollTo({top: 0, behavior: 'smooth'}); setTimeout(() => {$('#search-form').submit();}, 300);">
                                             <i class="fa-solid fa-search me-1"></i> Analisar Termo
@@ -1221,6 +1218,33 @@ $(document).ready(function() {
         });
     }
 });
+
+function refreshMarketplaceKeywords(marketplace, btn) {
+    const icon = $(btn).find('.icon-spin');
+    icon.addClass('fa-spin');
+    $(btn).prop('disabled', true);
+    
+    $.ajax({
+        url: 'api.php?action=sync_keywords',
+        method: 'POST',
+        data: { marketplace: marketplace },
+        success: function(response) {
+            if (response.success) {
+                alert(response.message);
+                location.reload();
+            } else {
+                alert('Erro ao atualizar: ' + (response.error || 'Erro desconhecido'));
+                icon.removeClass('fa-spin');
+                $(btn).prop('disabled', false);
+            }
+        },
+        error: function() {
+            alert('Erro de rede ou servidor ao atualizar palavras-chave.');
+            icon.removeClass('fa-spin');
+            $(btn).prop('disabled', false);
+        }
+    });
+}
 </script>
 
 <?php include __DIR__ . '/templates/footer.php'; ?>
