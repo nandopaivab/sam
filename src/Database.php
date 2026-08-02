@@ -406,7 +406,7 @@ class Database {
      * Unified seeder for Blue Ocean and Baby Niche tables on both SQLite & MySQL.
      * Ensures at least 10 high-quality products are present in each.
      */
-    public static function checkAndSeedNicheProducts(PDO $db): void {
+    public static function checkAndSeedNicheProducts(PDO $db, bool $force = false): void {
         $dbType = self::$driverType;
         $aiKeyType = $dbType === 'sqlite' ? 'INTEGER PRIMARY KEY AUTOINCREMENT' : 'INT AUTO_INCREMENT PRIMARY KEY';
         $textType = $dbType === 'sqlite' ? 'TEXT' : 'VARCHAR(255)';
@@ -461,7 +461,7 @@ class Database {
         try {
             // Seed Blue Ocean
             $cntBlue = (int)$db->query("SELECT COUNT(*) FROM blue_ocean_products")->fetchColumn();
-            if ($cntBlue < 10) {
+            if ($cntBlue < 10 || $force) {
                 $db->exec("DELETE FROM blue_ocean_products");
                 $insBlue = $db->prepare("INSERT INTO blue_ocean_products (title, category, niche, target_audience, problem_solved, avg_price, est_cost, proj_margin, approx_competitors, trend_score, seasonality, related_suppliers, suggested_kits, opportunity_badge, investment_recommendation) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 
@@ -479,7 +479,7 @@ class Database {
 
             // Seed Baby Niche
             $cntBaby = (int)$db->query("SELECT COUNT(*) FROM baby_niche_products")->fetchColumn();
-            if ($cntBaby < 10) {
+            if ($cntBaby < 10 || $force) {
                 $db->exec("DELETE FROM baby_niche_products");
                 $insBaby = $db->prepare("INSERT INTO baby_niche_products (title, sub_category, age_range, safety_cert, material_info, cleaning_ease, small_parts_risk, avg_price, est_cost, suggested_kits, income_bracket, ai_analysis) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 

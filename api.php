@@ -153,7 +153,7 @@ switch ($action) {
         
         // Force refresh of specialized niche seeds (Baby & Blue Ocean) with new random values
         try {
-            Database::checkAndSeedNicheProducts($db);
+            Database::checkAndSeedNicheProducts($db, true);
         } catch (\Exception $e) {}
 
         // Base 50 products list

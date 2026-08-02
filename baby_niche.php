@@ -77,8 +77,8 @@ include __DIR__ . '/templates/header.php';
             <p class="text-muted small mb-0">Produtos com altíssima conversão, rigorosos testes de segurança (Livre de BPA/Atóxico) e kits acessíveis para todas as rendas.</p>
         </div>
         <div class="d-flex gap-2">
-            <button class="btn btn-outline-secondary border-light-subtle d-flex align-items-center" onclick="alert('IA reanalisando normas de segurança do INMETRO e demanda no TikTok...'); location.reload();">
-                <i class="fa-solid fa-arrows-rotate me-2"></i> Atualizar IA Real-Time
+            <button id="btn-sync-baby-niche" class="btn btn-outline-secondary border-light-subtle d-flex align-items-center" onclick="triggerNicheSync('baby_niche', this)">
+                <i class="fa-solid fa-arrows-rotate me-2 icon-spin"></i> Atualizar IA Real-Time
             </button>
             <button class="btn btn-primary px-4 fw-bold shadow-lg" data-bs-toggle="modal" data-bs-target="#babyNicheModal">
                 <i class="fa-solid fa-plus me-2"></i> Cadastrar Oportunidade
@@ -309,6 +309,32 @@ function saveBabyNicheProduct() {
     .catch(err => {
         console.error(err);
         alert('Erro ao se conectar com o servidor.');
+    });
+}
+
+function triggerNicheSync(nicheType, btn) {
+    const icon = $(btn).find('.icon-spin');
+    icon.addClass('fa-spin');
+    $(btn).prop('disabled', true);
+    
+    $.ajax({
+        url: 'api.php?action=sync_database',
+        method: 'POST',
+        success: function(response) {
+            if (response.success) {
+                alert('🎉 Sincronização de IA Real-Time concluída com sucesso!');
+                location.reload();
+            } else {
+                alert('Erro ao sincronizar: ' + (response.error || 'Erro desconhecido'));
+                icon.removeClass('fa-spin');
+                $(btn).prop('disabled', false);
+            }
+        },
+        error: function() {
+            alert('Erro de rede ou servidor ao sincronizar dados da IA.');
+            icon.removeClass('fa-spin');
+            $(btn).prop('disabled', false);
+        }
     });
 }
 </script>
