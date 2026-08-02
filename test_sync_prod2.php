@@ -35,8 +35,8 @@ try {
     $db = Database::getConnection();
     
     echo "Inserting log test...<br>";
-    $stmtLog = $db->prepare("INSERT INTO activity_logs (user_id, action, target_table, record_id, details) VALUES (?, ?, ?, ?, ?)");
-    $stmtLog->execute([$user['id'] ?? 0, 'Sincronização Teste', 'products', 0, 'Teste de log de depuração.']);
+    $stmtLog = $db->prepare("INSERT INTO activity_logs (user_id, user_name, module, action_type, target_record, new_values, ip_address) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmtLog->execute([$user['id'] ?? 1, $user['name'] ?? 'Usuário', 'Database', 'Sincronização Teste', 'products', 'Teste de log de depuração.', '127.0.0.1']);
     echo "Log test complete.<br>";
 
     echo "<h3 style='color:green;'>Debugger 2 Green!</h3>";

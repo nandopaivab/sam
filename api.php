@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * TrendHunter Brasil - REST API Handler
  */
@@ -6,8 +8,6 @@
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
-
-declare(strict_types=1);
 
 // Custom PSR-4 equivalent autoloader for project files
 spl_autoload_register(function ($class) {
@@ -270,8 +270,17 @@ switch ($action) {
         }
 
         // Log sync activity
-        $stmtLog = $db->prepare("INSERT INTO activity_logs (user_id, action, target_table, record_id, details) VALUES (?, ?, ?, ?, ?)");
-        $stmtLog->execute([$currentUser['id'], 'Sincronização Banco de Dados', 'products', 0, "Sincronização global concluída com sucesso. {$count} produtos atualizados via crawler/IA."]);
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+        $stmtLog = $db->prepare("INSERT INTO activity_logs (user_id, user_name, module, action_type, target_record, new_values, ip_address) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmtLog->execute([
+            $currentUser['id'],
+            $currentUser['name'] ?? 'Usuário',
+            'Database',
+            'Sincronização Banco de Dados',
+            'products',
+            "Sincronização global concluída com sucesso. {$count} produtos atualizados via crawler/IA.",
+            $ip
+        ]);
 
         Validator::jsonResponse(200, [
             'success' => true,
