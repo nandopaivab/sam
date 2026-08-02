@@ -219,112 +219,112 @@ $categoriesData = [
 ];
 
 // Mock Google Trends Regional Data (States of Brazil e-commerce hot searches)
-$regionalTrends = [
-    'SP' => [
-        'name' => 'São Paulo',
-        'region' => 'Sudeste',
-        'region_trend' => 'Região Sudeste: Alta demanda por organizadores residenciais, kits domésticos e eletrônicos importados devido ao alto volume de entregas rápidas e hubs logísticos.',
-        'top_searches' => [
-            ['keyword' => 'Copo Stanley 1.2L', 'volume' => 100, 'growth' => '+320%', 'badge' => 'Explosivo'],
-            ['keyword' => 'Mini Projetor Smart Wifi', 'volume' => 92, 'growth' => '+180%', 'badge' => 'Alta Demanda'],
-            ['keyword' => 'Fone Bluetooth TWS Redmi', 'volume' => 88, 'growth' => '+140%', 'badge' => 'Estável'],
-            ['keyword' => 'Organizador Acrílico Giratório', 'volume' => 75, 'growth' => '+250%', 'badge' => 'Explosivo'],
-            ['keyword' => 'Bicicleta de Equilíbrio Infantil', 'volume' => 64, 'growth' => '+95%', 'badge' => 'Crescente']
-        ],
-        'hot_category' => 'Eletrônicos & Utilidades'
+$regionsMeta = [
+    'Norte' => [
+        'trend' => 'Região Norte: Grande volume de buscas voltado para climatização individual, energia portátil (solar) e hidratação térmica devido a temperaturas elevadas.',
+        'pool' => [
+            'Mini Ventilador Portátil USB', 'Climatizador de Ar de Mesa', 'Umidificador Ultrassônico Luz',
+            'Garrafa Squeeze Térmica 1L', 'Carregador Solar Powerbank Qi', 'Garrafa Térmica Stanley 1.2L', 'Luminária Recarregável USB'
+        ]
     ],
-    'RJ' => [
-        'name' => 'Rio de Janeiro',
-        'region' => 'Sudeste',
-        'region_trend' => 'Região Sudeste: Forte apelo para acessórios pessoais, vestuário de praia/esportes e gadgets portáteis para atividades ao ar livre.',
-        'top_searches' => [
-            ['keyword' => 'Garrafa Térmica Academia', 'volume' => 100, 'growth' => '+210%', 'badge' => 'Alta Demanda'],
-            ['keyword' => 'Óculos de Sol Cat Eye Vintage', 'volume' => 89, 'growth' => '+150%', 'badge' => 'Crescente'],
-            ['keyword' => 'Fone Bluetooth Gamer', 'volume' => 85, 'growth' => '+120%', 'badge' => 'Estável'],
-            ['keyword' => 'Bolsa Tiracolo Feminina', 'volume' => 78, 'growth' => '+80%', 'badge' => 'Estável'],
-            ['keyword' => 'Caixa de Som Portátil Prova D\'Água', 'volume' => 70, 'growth' => '+190%', 'badge' => 'Crescente']
-        ],
-        'hot_category' => 'Esportes & Moda'
+    'Nordeste' => [
+        'trend' => 'Região Nordeste: Forte interesse por acessórios de iluminação e áudio para criação de conteúdo (redes sociais/influenciadores), cosméticos e moda.',
+        'pool' => [
+            'Ring Light Tripé Iluminação', 'Microfone Lapela Sem Fio USB', 'Batom Lip Tint Magic Gloss',
+            'Smartwatch Watch 9 Ultra NFC', 'Mini Processador Alimentos USB', 'Óculos de Sol Retro Retangular', 'Kit Pincéis Maquiagem'
+        ]
     ],
-    'MG' => [
-        'name' => 'Minas Gerais',
-        'region' => 'Sudeste',
-        'region_trend' => 'Região Sudeste: Grande foco em utilidades domésticas e nicho de maternidade/bebê (silicone e segurança do sono).',
-        'top_searches' => [
-            ['keyword' => 'Mop Giratório Balde Limpeza', 'volume' => 100, 'growth' => '+140%', 'badge' => 'Estável'],
-            ['keyword' => 'Organizador de Temperos Cozinha', 'volume' => 94, 'growth' => '+280%', 'badge' => 'Explosivo'],
-            ['keyword' => 'Mordedor Sensorial Girafa Silicone', 'volume' => 82, 'growth' => '+110%', 'badge' => 'Crescente'],
-            ['keyword' => 'Prato Ventosa Bebê Alimentação', 'volume' => 79, 'growth' => '+130%', 'badge' => 'Crescente'],
-            ['keyword' => 'Lâmpada Inteligente RGB Alexa', 'volume' => 72, 'growth' => '+90%', 'badge' => 'Estável']
-        ],
-        'hot_category' => 'Utilidades Domésticas & Bebês'
+    'Centro-Oeste' => [
+        'trend' => 'Região Centro-Oeste: Alta procura por ergonomia de escritório, iluminação de mesa e organizadores corporativos para Home Office.',
+        'pool' => [
+            'Organizador de Cabos de Mesa', 'Luminária de Monitor LED USB', 'Suporte de Tablet para Cama',
+            'Teclado Mecânico Compacto', 'Garrafa Térmica Digital Inox', 'Suporte Celular Mesa Regulável', 'Mochila Antifurto Impermeável'
+        ]
     ],
-    'BA' => [
-        'name' => 'Bahia',
-        'region' => 'Nordeste',
-        'region_trend' => 'Região Nordeste: Forte interesse por acessórios de iluminação e áudio para criação de conteúdo (redes sociais/influenciadores) e beleza.',
-        'top_searches' => [
-            ['keyword' => 'Ring Light Tripé Iluminação', 'volume' => 100, 'growth' => '+120%', 'badge' => 'Estável'],
-            ['keyword' => 'Microfone Lapela Sem Fio USB', 'volume' => 91, 'growth' => '+200%', 'badge' => 'Alta Demanda'],
-            ['keyword' => 'Batom Lip Tint Magic Gloss', 'volume' => 84, 'growth' => '+170%', 'badge' => 'Crescente'],
-            ['keyword' => 'Smartwatch Watch 9 Ultra NFC', 'volume' => 79, 'growth' => '+150%', 'badge' => 'Crescente'],
-            ['keyword' => 'Mini Processador Alimentos USB', 'volume' => 68, 'growth' => '+95%', 'badge' => 'Estável']
-        ],
-        'hot_category' => 'Vestíveis & Beleza'
+    'Sudeste' => [
+        'trend' => 'Região Sudeste: Alta demanda por organizadores residenciais, kits domésticos e eletrônicos importados devido ao alto volume de entregas rápidas (Full).',
+        'pool' => [
+            'Copo Stanley 1.2L', 'Mini Projetor Smart Wifi', 'Fone Bluetooth TWS Redmi',
+            'Organizador Acrílico Giratório', 'Bicicleta de Equilíbrio Infantil', 'Mop Giratório Balde Limpeza', 'Lixeira Automática Sensor'
+        ]
     ],
-    'PR' => [
-        'name' => 'Paraná',
-        'region' => 'Sul',
-        'region_trend' => 'Região Sul: Destaque para forte sazonalidade de clima frio, com aumento repentino em vestuário térmico, cobertores e aquecimento residencial.',
-        'top_searches' => [
-            ['keyword' => 'Moletom Canguru com Capuz', 'volume' => 100, 'growth' => '+310%', 'badge' => 'Sazonal Explosivo'],
-            ['keyword' => 'Jaqueta Corta Vento Impermeável', 'volume' => 93, 'growth' => '+240%', 'badge' => 'Sazonal Alta'],
-            ['keyword' => 'Aquecedor Elétrico Portátil', 'volume' => 88, 'growth' => '+420%', 'badge' => 'Explosivo'],
-            ['keyword' => 'Copo Térmico Cerveja Stanley', 'volume' => 82, 'growth' => '+130%', 'badge' => 'Estável'],
-            ['keyword' => 'Suporte Articulado Monitor Duplo', 'volume' => 70, 'growth' => '+110%', 'badge' => 'Estável']
-        ],
-        'hot_category' => 'Moda Inverno & Tech'
-    ],
-    'RS' => [
-        'name' => 'Rio Grande do Sul',
-        'region' => 'Sul',
-        'region_trend' => 'Região Sul: Tendência focada em calçados, jaquetas pesadas e utilidades domésticas refinadas de cozinha para inverno.',
-        'top_searches' => [
-            ['keyword' => 'Calça Alfaiataria Masculina', 'volume' => 100, 'growth' => '+180%', 'badge' => 'Alta Demanda'],
-            ['keyword' => 'Jaqueta Forrada Pelúcia Masculina', 'volume' => 95, 'growth' => '+390%', 'badge' => 'Sazonal Explosivo'],
-            ['keyword' => 'Balança Digital Cozinha Precisão', 'volume' => 82, 'growth' => '+90%', 'badge' => 'Estável'],
-            ['keyword' => 'Kit Potes Vidro Herméticos', 'volume' => 78, 'growth' => '+150%', 'badge' => 'Crescente'],
-            ['keyword' => 'Luminária de Mesa Monitor Barra', 'volume' => 71, 'growth' => '+110%', 'badge' => 'Estável']
-        ],
-        'hot_category' => 'Moda Masculina & Cozinha'
-    ],
-    'DF' => [
-        'name' => 'Distrito Federal',
-        'region' => 'Centro-Oeste',
-        'region_trend' => 'Região Centro-Oeste: Alta procura por ergonomia de escritório, iluminação de mesa e organizadores corporativos para Home Office.',
-        'top_searches' => [
-            ['keyword' => 'Organizador de Cabos de Mesa', 'volume' => 100, 'growth' => '+150%', 'badge' => 'Alta Demanda'],
-            ['keyword' => 'Luminária de Monitor LED USB', 'volume' => 90, 'growth' => '+110%', 'badge' => 'Crescente'],
-            ['keyword' => 'Suporte de Tablet para Cama', 'volume' => 85, 'growth' => '+80%', 'badge' => 'Estável'],
-            ['keyword' => 'Teclado Mecânico Compacto', 'volume' => 74, 'growth' => '+140%', 'badge' => 'Crescente'],
-            ['keyword' => 'Garrafa Térmica Digital Inox', 'volume' => 69, 'growth' => '+90%', 'badge' => 'Estável']
-        ],
-        'hot_category' => 'Escritório & Tech'
-    ],
-    'AM' => [
-        'name' => 'Amazonas',
-        'region' => 'Norte',
-        'region_trend' => 'Região Norte: Grande volume voltado para climatização individual, energia portátil (solar) e hidratação térmica devido a altas temperaturas.',
-        'top_searches' => [
-            ['keyword' => 'Mini Ventilador Portátil USB', 'volume' => 100, 'growth' => '+380%', 'badge' => 'Explosivo'],
-            ['keyword' => 'Climatizador de Ar de Mesa', 'volume' => 95, 'growth' => '+410%', 'badge' => 'Explosivo'],
-            ['keyword' => 'Umidificador Ultrassônico Luz', 'volume' => 84, 'growth' => '+120%', 'badge' => 'Estável'],
-            ['keyword' => 'Garrafa Squeeze Térmica 1L', 'volume' => 80, 'growth' => '+150%', 'badge' => 'Crescente'],
-            ['keyword' => 'Carregador Solar Powerbank Qi', 'volume' => 71, 'growth' => '+95%', 'badge' => 'Estável']
-        ],
-        'hot_category' => 'Climatização & Energia'
+    'Sul' => [
+        'trend' => 'Região Sul: Destaque para forte sazonalidade de clima frio, com aumento repentino em vestuário térmico, cobertores e aquecimento residencial.',
+        'pool' => [
+            'Moletom Canguru com Capuz', 'Jaqueta Corta Vento Impermeável', 'Aquecedor Elétrico Portátil',
+            'Copo Térmico Cerveja Stanley', 'Suporte Articulado Monitor Duplo', 'Calça Alfaiataria Masculina', 'Jaqueta Forrada Pelúcia'
+        ]
     ]
 ];
+
+$statesList = [
+    'AC' => ['Acre', 'Norte', 'Climatização & Acessórios'],
+    'AL' => ['Alagoas', 'Nordeste', 'Beleza & Moda'],
+    'AP' => ['Amapá', 'Norte', 'Eletrônicos & Energia'],
+    'AM' => ['Amazonas', 'Norte', 'Climatização & Energia'],
+    'BA' => ['Bahia', 'Nordeste', 'Vestíveis & Beleza'],
+    'CE' => ['Ceará', 'Nordeste', 'Utilidades & Lar'],
+    'DF' => ['Distrito Federal', 'Centro-Oeste', 'Escritório & Tech'],
+    'ES' => ['Espírito Santo', 'Sudeste', 'Moda & Acessórios'],
+    'GO' => ['Goiás', 'Centro-Oeste', 'Agro & Utilidades'],
+    'MA' => ['Maranhão', 'Nordeste', 'Eletros & Utilidades'],
+    'MT' => ['Mato Grosso', 'Centro-Oeste', 'Ferramentas & Casa'],
+    'MS' => ['Mato Grosso do Sul', 'Centro-Oeste', 'Esportes & Camping'],
+    'MG' => ['Minas Gerais', 'Sudeste', 'Utilidades Domésticas & Bebês'],
+    'PA' => ['Pará', 'Norte', 'Utilidades & Som'],
+    'PB' => ['Paraíba', 'Nordeste', 'Casa & Organização'],
+    'PR' => ['Paraná', 'Sul', 'Moda Inverno & Tech'],
+    'PE' => ['Pernambuco', 'Nordeste', 'Eletrônicos & Áudio'],
+    'PI' => ['Piauí', 'Nordeste', 'Climatização & Lar'],
+    'RJ' => ['Rio de Janeiro', 'Sudeste', 'Esportes & Moda'],
+    'RN' => ['Rio Grande do Norte', 'Nordeste', 'Moda & Acessórios'],
+    'RS' => ['Rio Grande do Sul', 'Sul', 'Moda Masculina & Cozinha'],
+    'RO' => ['Rondônia', 'Norte', 'Ferramentas & Acessórios'],
+    'RR' => ['Roraima', 'Norte', 'Energia & Climatização'],
+    'SC' => ['Santa Catarina', 'Sul', 'E-commerce & Casa'],
+    'SP' => ['São Paulo', 'Sudeste', 'Eletrônicos & Utilidades'],
+    'SE' => ['Sergipe', 'Nordeste', 'Beleza & Acessórios'],
+    'TO' => ['Tocantins', 'Norte', 'Climatização & Casa']
+];
+
+$regionalTrends = [];
+foreach ($statesList as $uf => $info) {
+    $stateName = $info[0];
+    $regionName = $info[1];
+    $hotCat = $info[2];
+    
+    $regionData = $regionsMeta[$regionName];
+    $pool = $regionData['pool'];
+    
+    $topSearches = [];
+    $seed = strlen($stateName);
+    for ($i = 0; $i < 5; $i++) {
+        $kw = $pool[($seed + $i) % count($pool)];
+        $vol = 60 + (($seed * ($i + 3)) % 41);
+        $growthPct = 80 + (($seed * ($i + 7)) % 350);
+        $badges = ['Explosivo', 'Alta Demanda', 'Crescente', 'Sazonal Alta', 'Estável'];
+        $badge = $badges[($seed + $i) % count($badges)];
+        
+        $topSearches[] = [
+            'keyword' => $kw,
+            'volume' => $vol,
+            'growth' => '+' . $growthPct . '%',
+            'badge' => $badge
+        ];
+    }
+    
+    usort($topSearches, function($a, $b) {
+        return $b['volume'] - $a['volume'];
+    });
+    
+    $regionalTrends[$uf] = [
+        'name' => $stateName,
+        'region' => $regionName,
+        'region_trend' => $regionData['trend'],
+        'top_searches' => $topSearches,
+        'hot_category' => $hotCat
+    ];
+}
 
 require __DIR__ . '/templates/header.php';
 ?>
@@ -831,7 +831,7 @@ require __DIR__ . '/templates/header.php';
                         <h5 class="fw-bold mb-3 text-white"><i class="fa-solid fa-location-dot text-accent-turquoise me-2"></i> Estados do Brasil</h5>
                         <p class="text-muted small">Selecione o estado brasileiro para filtrar as buscas e micro-tendências locais de e-commerce.</p>
                         
-                        <div class="list-group d-flex flex-column gap-2" id="states-list-group">
+                        <div class="list-group d-flex flex-column gap-2" id="states-list-group" style="max-height: 550px; overflow-y: auto; padding-right: 5px;">
                             <?php foreach ($regionalTrends as $uf => $data): ?>
                                 <button type="button" class="btn btn-outline-secondary border-light-subtle text-start text-white p-3 d-flex justify-content-between align-items-center state-btn" id="btn-state-<?php echo $uf; ?>" onclick="selectTrendsState('<?php echo $uf; ?>')" style="border-radius: 10px; background-color: rgba(255,255,255,0.01);">
                                     <div>
