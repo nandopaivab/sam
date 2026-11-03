@@ -1,0 +1,11 @@
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Block direct access to sensitive backend directories
+    RewriteRule ^(config|src|storage|cron|templates)/(.*)$ - [F,L]
+</IfModule>
+
+# Prevent directory listing
+Options -Indexes
