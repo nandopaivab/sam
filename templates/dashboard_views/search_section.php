@@ -106,7 +106,49 @@ declare(strict_types=1);
             </div>
         </div>
 
+        <!-- TensorFlow.js & MobileNet v2 (100% Free Browser Computer Vision - Zero API Key Needed) -->
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
         <script>
+            let samMobilenetModel = null;
+
+            async function getSamVisionModel() {
+                if (samMobilenetModel) return samMobilenetModel;
+                if (typeof mobilenet !== 'undefined') {
+                    samMobilenetModel = await mobilenet.load({ version: 2, alpha: 1.0 });
+                }
+                return samMobilenetModel;
+            }
+
+            // Map MobileNet ImageNet classes to Brazilian E-Commerce Products & Categories
+            function mapVisionClassToEcommerce(predictions) {
+                if (!predictions || predictions.length === 0) return null;
+                const combined = predictions.map(p => p.className.toLowerCase()).join(' | ');
+
+                const rules = [
+                    { keywords: ['tricycle', 'go-kart', 'moped', 'motor scooter', 'scooter', 'barrow', 'wheelbarrow', 'shopping cart', 'toyshop', 'unicycle', 'bobsled', 'lawn mower', 'vacuum', 'racer', 'sports car', 'convertible', 'beach wagon', 'golfcart', 'jinrikisha', 'cradle'], query: 'Carrinho de Rolimã Infantil Gira Gira', category: 'Brinquedos & Hobbies' },
+                    { keywords: ['water bottle', 'pop bottle', 'beer bottle', 'wine bottle', 'thermos', 'pitcher', 'jug', 'coffee mug', 'cup', 'beaker', 'cocktail shaker'], query: 'Garrafa Térmica', category: 'Esportes & Academia' },
+                    { keywords: ['headphone', 'earphone', 'ipod', 'microphone', 'loudspeaker', 'radio', 'cassette', 'cd player', 'modem'], query: 'Fone Bluetooth', category: 'Eletrônicos & Áudio' },
+                    { keywords: ['digital watch', 'stopwatch', 'analog clock', 'wall clock', 'magnetic compass', 'barometer', 'buckle'], query: 'Smartwatch', category: 'Vestíveis & Tecnologia' },
+                    { keywords: ['cellular telephone', 'hand-held computer', 'ipod', 'remote control', 'pay-phone'], query: 'Celular', category: 'Eletrônicos & Áudio' },
+                    { keywords: ['lipstick', 'face powder', 'perfume', 'lotion', 'hair spray', 'sunscreen', 'nail polish', 'wig'], query: 'Maquiagem', category: 'Beleza & Cuidados Pessoais' },
+                    { keywords: ['crock pot', 'frying pan', 'wok', 'Dutch oven', 'microwave', 'toaster', 'espresso maker', 'waffle iron', 'rotisserie', 'teapot', 'coffeepot', 'spatula', 'mixing bowl', 'food processor'], query: 'Air Fryer', category: 'Utilidades Domésticas' },
+                    { keywords: ['jersey', 'sweatshirt', 'suit', 'trench coat', 'jean', 'cardigan', 'polo shirt', 'bow tie', 'windsor tie', 'military uniform'], query: 'Roupas Masculinas', category: 'Moda Masculina' },
+                    { keywords: ['gown', 'miniskirt', 'overskirt', 'hoopskirt', 'sarong', 'bikini', 'maillot', 'brassiere', 'kimono', 'stole', 'poncho', 'pajama'], query: 'Roupas Femininas', category: 'Moda Feminina' },
+                    { keywords: ['bib', 'diaper', 'crib', 'bassinet', 'teddy', 'toy poodle', 'rattle', 'pacifier', 'bonnet'], query: 'Roupas de Crianças', category: 'Moda Infantil' },
+                    { keywords: ['jigsaw puzzle', 'lego', 'pinwheel', 'balloon', 'kite', 'comic book', 'joystick', 'chess', 'rubik'], query: 'Brinquedos', category: 'Brinquedos & Hobbies' }
+                ];
+
+                for (const rule of rules) {
+                    for (const kw of rule.keywords) {
+                        if (combined.includes(kw.toLowerCase())) {
+                            return { query: rule.query, category: rule.category, rawClasses: combined };
+                        }
+                    }
+                }
+                return { query: null, category: '', rawClasses: combined };
+            }
+
             function searchNiche(keyword, category) {
                 document.getElementById('search-query').value = keyword;
                 document.getElementById('search-category').value = category;
@@ -133,7 +175,7 @@ declare(strict_types=1);
 
                 $('#sam-lens-panel').slideDown(150);
                 $('#sam-lens-preview-bar').slideDown(150);
-                $('#sam-lens-status').html('<i class="fa-solid fa-spinner fa-spin me-1"></i> Analisando imagem via SAM Lens IA...');
+                $('#sam-lens-status').html('<i class="fa-solid fa-spinner fa-spin me-1"></i> Analisando imagem via SAM Lens IA Neural...');
                 $('#sam-lens-detected-title').text('Processando visão computacional do produto...');
                 $('#sam-lens-detected-sub').text('Arquivo: ' + file.name);
 
@@ -144,7 +186,8 @@ declare(strict_types=1);
 
                     // Resize image via canvas to max 800px so upload & AI Vision are instant
                     const img = new Image();
-                    img.onload = function() {
+                    img.crossOrigin = 'anonymous';
+                    img.onload = async function() {
                         const canvas = document.createElement('canvas');
                         const maxDim = 800;
                         let w = img.width;
@@ -164,13 +207,28 @@ declare(strict_types=1);
                         ctx.drawImage(img, 0, 0, w, h);
                         const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
+                        // Run Neural Visual Classification directly in browser (100% Free, Zero API Key)
+                        let visionMatch = null;
+                        try {
+                            const model = await getSamVisionModel();
+                            if (model) {
+                                const predictions = await model.classify(canvas, 5);
+                                visionMatch = mapVisionClassToEcommerce(predictions);
+                            }
+                        } catch (visionErr) {
+                            console.warn('Vision fallback:', visionErr);
+                        }
+
                         $.ajax({
                             url: 'api.php?action=image_search',
                             method: 'POST',
                             data: {
                                 image_base64: compressedDataUrl,
                                 filename: file.name || 'imagem.jpg',
-                                current_hint: $('#search-query').val().trim()
+                                current_hint: $('#search-query').val().trim(),
+                                vision_query: (visionMatch && visionMatch.query) ? visionMatch.query : '',
+                                vision_category: (visionMatch && visionMatch.category) ? visionMatch.category : '',
+                                vision_raw: (visionMatch && visionMatch.rawClasses) ? visionMatch.rawClasses : ''
                             },
                             success: function(res) {
                                 if (res.success && res.detected_query) {
@@ -178,7 +236,7 @@ declare(strict_types=1);
                                     if (res.detected_category) {
                                         $('#search-category').val(res.detected_category);
                                     }
-                                    $('#sam-lens-status').html('<i class="fa-solid fa-circle-check me-1"></i> ' + (res.engine || 'SAM Lens Vision'));
+                                    $('#sam-lens-status').html('<i class="fa-solid fa-circle-check me-1"></i> ' + (res.engine || 'SAM Lens Neural Vision'));
                                     $('#sam-lens-detected-title').text('Produto Identificado: ' + res.detected_query);
                                     $('#sam-lens-detected-sub').text(res.details || 'Executando varredura multi-marketplace automaticamente...');
                                     $('#search-form').submit();
