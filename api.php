@@ -1347,16 +1347,25 @@ switch ($action) {
         Validator::jsonResponse(200, ['success' => true, 'report' => $reportText]);
         break;
 
-    // 2. Fetch current SAM Hype Daily E-Commerce Trending keywords for Brazil ("Alta do Dia")
+    // 2. Fetch current SAM Hype Daily E-Commerce & Google Official Trending keywords for Brazil ("Alta do Dia")
     case 'get_trends':
         $forceRefresh = isset($_GET['refresh']) && $_GET['refresh'] == '1';
         if ($forceRefresh) {
+            Cache::delete(TrendsClient::CACHE_KEY . '_v2_' . date('Y-m-d'));
             Cache::delete(TrendsClient::CACHE_KEY . '_' . date('Y-m-d'));
             Cache::delete(TrendsClient::CACHE_KEY);
+            Cache::delete(TrendsClient::GOOGLE_CACHE_KEY . '_' . date('Y-m-d_H'));
             Cache::delete('google_trends_br');
         }
-        $trends = TrendsClient::getTrendingKeywords($forceRefresh);
-        Validator::jsonResponse(200, ['success' => true, 'date' => date('d/m/Y'), 'trends' => $trends]);
+        $ecommerceTrends = TrendsClient::getEcommerceDailyTrends($forceRefresh);
+        $googleTrends = TrendsClient::getGoogleOfficialTrends($forceRefresh);
+        Validator::jsonResponse(200, [
+            'success'          => true,
+            'date'             => date('d/m/Y'),
+            'trends'           => $ecommerceTrends,
+            'ecommerce_trends' => $ecommerceTrends,
+            'google_trends'    => $googleTrends
+        ]);
         break;
 
     // Sync/update keywords statistics dynamically

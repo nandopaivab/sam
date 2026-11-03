@@ -326,7 +326,89 @@ $(document).ready(function() {
         renderPaginationControls(products.length, limit);
     }
 
-    // 5. Load Sidebar SAM Hype Trending Terms Widget
+    // 5. Load Sidebar SAM Hype Trending Terms Widget (2 Abas: Varejo & Google Top 10)
+    window.samHypeTrendsData = { ecommerce: [], google: [] };
+    window.activeHypeTrendsTab = 'ecommerce';
+
+    function renderHypeTrendsList() {
+        const list = $('#google-trends-list');
+        if (!list.length) return;
+
+        const currentTab = window.activeHypeTrendsTab || 'ecommerce';
+        const items = (window.samHypeTrendsData && Array.isArray(window.samHypeTrendsData[currentTab]))
+            ? window.samHypeTrendsData[currentTab]
+            : [];
+
+        if (!items.length) {
+            list.html('<li class="text-muted text-center py-2">Sem tendências no momento</li>');
+            return;
+        }
+
+        list.empty();
+        items.slice(0, 10).forEach((item, index) => {
+            const term = (typeof item === 'object' && item !== null) ? (item.term || '') : String(item);
+            const badgeText = (typeof item === 'object' && item !== null && (item.badge || item.growth))
+                ? (item.badge || item.growth)
+                : '';
+            const subtitle = (typeof item === 'object' && item !== null && (item.subtitle || item.channel))
+                ? (item.subtitle || item.channel)
+                : 'Alta do Dia';
+            const safeTerm = term.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+            const safeTitle = subtitle.replace(/"/g, '&quot;');
+
+            let rankStyle = 'background: rgba(148,163,184,0.18); color: var(--text-secondary);';
+            if (index === 0) rankStyle = 'background: linear-gradient(135deg,#f59e0b,#ea580c); color: #fff;';
+            else if (index === 1) rankStyle = 'background: rgba(6,225,204,0.2); color: #06e1cc; border: 1px solid rgba(6,225,204,0.35);';
+            else if (index === 2) rankStyle = 'background: rgba(99,102,241,0.22); color: #818cf8; border: 1px solid rgba(99,102,241,0.35);';
+
+            const badgeClass = currentTab === 'google'
+                ? 'bg-info-subtle text-info'
+                : 'bg-success-subtle text-success';
+
+            list.append(`
+                <li class="d-flex align-items-center justify-content-between py-1 px-1 rounded hover-bg-subtle" style="cursor: pointer; gap: 6px;" title="${safeTitle}" onclick="searchKeyword('${safeTerm}')">
+                    <div class="d-flex align-items-center" style="min-width: 0; flex: 1;">
+                        <span class="badge me-2 flex-shrink-0" style="width: 20px; height: 18px; font-size: 9.5px; display: inline-flex; align-items: center; justify-content: center; padding: 0; ${rankStyle}">${index + 1}</span>
+                        <span class="text-truncate fw-medium hover-accent" style="color: var(--text-primary); font-size: 11px;">${term}</span>
+                    </div>
+                    <span class="badge ${badgeClass} flex-shrink-0" style="font-size: 9px; padding: 2px 5px; font-weight: 700;">${badgeText}</span>
+                </li>
+            `);
+        });
+    }
+
+    window.switchHypeTrendsTab = function(tab) {
+        window.activeHypeTrendsTab = (tab === 'google') ? 'google' : 'ecommerce';
+        const btnEco = $('#hype-tab-ecommerce');
+        const btnGoo = $('#hype-tab-google');
+
+        if (window.activeHypeTrendsTab === 'google') {
+            btnGoo.css({
+                background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.24), rgba(99, 102, 241, 0.24))',
+                color: '#38bdf8',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+            }).removeClass('fw-semibold').addClass('fw-bold');
+            btnEco.css({
+                background: 'transparent',
+                color: 'var(--text-secondary)',
+                boxShadow: 'none'
+            }).removeClass('fw-bold').addClass('fw-semibold');
+        } else {
+            btnEco.css({
+                background: 'linear-gradient(135deg, rgba(6, 225, 204, 0.22), rgba(99, 102, 241, 0.22))',
+                color: '#06e1cc',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+            }).removeClass('fw-semibold').addClass('fw-bold');
+            btnGoo.css({
+                background: 'transparent',
+                color: 'var(--text-secondary)',
+                boxShadow: 'none'
+            }).removeClass('fw-bold').addClass('fw-semibold');
+        }
+
+        renderHypeTrendsList();
+    };
+
     function loadTrends() {
         refreshTrends(false);
     }
@@ -338,30 +420,12 @@ $(document).ready(function() {
         const url = force ? 'api.php?action=get_trends&refresh=1' : 'api.php?action=get_trends';
         
         $.getJSON(url, function(response) {
-            if (response.success && Array.isArray(response.trends) && response.trends.length > 0) {
-                list.empty();
-                // Render top 8 e-commerce product trends with rank & growth badge
-                response.trends.slice(0, 8).forEach((item, index) => {
-                    const term = (typeof item === 'object' && item !== null) ? (item.term || '') : String(item);
-                    const growth = (typeof item === 'object' && item !== null && item.growth) ? item.growth : ('+' + (195 - index * 12) + '%');
-                    const channel = (typeof item === 'object' && item !== null && item.channel) ? item.channel : 'HOT';
-                    const safeTerm = term.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-
-                    let rankStyle = 'background: rgba(148,163,184,0.18); color: var(--text-secondary);';
-                    if (index === 0) rankStyle = 'background: linear-gradient(135deg,#f59e0b,#ea580c); color: #fff;';
-                    else if (index === 1) rankStyle = 'background: rgba(6,225,204,0.2); color: #06e1cc; border: 1px solid rgba(6,225,204,0.35);';
-                    else if (index === 2) rankStyle = 'background: rgba(99,102,241,0.22); color: #818cf8; border: 1px solid rgba(99,102,241,0.35);';
-
-                    list.append(`
-                        <li class="d-flex align-items-center justify-content-between py-1 px-1 rounded hover-bg-subtle" style="cursor: pointer; gap: 6px;" title="Pesquisar '${term}' (${channel})" onclick="searchKeyword('${safeTerm}')">
-                            <div class="d-flex align-items-center" style="min-width: 0; flex: 1;">
-                                <span class="badge me-2 flex-shrink-0" style="width: 20px; height: 18px; font-size: 9.5px; display: inline-flex; align-items: center; justify-content: center; padding: 0; ${rankStyle}">${index + 1}</span>
-                                <span class="text-truncate fw-medium hover-accent" style="color: var(--text-primary); font-size: 11px;">${term}</span>
-                            </div>
-                            <span class="badge bg-success-subtle text-success flex-shrink-0" style="font-size: 9px; padding: 2px 5px; font-weight: 700;">${growth}</span>
-                        </li>
-                    `);
-                });
+            if (response && response.success) {
+                window.samHypeTrendsData = {
+                    ecommerce: Array.isArray(response.ecommerce_trends) ? response.ecommerce_trends : (Array.isArray(response.trends) ? response.trends : []),
+                    google: Array.isArray(response.google_trends) ? response.google_trends : []
+                };
+                renderHypeTrendsList();
             } else {
                 list.html('<li class="text-muted text-center py-2">Sem tendências no momento</li>');
             }

@@ -282,6 +282,15 @@ $activeMeta = $pageMetaMap[$currentPage] ?? [
                         </div>
                         <button type="button" onclick="refreshTrends(true)" class="btn btn-link p-0 text-muted hover-accent-turquoise" title="Sincronizar Ranking Oficial da Alta do Dia" style="font-size: 11px; text-decoration: none;"><i class="fa-solid fa-arrows-rotate"></i></button>
                     </div>
+                    <!-- 2 Abinhas de Fonte Oficial -->
+                    <div class="d-flex gap-1 mb-2 p-1 rounded-2" style="background: rgba(15, 23, 42, 0.45); border: 1px solid rgba(148, 163, 184, 0.14);">
+                        <button type="button" id="hype-tab-ecommerce" onclick="switchHypeTrendsTab('ecommerce')" class="btn btn-sm flex-fill py-1 px-1 fw-bold border-0 rounded-1" style="font-size: 10px; background: linear-gradient(135deg, rgba(6, 225, 204, 0.22), rgba(99, 102, 241, 0.22)); color: #06e1cc; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">
+                            <i class="fa-solid fa-cart-shopping me-1" style="font-size: 9px;"></i>Varejo
+                        </button>
+                        <button type="button" id="hype-tab-google" onclick="switchHypeTrendsTab('google')" class="btn btn-sm flex-fill py-1 px-1 fw-semibold border-0 rounded-1" style="font-size: 10px; background: transparent; color: var(--text-secondary);">
+                            <i class="fa-brands fa-google me-1" style="font-size: 9px;"></i>Google Top 10
+                        </button>
+                    </div>
                     <ul id="google-trends-list" class="list-unstyled p-0 m-0 d-flex flex-column gap-1" style="font-size: 11px;">
                         <div class="text-center py-2"><i class="fa-solid fa-spinner fa-spin text-muted"></i></div>
                     </ul>
