@@ -642,7 +642,7 @@ switch ($action) {
             }
 
             // Cache Strategy: Cache search outputs in Redis/Files for 1 hour to prevent API blocks
-            $cacheKey = "search_v4_{$marketCode}_" . md5($query . '_' . ($category ?? ''));
+            $cacheKey = "search_v6_{$marketCode}_" . md5($query . '_' . ($category ?? ''));
             $marketResults = Cache::get($cacheKey);
 
             if ($marketResults === null) {
@@ -1033,8 +1033,24 @@ switch ($action) {
             $retailPrice = 149.90;
             $category = 'Brinquedos & Hobbies';
             $title = 'Carrinho De Rolimã Infantil 100kg Menino Menina Gira Azul';
+        } elseif (str_contains($kwNorm, 'iphone')) {
+            $retailPrice = (str_contains($kwNorm, '17') || str_contains($kwNorm, '16')) ? 8999.00 : 4899.00;
+            $category = 'Eletrônicos & Áudio';
+            $title = 'Apple ' . ucwords($keyword) . ' 256GB 5G Original Anatel';
+        } elseif (str_contains($kwNorm, 'macbook') || str_contains($kwNorm, 'imac')) {
+            $retailPrice = str_contains($kwNorm, 'pro') ? 12999.00 : 7899.00;
+            $category = 'Eletrônicos & Áudio';
+            $title = 'Apple ' . ucwords($keyword) . ' SSD 512GB Original';
+        } elseif (str_contains($kwNorm, 'airpod')) {
+            $retailPrice = str_contains($kwNorm, 'max') ? 4199.00 : (str_contains($kwNorm, 'pro') ? 1799.00 : 1099.00);
+            $category = 'Eletrônicos & Áudio';
+            $title = 'Apple ' . ucwords($keyword) . ' Original MagSafe';
+        } elseif (str_contains($kwNorm, 'ipad') || str_contains($kwNorm, 'notebook') || str_contains($kwNorm, 'ps5') || str_contains($kwNorm, 'playstation') || str_contains($kwNorm, 'smart tv')) {
+            $retailPrice = 3499.00;
+            $category = 'Eletrônicos & Áudio';
+            $title = ucwords($keyword) . ' Original Lacrado';
         } else {
-            $retailPrice = $product ? (float)$product['price'] : 49.90;
+            $retailPrice = $product ? (float)$product['price'] : 149.90;
             $category = $product ? $product['category'] : 'Geral';
             $title = $product ? $product['title'] : ucwords($keyword);
         }

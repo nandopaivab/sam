@@ -349,29 +349,237 @@ abstract class BaseMarketplace implements MarketplaceInterface {
             }
         }
 
-        // 3. For any specific product search not in broad categories, generate titles strictly faithful to the user's exact query!
+        // 3. Smart Dynamic Product & Price Intelligence Engine for any specific product query!
         if ($activeTemplate === null) {
             $cleanQuery = mb_convert_case($query ?: 'Produto', MB_CASE_TITLE, 'UTF-8');
-            $inferredCategory = $category ?: (
-                (str_contains($normQuery, 'brinquedo') || str_contains($normQuery, 'carrinho') || str_contains($normQuery, 'boneca') || str_contains($normQuery, 'infantil'))
-                    ? 'Brinquedos & Hobbies'
-                    : 'Geral & Variedades'
-            );
-            $activeTemplate = [
-                'titles' => [
-                    $cleanQuery . ' Original Pronta Entrega com Nota Fiscal',
-                    $cleanQuery . ' Reforçado Premium Suporta Até 100kg',
-                    'Kit ' . $cleanQuery . ' Completo + Acessórios',
-                    $cleanQuery . ' Importado Alta Resistência Envio Full',
-                    $cleanQuery . ' Modelo Novo c/ Garantia Nacional',
-                    $cleanQuery . ' Edição Especial Mais Vendido'
-                ],
-                'price_min' => 49.90,
-                'price_max' => 289.90,
-                'category' => $inferredCategory,
-                'image_prefix' => 'general',
-                'is_custom_query' => true
+            // Normalize brand casing (iPhone, AirPods, MacBook, iPad, PS5, JBL, etc.)
+            $brandReplacements = [
+                '/\bIphone\b/i' => 'iPhone',
+                '/\bAirpods\b/i' => 'AirPods',
+                '/\bMacbook\b/i' => 'MacBook',
+                '/\bIpad\b/i' => 'iPad',
+                '/\bImac\b/i' => 'iMac',
+                '/\bPs5\b/i' => 'PS5',
+                '/\bPs4\b/i' => 'PS4',
+                '/\bJbl\b/i' => 'JBL',
+                '/\bTvs?\b/i' => 'Smart TV',
+                '/\bSsd\b/i' => 'SSD',
+                '/\bUsb\b/i' => 'USB',
             ];
+            foreach ($brandReplacements as $pattern => $rep) {
+                $cleanQuery = preg_replace($pattern, $rep, $cleanQuery);
+            }
+
+            if (str_contains($normQuery, 'iphone')) {
+                $isProMax = str_contains($normQuery, 'pro max');
+                $isPro = str_contains($normQuery, 'pro');
+                $isLatest = (str_contains($normQuery, '17') || str_contains($normQuery, '16'));
+                $isMidGen = (str_contains($normQuery, '15') || str_contains($normQuery, '14'));
+
+                if ($isLatest && ($isProMax || $isPro)) {
+                    $pMin = 7499.00; $pMax = 11999.00;
+                } elseif ($isLatest) {
+                    $pMin = 5199.00; $pMax = 7899.00;
+                } elseif ($isMidGen && ($isProMax || $isPro)) {
+                    $pMin = 5499.00; $pMax = 8699.00;
+                } elseif ($isMidGen) {
+                    $pMin = 3699.00; $pMax = 5499.00;
+                } else {
+                    $pMin = 2499.00; $pMax = 6899.00;
+                }
+
+                $activeTemplate = [
+                    'titles' => [
+                        "Apple {$cleanQuery} (256 GB) - Titânio Natural - Lacrado Anatel",
+                        "Apple {$cleanQuery} (512 GB) - Titânio Preto - 5G Original",
+                        "{$cleanQuery} Apple 256GB Câmera Tripla 48MP Tela ProMotion 120Hz",
+                        "Apple {$cleanQuery} (1 TB) - Titânio Deserto - Garantia Apple 1 Ano",
+                        "{$cleanQuery} 256GB Titânio Branco Desbloqueado - Envio Full c/ NF",
+                        "Apple {$cleanQuery} 512GB 5G Dual eSIM Original Pronta Entrega"
+                    ],
+                    'price_min' => $pMin,
+                    'price_max' => $pMax,
+                    'category' => 'Eletrônicos & Áudio',
+                    'image_prefix' => 'smartphone',
+                    'is_custom_query' => true
+                ];
+            } elseif (str_contains($normQuery, 'airpod')) {
+                $isMax = str_contains($normQuery, 'max');
+                $isPro = str_contains($normQuery, 'pro');
+                $pMin = $isMax ? 3699.00 : ($isPro ? 1499.00 : 899.00);
+                $pMax = $isMax ? 4899.00 : ($isPro ? 2299.00 : 1499.00);
+
+                $activeTemplate = [
+                    'titles' => [
+                        "Apple {$cleanQuery} (2ª Geração) com Estojo MagSafe USB-C Original",
+                        "Fone de Ouvido Apple {$cleanQuery} Cancelamento Ativo de Ruído Lacrado",
+                        "{$cleanQuery} Apple Chip H2 Áudio Espacial Personalizado Bluetooth",
+                        "Apple {$cleanQuery} Original Com Case de Recarga MagSafe Garantia 1 Ano",
+                        "{$cleanQuery} Sem Fio Apple Resistente a Suor e Água IP54 - Envio Full",
+                        "Fone Apple {$cleanQuery} Original Lacrado com Nota Fiscal Brasil"
+                    ],
+                    'price_min' => $pMin,
+                    'price_max' => $pMax,
+                    'category' => 'Eletrônicos & Áudio',
+                    'image_prefix' => 'headphone',
+                    'is_custom_query' => true
+                ];
+            } elseif (str_contains($normQuery, 'macbook') || str_contains($normQuery, 'imac') || str_contains($normQuery, 'mac mini')) {
+                $isPro = str_contains($normQuery, 'pro');
+                $pMin = $isPro ? 9899.00 : 5899.00;
+                $pMax = $isPro ? 21499.00 : 10999.00;
+
+                $activeTemplate = [
+                    'titles' => [
+                        "Apple {$cleanQuery} 14\" Chip M3 Pro (18GB RAM, 512GB SSD) Preto-Espacial",
+                        "{$cleanQuery} Apple 14 Polegadas Chip M4 16GB RAM 512GB SSD Liquid Retina XDR",
+                        "Apple {$cleanQuery} 16\" Chip M3 Max (36GB RAM, 1TB SSD) Original Lacrado",
+                        "Notebook Apple {$cleanQuery} SSD 512GB Cinza-Espacial Garantia Oficial Apple",
+                        "Apple {$cleanQuery} Tela Retina XDR 120Hz Bateria 22h - Envio Imediato Full",
+                        "{$cleanQuery} Apple Original Lacrado Teclado Retroiluminado Touch ID c/ NF"
+                    ],
+                    'price_min' => $pMin,
+                    'price_max' => $pMax,
+                    'category' => 'Eletrônicos & Áudio',
+                    'image_prefix' => 'laptop',
+                    'is_custom_query' => true
+                ];
+            } elseif (str_contains($normQuery, 'ipad') || str_contains($normQuery, 'galaxy tab') || str_contains($normQuery, 'tablet')) {
+                $isPro = str_contains($normQuery, 'pro');
+                $pMin = $isPro ? 6299.00 : 1499.00;
+                $pMax = $isPro ? 12899.00 : 4899.00;
+
+                $activeTemplate = [
+                    'titles' => [
+                        "{$cleanQuery} Wi-Fi 256GB Tela Liquid Retina Original Lacrado",
+                        "Apple {$cleanQuery} Chip M2 / M4 11 Polegadas Wi-Fi + 5G Cinza-Espacial",
+                        "{$cleanQuery} 128GB Tela Ultra Retina XDR Compatível com Caneta Pencil",
+                        "{$cleanQuery} Original com Garantia Oficial de 1 Ano e Nota Fiscal",
+                        "Kit {$cleanQuery} + Capa Magnética Inteligente Pronta Entrega Full",
+                        "{$cleanQuery} Edição Pro Alta Performance Estudos e Design"
+                    ],
+                    'price_min' => $pMin,
+                    'price_max' => $pMax,
+                    'category' => 'Eletrônicos & Áudio',
+                    'image_prefix' => 'tablet',
+                    'is_custom_query' => true
+                ];
+            } elseif (str_contains($normQuery, 'notebook') || str_contains($normQuery, 'laptop') || str_contains($normQuery, 'pc gamer')) {
+                $activeTemplate = [
+                    'titles' => [
+                        "{$cleanQuery} Intel Core i7 16GB RAM SSD 512GB Tela 15.6\" Full HD",
+                        "{$cleanQuery} Gamer RTX 4060 16GB DDR5 SSD 1TB NVMe Tela 144Hz",
+                        "{$cleanQuery} Ultra Fino Ryzen 7 512GB SSD Windows 11 Original",
+                        "{$cleanQuery} Profissional Alta Performance Bivolt Garantia 1 Ano",
+                        "{$cleanQuery} Completo Pronta Entrega com Nota Fiscal Envio Full",
+                        "{$cleanQuery} Edição Especial Trabalho e Estudos SSD Rápido"
+                    ],
+                    'price_min' => 2499.00,
+                    'price_max' => 8499.00,
+                    'category' => 'Eletrônicos & Áudio',
+                    'image_prefix' => 'laptop',
+                    'is_custom_query' => true
+                ];
+            } elseif (str_contains($normQuery, 'samsung') || str_contains($normQuery, 'galaxy') || str_contains($normQuery, 'xiaomi') || str_contains($normQuery, 'redmi') || str_contains($normQuery, 'poco') || str_contains($normQuery, 'motorola') || str_contains($normQuery, 'moto g')) {
+                $isUltra = (str_contains($normQuery, 'ultra') || str_contains($normQuery, 's24') || str_contains($normQuery, 's23'));
+                $pMin = $isUltra ? 3899.00 : 949.00;
+                $pMax = $isUltra ? 7499.00 : 2899.00;
+                $activeTemplate = [
+                    'titles' => [
+                        "Smartphone {$cleanQuery} 5G 256GB 8GB RAM Câmera Tripla Original",
+                        "{$cleanQuery} Dual SIM 256GB Tela AMOLED 120Hz Desbloqueado Anatel",
+                        "Celular {$cleanQuery} 512GB 12GB RAM Carregador Turbo Incluso c/ NF",
+                        "Smartphone {$cleanQuery} Original Lacrado Garantia Nacional 1 Ano",
+                        "{$cleanQuery} 5G NFC Bateria 5000mAh Pronta Entrega Envio Full",
+                        "{$cleanQuery} Edição Global Oficial Completo na Caixa"
+                    ],
+                    'price_min' => $pMin,
+                    'price_max' => $pMax,
+                    'category' => 'Eletrônicos & Áudio',
+                    'image_prefix' => 'smartphone',
+                    'is_custom_query' => true
+                ];
+            } elseif (str_contains($normQuery, 'ps5') || str_contains($normQuery, 'playstation') || str_contains($normQuery, 'xbox') || str_contains($normQuery, 'nintendo switch') || str_contains($normQuery, 'steam deck')) {
+                $activeTemplate = [
+                    'titles' => [
+                        "Console {$cleanQuery} Edição Slim SSD 1TB + Controle Sem Fio Original",
+                        "{$cleanQuery} Nacional Lacrado com Garantia Oficial 1 Ano e Nota Fiscal",
+                        "Bundle Console {$cleanQuery} + 2 Controles + Jogo Fisico Pronta Entrega",
+                        "{$cleanQuery} Digital Edition 4K 120Hz HDR Envio Imediato Full",
+                        "Console {$cleanQuery} Modelo Novo Silencioso Bivolt Oficial Brasil",
+                        "{$cleanQuery} Completo na Caixa Lacrado de Fábrica"
+                    ],
+                    'price_min' => 2199.00,
+                    'price_max' => 4899.00,
+                    'category' => 'Brinquedos & Hobbies',
+                    'image_prefix' => 'console',
+                    'is_custom_query' => true
+                ];
+            } elseif (str_contains($normQuery, 'smart tv') || str_contains($normQuery, 'televisao') || str_contains($normQuery, 'monitor') || str_contains($normQuery, 'geladeira') || str_contains($normQuery, 'ar condicionado') || str_contains($normQuery, 'lava e seca')) {
+                $activeTemplate = [
+                    'titles' => [
+                        "{$cleanQuery} 4K UHD Wi-Fi Bluetooth Comando de Voz Bivolt",
+                        "{$cleanQuery} Inverter Econômico Alta Eficiência Garantia Oficial",
+                        "{$cleanQuery} Modelo Premium Design Slim Pronta Entrega com NF",
+                        "{$cleanQuery} Inteligente Conectividade Completa Envio Rápido",
+                        "{$cleanQuery} Original Novo na Caixa Lacrado de Fábrica",
+                        "{$cleanQuery} Linha Premium Mais Vendido da Categoria"
+                    ],
+                    'price_min' => 1399.00,
+                    'price_max' => 5899.00,
+                    'category' => 'Utilidades Domésticas',
+                    'image_prefix' => 'appliance',
+                    'is_custom_query' => true
+                ];
+            } elseif (str_contains($normQuery, 'apple watch') || str_contains($normQuery, 'garmin')) {
+                $activeTemplate = [
+                    'titles' => [
+                        "{$cleanQuery} GPS Caixa de Alumínio Pulseira Esportiva Original",
+                        "{$cleanQuery} Tela Retina Sempre Ativa Monitor Cardíaco e Oxigênio",
+                        "{$cleanQuery} Resistente à Água 50m Lacrado Garantia Oficial 1 Ano",
+                        "{$cleanQuery} GPS + Cellular Original com Nota Fiscal Envio Full",
+                        "{$cleanQuery} Edição Especial Esporte e Saúde Bateria Longa Duração",
+                        "{$cleanQuery} Novo Lacrado Pronta Entrega Brasil"
+                    ],
+                    'price_min' => 1899.00,
+                    'price_max' => 6499.00,
+                    'category' => 'Vestíveis & Tecnologia',
+                    'image_prefix' => 'smartwatch',
+                    'is_custom_query' => true
+                ];
+            } else {
+                // Intelligent dynamic price range based on product keywords
+                $pMin = 39.90;
+                $pMax = 499.90;
+                if (str_contains($normQuery, 'pro max') || str_contains($normQuery, 'ultra') || str_contains($normQuery, 'profissional')) {
+                    $pMin = 399.90;
+                    $pMax = 3499.90;
+                } elseif (str_contains($normQuery, 'eletrico') || str_contains($normQuery, 'robo') || str_contains($normQuery, 'drone') || str_contains($normQuery, 'camera') || str_contains($normQuery, 'projetor')) {
+                    $pMin = 189.90;
+                    $pMax = 1899.90;
+                }
+
+                $inferredCategory = $category ?: (
+                    (str_contains($normQuery, 'brinquedo') || str_contains($normQuery, 'carrinho') || str_contains($normQuery, 'boneca') || str_contains($normQuery, 'infantil'))
+                        ? 'Brinquedos & Hobbies'
+                        : 'Geral & Variedades'
+                );
+                $activeTemplate = [
+                    'titles' => [
+                        "{$cleanQuery} Original Pronta Entrega com Nota Fiscal",
+                        "{$cleanQuery} Premium Alta Qualidade Envio Imediato Full",
+                        "Kit {$cleanQuery} Completo + Acessórios Originais",
+                        "{$cleanQuery} Modelo Novo com Garantia Nacional",
+                        "{$cleanQuery} Linha Pro Mais Vendido no Brasil",
+                        "{$cleanQuery} Oficial Lacrado Pronta Entrega"
+                    ],
+                    'price_min' => $pMin,
+                    'price_max' => $pMax,
+                    'category' => $inferredCategory,
+                    'image_prefix' => 'general',
+                    'is_custom_query' => true
+                ];
+            }
         }
 
         $stores = [

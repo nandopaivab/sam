@@ -126,13 +126,14 @@ declare(strict_types=1);
                 const combined = predictions.map(p => p.className.toLowerCase()).join(' | ');
 
                 const rules = [
-                    { keywords: ['tricycle', 'go-kart', 'moped', 'motor scooter', 'scooter', 'barrow', 'wheelbarrow', 'shopping cart', 'toyshop', 'unicycle', 'bobsled', 'lawn mower', 'vacuum', 'racer', 'sports car', 'convertible', 'beach wagon', 'golfcart', 'jinrikisha', 'cradle'], query: 'Carrinho de Rolimã Infantil Gira Gira', category: 'Brinquedos & Hobbies' },
+                    { keywords: ['notebook', 'laptop', 'desktop computer', 'computer keyboard', 'space bar', 'typewriter keyboard', 'web site', 'monitor', 'screen, crt'], query: 'MacBook Pro', category: 'Eletrônicos & Áudio' },
+                    { keywords: ['cellular telephone', 'cellphone', 'mobile phone', 'hand-held computer', 'pay-phone', 'ipod', 'reflex camera', 'polaroid camera', 'remote control'], query: 'iPhone 17 Pro Max', category: 'Eletrônicos & Áudio' },
+                    { keywords: ['headphone', 'earphone', 'earplug', 'stethoscope', 'whistle', 'microphone', 'loudspeaker', 'cassette', 'cd player'], query: 'AirPods Pro', category: 'Eletrônicos & Áudio' },
+                    { keywords: ['tricycle', 'go-kart', 'moped', 'motor scooter', 'scooter', 'barrow', 'wheelbarrow', 'shopping cart', 'toyshop', 'unicycle', 'bobsled', 'lawn mower', 'racer', 'sports car', 'convertible', 'beach wagon', 'golfcart', 'jinrikisha', 'cradle'], query: 'Carrinho de Rolimã Infantil Gira Gira', category: 'Brinquedos & Hobbies' },
                     { keywords: ['water bottle', 'pop bottle', 'beer bottle', 'wine bottle', 'thermos', 'pitcher', 'jug', 'coffee mug', 'cup', 'beaker', 'cocktail shaker'], query: 'Garrafa Térmica', category: 'Esportes & Academia' },
-                    { keywords: ['headphone', 'earphone', 'ipod', 'microphone', 'loudspeaker', 'radio', 'cassette', 'cd player', 'modem'], query: 'Fone Bluetooth', category: 'Eletrônicos & Áudio' },
                     { keywords: ['digital watch', 'stopwatch', 'analog clock', 'wall clock', 'magnetic compass', 'barometer', 'buckle'], query: 'Smartwatch', category: 'Vestíveis & Tecnologia' },
-                    { keywords: ['cellular telephone', 'hand-held computer', 'ipod', 'remote control', 'pay-phone'], query: 'Celular', category: 'Eletrônicos & Áudio' },
                     { keywords: ['lipstick', 'face powder', 'perfume', 'lotion', 'hair spray', 'sunscreen', 'nail polish', 'wig'], query: 'Maquiagem', category: 'Beleza & Cuidados Pessoais' },
-                    { keywords: ['crock pot', 'frying pan', 'wok', 'Dutch oven', 'microwave', 'toaster', 'espresso maker', 'waffle iron', 'rotisserie', 'teapot', 'coffeepot', 'spatula', 'mixing bowl', 'food processor'], query: 'Air Fryer', category: 'Utilidades Domésticas' },
+                    { keywords: ['crock pot', 'frying pan', 'wok', 'dutch oven', 'microwave', 'toaster', 'espresso maker', 'waffle iron', 'rotisserie', 'teapot', 'coffeepot', 'spatula', 'mixing bowl', 'food processor'], query: 'Air Fryer', category: 'Utilidades Domésticas' },
                     { keywords: ['jersey', 'sweatshirt', 'suit', 'trench coat', 'jean', 'cardigan', 'polo shirt', 'bow tie', 'windsor tie', 'military uniform'], query: 'Roupas Masculinas', category: 'Moda Masculina' },
                     { keywords: ['gown', 'miniskirt', 'overskirt', 'hoopskirt', 'sarong', 'bikini', 'maillot', 'brassiere', 'kimono', 'stole', 'poncho', 'pajama'], query: 'Roupas Femininas', category: 'Moda Feminina' },
                     { keywords: ['bib', 'diaper', 'crib', 'bassinet', 'teddy', 'toy poodle', 'rattle', 'pacifier', 'bonnet'], query: 'Roupas de Crianças', category: 'Moda Infantil' },
