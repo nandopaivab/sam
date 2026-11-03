@@ -332,9 +332,21 @@ require __DIR__ . '/templates/header.php';
     <!-- Tab 1: Viral Products Panel -->
     <div class="tab-pane fade show active" id="products-panel" role="tabpanel" aria-labelledby="products-tab">
         <div class="card-premium p-4">
-            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
-                <h5 class="fw-bold mb-0 text-white"><i class="fa-solid fa-fire text-danger me-2"></i> Produtos Virais - TikTok Shop BR</h5>
-                <small class="text-muted">Mostrando produtos com maior receita nos últimos 7 dias</small>
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <div>
+                    <h5 class="fw-bold mb-0 text-white"><i class="fa-solid fa-fire text-danger me-2"></i> Produtos Virais - TikTok Shop BR</h5>
+                    <small class="text-muted">Mostrando os 100 produtos mais virais ordenados por maior receita nos últimos 7 dias</small>
+                </div>
+                <div class="d-flex flex-wrap gap-1" id="tk-category-filters">
+                    <button type="button" class="btn btn-xs btn-info text-dark fw-bold px-2 py-1" style="font-size:11px;" onclick="filterTkCategory('', this)">Todas</button>
+                    <button type="button" class="btn btn-xs btn-outline-secondary text-light border-light-subtle px-2 py-1" style="font-size:11px;" onclick="filterTkCategory('Eletrônicos & Acessórios', this)">Eletrônicos</button>
+                    <button type="button" class="btn btn-xs btn-outline-secondary text-light border-light-subtle px-2 py-1" style="font-size:11px;" onclick="filterTkCategory('Beleza & Cuidados', this)">Beleza</button>
+                    <button type="button" class="btn btn-xs btn-outline-secondary text-light border-light-subtle px-2 py-1" style="font-size:11px;" onclick="filterTkCategory('Utilidades Domésticas', this)">Casa & Cozinha</button>
+                    <button type="button" class="btn btn-xs btn-outline-secondary text-light border-light-subtle px-2 py-1" style="font-size:11px;" onclick="filterTkCategory('Brinquedos & Hobbies', this)">Brinquedos</button>
+                    <button type="button" class="btn btn-xs btn-outline-secondary text-light border-light-subtle px-2 py-1" style="font-size:11px;" onclick="filterTkCategory('Smartwatches & Tech', this)">Tech & Watch</button>
+                    <button type="button" class="btn btn-xs btn-outline-secondary text-light border-light-subtle px-2 py-1" style="font-size:11px;" onclick="filterTkCategory('Esportes & Academia', this)">Fitness</button>
+                    <button type="button" class="btn btn-xs btn-outline-secondary text-light border-light-subtle px-2 py-1" style="font-size:11px;" onclick="filterTkCategory('Moda', this)">Moda</button>
+                </div>
             </div>
             
             <div class="table-responsive">
@@ -356,35 +368,145 @@ require __DIR__ . '/templates/header.php';
                         <?php
                         $tkProducts = [];
                         $categories = [
-                            'Eletrônicos & Acessórios', 'Beleza & Cuidados', 'Moda Masculina', 'Moda Feminina',
-                            'Utilidades Domésticas', 'Esportes & Academia', 'Brinquedos & Hobbies', 'Smartwatches & Tech'
+                            'Eletrônicos & Acessórios', 'Beleza & Cuidados', 'Utilidades Domésticas', 'Brinquedos & Hobbies',
+                            'Smartwatches & Tech', 'Esportes & Academia', 'Moda Feminina', 'Moda Masculina'
                         ];
-                        $prodNouns = [
-                            'Eletrônicos & Acessórios' => ['Fone de Ouvido Bluetooth TWS', 'Carregador Magnético por Indução', 'Mini Projetor Portátil Led', 'Tripé de Câmera com Ring Light', 'Microfone de Lapela Sem Fio', 'Cabo Organizador Magnético', 'Adaptador Hub USB-C Multiporta', 'Caixa de Som Portátil Bluetooth'],
-                            'Beleza & Cuidados' => ['Batom Lip Tint Magic Gloss', 'Base Líquida Corretiva Hidratante', 'Modelador de Cabelo Ondulador', 'Sérum Facial Ácido Hialurônico', 'Kit de Pincéis de Maquiagem', 'Escova Secadora e Alisadora', 'Massageador Facial de Quartzo', 'Paleta de Sombras Ultra Pigmentada'],
-                            'Moda Masculina' => ['Calça Jeans Slim Confort', 'Camiseta Básica Algodão Egípcio', 'Moletom Casual Canguru com Capuz', 'Bermuda Sarja Masculina Casual', 'Jaqueta Corta Vento Impermeável', 'Kit 10 Pares de Meias Invisíveis', 'Sapato Social Moderno Couro', 'Carteira Slim de Couro Legítimo'],
-                            'Moda Feminina' => ['Vestido Longo Plissado Casual', 'Conjunto Feminino Cropped e Saia', 'Blusa Canelada Gola Alta Soft', 'Calça Alfaiataria Feminina Elegante', 'Bolsa Tiracolo Transversal Fashion', 'Óculos de Sol Vintage Cat Eye', 'Top Fitness Alto Impacto Suplex', 'Kit 5 Calcinhas Sem Costura Loba'],
-                            'Utilidades Domésticas' => ['Mop Giratório Limpeza Prática', 'Organizador de Acrílico Giratório', 'Kit 6 Potes Herméticos Vidro', 'Mini Processador Alimentos USB', 'Luminária de Mesa Inteligente RGB', 'Espremedor de Frutas Portátil USB', 'Balança Digital de Cozinha Alta Precisão', 'Suporte Magnético para Facas Inox'],
-                            'Esportes & Academia' => ['Garrafa Térmica Inox Premium', 'Kit 5 Faixas Elásticas Mini Band', 'Corda de Pular Profissional Roller', 'Tapete Yoga Mat Antiderrapante', 'Cinto Lombar Musculação Neoprene', 'Rolo de Liberação Miofascial Foam', 'Pochete Esportiva Impermeável Corrida', 'Luva de Academia Musculação Gel'],
-                            'Brinquedos & Hobbies' => ['Blocos de Montar LEGO Creator', 'Câmera Fotográfica Infantil Digital', 'Mini Drone com Câmera HD Quadcopter', 'Jogo de Tabuleiro Clássico Estratégia', 'Quebra-Cabeça 1000 Peças Paisagens', 'Kit Pintura Tela por Números Art', 'Cubo Mágico Profissional Speed', 'Carro Controle Remoto 4x4 Off-Road'],
-                            'Smartwatches & Tech' => ['Smartwatch Watch 9 Ultra NFC', 'Pulseira de Silicone Esportiva Watch', 'Fone de Ouvido Noise Cancelling', 'Pelicula de Vidro Curva 3D Smartwatch', 'Localizador Tracker Inteligente AirTag', 'Carregador Rápido GaN 65W Turbo', 'Suporte Veicular Celular com Carregador', 'Suporte Articulado para Monitor Duplo']
+                        $prodCatalog = [
+                            'Eletrônicos & Acessórios' => [
+                                ['title' => 'Mini Projetor Portátil Smart 4K Wi-Fi Android 11', 'price' => 389.90],
+                                ['title' => 'Fone de Ouvido Bluetooth TWS Pro Cancelamento de Ruído', 'price' => 149.90],
+                                ['title' => 'Microfone de Lapela Sem Fio Duplo Tipo-C & Lightning', 'price' => 89.90],
+                                ['title' => 'Caixa de Som Bluetooth Portátil À Prova D\'Água 40W RGB', 'price' => 219.90],
+                                ['title' => 'Carregador Magnético MagSafe 3 em 1 Indução 15W', 'price' => 129.90],
+                                ['title' => 'Ring Light Profissional 26cm com Tripé 2.1m Studio', 'price' => 79.90],
+                                ['title' => 'Câmera de Segurança Wi-Fi Dome 360° Full HD Visão Noturna', 'price' => 139.90],
+                                ['title' => 'Power Bank MagSafe 10000mAh Carregamento Ultra Rápido', 'price' => 159.90],
+                                ['title' => 'Teclado Mecânico Gamer Sem Fio RGB Switch Red Compacto', 'price' => 249.90],
+                                ['title' => 'Repetidor Sinal Wi-Fi 6 Dual Band 3000Mbps Longo Alcance', 'price' => 169.90],
+                                ['title' => 'Fone Headphone Bluetooth Over-Ear Bass Pro Dobrável', 'price' => 189.90],
+                                ['title' => 'Adaptador Hub USB-C 8 em 1 HDMI 4K Leitor SD Macbook', 'price' => 144.90],
+                                ['title' => 'Luminária Barra LED Monitor Gamer Anti-Reflexo Touch', 'price' => 134.90]
+                            ],
+                            'Beleza & Cuidados' => [
+                                ['title' => 'Escova Secadora e Alisadora 5 em 1 Modelador Cachos Turbo', 'price' => 189.90],
+                                ['title' => 'Sérum Facial Ácido Hialurônico + Vitamina C Pura 30ml', 'price' => 59.90],
+                                ['title' => 'Kit 15 Pincéis de Maquiagem Profissional Kabuki Cerdas Macias', 'price' => 49.90],
+                                ['title' => 'Aparelho Depilador Laser IPL Portátil Rejuvenescimento', 'price' => 279.90],
+                                ['title' => 'Paleta de Sombras Ultra Pigmentada 36 Cores Matte & Glow', 'price' => 64.90],
+                                ['title' => 'Batom Lip Tint Magic Gloss Hidratante Ácido Hialurônico', 'price' => 29.90],
+                                ['title' => 'Modelador de Cabelo Ondulador Automático Cerâmica Iônica', 'price' => 169.90],
+                                ['title' => 'Massageador Facial Lifting Microcorrente EMS Anti-Idade', 'price' => 119.90],
+                                ['title' => 'Base Líquida Matte Alta Cobertura Resistente à Água FPS 30', 'price' => 69.90],
+                                ['title' => 'Secador de Cabelo Profissional Iônico 2400W Motor AC Salão', 'price' => 229.90],
+                                ['title' => 'Escova Limpeza Facial Elétrica Ultrassônica Silicone Waterproof', 'price' => 54.90],
+                                ['title' => 'Kit Skincare Coreano 5 Passos Limpeza e Hidratação Profunda', 'price' => 149.90],
+                                ['title' => 'Prancha Chapinha Titânio Profissional 480°F Bivolt Progressiva', 'price' => 199.90]
+                            ],
+                            'Utilidades Domésticas' => [
+                                ['title' => 'Robô Aspirador de Pó Inteligente 3 em 1 Passa Pano USB', 'price' => 289.90],
+                                ['title' => 'Fritadeira Sem Óleo Air Fryer Digital 5.5L Cesto Antiaderente', 'price' => 399.90],
+                                ['title' => 'Mop Giratório Spray 360° Inox com Balde Centrífuga Duplo', 'price' => 119.90],
+                                ['title' => 'Mini Processador e Triturador de Alimentos Elétrico USB Inox', 'price' => 39.90],
+                                ['title' => 'Luminária de Mesa Inteligente G-Speaker RGB com Carregador', 'price' => 99.90],
+                                ['title' => 'Kit 10 Potes Herméticos Empilháveis Acrílico Cozinha', 'price' => 129.90],
+                                ['title' => 'Lavadora de Alta Pressão Portátil Sem Fio Bateria 48V Maleta', 'price' => 219.90],
+                                ['title' => 'Vaporizador Passadeira a Vapor Portátil Higienizador Roupas', 'price' => 149.90],
+                                ['title' => 'Organizador de Maquiagem e Perfumes Giratório 360° Acrílico', 'price' => 69.90],
+                                ['title' => 'Chaleira Elétrica Inox 1.8L Desligamento Automático', 'price' => 84.90],
+                                ['title' => 'Seladora a Vácuo Doméstica Automática Conserva Alimentos', 'price' => 114.90],
+                                ['title' => 'Umidificador e Difusor de Aromas Ultrassônico Efeito Chama', 'price' => 89.90],
+                                ['title' => 'Dispenser Automático Sabonete Espuma Sensor Infravermelho', 'price' => 64.90]
+                            ],
+                            'Brinquedos & Hobbies' => [
+                                ['title' => 'Carrinho De Rolimã Infantil 100kg Menino Menina Gira Azul', 'price' => 149.90],
+                                ['title' => 'Drone Quadcopter 4K Câmera Dupla Wi-Fi FPV Desvio Obstáculos', 'price' => 269.90],
+                                ['title' => 'Câmera Fotográfica Infantil Instantânea Imprime Fotos Térmica', 'price' => 159.90],
+                                ['title' => 'Carrinho de Controle Remoto 4x4 Off-Road Anfíbio Gestos', 'price' => 179.90],
+                                ['title' => 'Console Portátil Retrô R36S Tela IPS 64GB 15.000 Jogos', 'price' => 299.90],
+                                ['title' => 'Lançador Automático Bolhas de Sabão Bazooka 69 Furos LED', 'price' => 69.90],
+                                ['title' => 'Mesa Projetora Infantil Desenho Educativo Lousa Mágica', 'price' => 89.90],
+                                ['title' => 'Pista de Corrida Infantil Dinossauro 240 Peças Flexível', 'price' => 119.90],
+                                ['title' => 'Pelúcia Capivara Viral TikTok com Mochila Tartaruga 35cm', 'price' => 59.90],
+                                ['title' => 'Blocos de Montar Magnéticos 100 Peças Educativo 3D', 'price' => 164.90],
+                                ['title' => 'Hoverboard Skate Elétrico 6.5" Bluetooth LED Original', 'price' => 799.90],
+                                ['title' => 'Tapete Musical Infantil Piano Dança Educativo Interativo', 'price' => 74.90]
+                            ],
+                            'Smartwatches & Tech' => [
+                                ['title' => 'Smartwatch W99 Plus Ultra Série 9 Tela AMOLED 49mm NFC GPS', 'price' => 229.90],
+                                ['title' => 'Smartwatch Feminino Dourado Amoled Recebe Ligações + 2 Pulseiras', 'price' => 199.90],
+                                ['title' => 'Carregador Rápido Turbo GaN 65W 3 Portas USB-C Notebook & Celular', 'price' => 139.90],
+                                ['title' => 'Anel Inteligente Smart Ring Monitor Sono Batimentos IP68', 'price' => 289.90],
+                                ['title' => 'Localizador Inteligente Smart Tag Compatível Apple Find My', 'price' => 79.90],
+                                ['title' => 'Suporte Articulado Pistão a Gás Duplo Monitor 17" a 32"', 'price' => 219.90],
+                                ['title' => 'Suporte Veicular Magnético Magsafe Carregador Sem Fio 15W', 'price' => 109.90],
+                                ['title' => 'Óculos Inteligente Bluetooth Áudio Aberto Lentes Polarizadas', 'price' => 259.90],
+                                ['title' => 'Estabilizador Gimbal 3 Eixos para Celular Rastreamento IA', 'price' => 449.90],
+                                ['title' => 'Leitor Biométrico e Hub USB 3.0 Alta Velocidade Desktop', 'price' => 94.90],
+                                ['title' => 'Tradutor Instantâneo de Voz Portátil IA 138 Idiomas Wi-Fi', 'price' => 319.90],
+                                ['title' => 'Caneta Stylus Touch Rejeição de Palma para iPad Magnética', 'price' => 119.90]
+                            ],
+                            'Esportes & Academia' => [
+                                ['title' => 'Garrafa Térmica Inox Parede Dupla 1.2L com Alça e Canudo', 'price' => 139.90],
+                                ['title' => 'Pistola Massageadora Muscular Profissional 30 Velocidades LCD', 'price' => 169.90],
+                                ['title' => 'Copo Térmico Inox 1200ml Vácuo Mantém Gelado 24h', 'price' => 119.90],
+                                ['title' => 'Kit 11 Peças Elásticos Extensores Musculação Treino em Casa', 'price' => 69.90],
+                                ['title' => 'Balança Digital Bioimpedância Bluetooth App Corporal 180kg', 'price' => 89.90],
+                                ['title' => 'Roda Abdominal Dupla com Retorno Automático e Apoio Cotovelo', 'price' => 99.90],
+                                ['title' => 'Mochila Hidratação Térmica Impermeável Ciclismo Corrida 2L', 'price' => 114.90],
+                                ['title' => 'Corda de Pular Inteligente Digital Sem Fio Contador Calorias', 'price' => 59.90],
+                                ['title' => 'Tapete Yoga Mat Antiderrapante TPE 6mm com Alça Transporte', 'price' => 109.90],
+                                ['title' => 'Coqueteleira Elétrica Mixer Portátil Recarregável USB 600ml', 'price' => 79.90],
+                                ['title' => 'Bicicleta Spinning Ergométrica Mecânica Silenciosa Display', 'price' => 989.90],
+                                ['title' => 'Kit 2 Joelheiras de Compressão Ortopédica Corrida Crossfit', 'price' => 64.90]
+                            ],
+                            'Moda Feminina' => [
+                                ['title' => 'Conjunto Fitness Feminino Sem Costura Legging Cintura Alta + Top', 'price' => 119.90],
+                                ['title' => 'Vestido Midi Canelado Modelador Premium Fenda Lateral', 'price' => 99.90],
+                                ['title' => 'Bolsa Tiracolo Couro PU Matelassê Alça Corrente Dourada', 'price' => 129.90],
+                                ['title' => 'Calça Pantalona Alfaiataria Cintura Alta Com Cinto Forrada', 'price' => 134.90],
+                                ['title' => 'Cinta Modeladora Abdominal Redutora Compressão Invisível', 'price' => 89.90],
+                                ['title' => 'Óculos de Sol Feminino Retrô Proteção UV400 Polarizado', 'price' => 79.90],
+                                ['title' => 'Kit 3 Croppeds Básicos Canelados Algodão Premium', 'price' => 84.90],
+                                ['title' => 'Sandália Feminina Salto Bloco Médio Tiras Strass Festa', 'price' => 149.90],
+                                ['title' => 'Jaqueta Puffer Feminina Forrada Impermeável Capuz Removível', 'price' => 219.90],
+                                ['title' => 'Macaquinho Fitness Costas Nuas Empina Bumbum Suplex', 'price' => 109.90],
+                                ['title' => 'Meia Calça Térmica Translúcida Forrada Pelúcia Inverno', 'price' => 59.90],
+                                ['title' => 'Pijama Feminino Cetim Toque de Seda Longo Botões Luxo', 'price' => 114.90]
+                            ],
+                            'Moda Masculina' => [
+                                ['title' => 'Kit 5 Camisetas Básicas Masculinas Algodão Pima Premium', 'price' => 179.90],
+                                ['title' => 'Jaqueta Corta Vento Impermeável Masculina Capuz Refletiva', 'price' => 149.90],
+                                ['title' => 'Calça Jogger Cargo Sarja Masculina Elastano 6 Bolsos', 'price' => 129.90],
+                                ['title' => 'Carteira Masculina Antifurto RFID Slim Pop-Up Alumínio & Couro', 'price' => 69.90],
+                                ['title' => 'Mochila Executiva Impermeável Notebook 17" Antifurto USB', 'price' => 169.90],
+                                ['title' => 'Kit 3 Bermudas Moletom Masculinas Academia Casual Bolso Zíper', 'price' => 119.90],
+                                ['title' => 'Tênis Esportivo Masculino Amortecimento Corrida Ultra Leve', 'price' => 189.90],
+                                ['title' => 'Moletom Canguru Masculino Felpado Grosso Capuz Inverno', 'price' => 139.90],
+                                ['title' => 'Relógio Masculino Cronógrafo Esportivo Aço Inoxidável Prova D\'Água', 'price' => 209.90],
+                                ['title' => 'Camisa Polo Piquet Masculina Elastano Corte Slim Premium', 'price' => 89.90],
+                                ['title' => 'Cinto Masculino Couro Legítimo Fivela Automática Catraca', 'price' => 74.90],
+                                ['title' => 'Óculos de Sol Masculino Polarizado UV400 Armação Acetato', 'price' => 94.90]
+                            ]
                         ];
                         $colors = ['745df7', '06e1cc', 'ffc107', 'dc3545', '198754', '0d6efd', '6f42c1', 'fd7e14', 'e83e8c', '20c997'];
 
                         for ($i = 0; $i < 100; $i++) {
                             $cat = $categories[$i % count($categories)];
-                            $nounList = $prodNouns[$cat];
-                            $noun = $nounList[$i % count($nounList)];
-                            $brand = ['Pro', 'Max', 'Ultra', 'Elite', 'Premium', 'Xiaomi', 'Lenovo', 'Stanley', 'Beauty', 'Fit', 'Home'][$i % 11];
-                            $title = $noun . ' ' . $brand . ' ' . ($i + 1);
-                            $price = round(19.90 + fmod($i * 4.75, 350), 2);
-                            $sales = (15000 - ($i * 145) % 14500);
-                            $revenue = $price * $sales;
-                            $growth = round(5.0 + fmod($i * 2.3, 95), 1);
-                            $rating = round(4.2 + fmod($i * 0.13, 0.8), 1);
+                            $catItems = $prodCatalog[$cat];
+                            // Use intdiv so each pass through the 8 categories picks the NEXT distinct item in that category!
+                            $itemIdx = intdiv($i, count($categories)) % count($catItems);
+                            $itemData = $catItems[$itemIdx];
+
+                            $title = $itemData['title'];
+                            $price = round($itemData['price'] * (0.96 + fmod($i * 0.017, 0.12)), 2);
+                            $sales = max(450, (int)(16800 - ($i * 152) + (($i * 37) % 900)));
+                            $revenue = round($price * $sales, 2);
+                            $growth = round(14.0 + fmod($i * 6.7, 145), 1);
+                            $rating = round(4.4 + fmod($i * 0.09, 0.6), 1);
                             if ($rating > 5.0) $rating = 5.0;
                             $color = $colors[$i % count($colors)];
-                            $imgText = urlencode(mb_substr($noun, 0, 8));
+                            $words = explode(' ', $title);
+                            $imgText = urlencode(($words[0] ?? '') . ' ' . ($words[1] ?? ''));
                             $img = "https://placehold.co/100x100/{$color}/FFFFFF?text={$imgText}";
 
                             $tkProducts[] = [
@@ -400,6 +522,9 @@ require __DIR__ . '/templates/header.php';
                             ];
                         }
 
+                        // Sort server-side by revenue descending so top earners appear first immediately
+                        usort($tkProducts, fn($a, $b) => $b['revenue'] <=> $a['revenue']);
+
                         foreach ($tkProducts as $p):
                             $pSearchUrl = "https://www.tiktok.com/search?q=" . urlencode($p['title']);
                         ?>
@@ -408,17 +533,17 @@ require __DIR__ . '/templates/header.php';
                                 <img src="<?php echo $p['img']; ?>" alt="Foto" class="rounded border border-light-subtle" style="width: 45px; height: 45px; object-fit: cover;">
                             </td>
                             <td>
-                                <a href="<?php echo $pSearchUrl; ?>" target="_blank" class="fw-semibold text-white hover-accent text-decoration-none text-truncate d-block" style="max-width: 240px;" title="<?php echo htmlspecialchars($p['title']); ?>">
+                                <a href="<?php echo $pSearchUrl; ?>" target="_blank" class="fw-semibold text-white hover-accent text-decoration-none text-truncate d-block" style="max-width: 260px;" title="<?php echo htmlspecialchars($p['title']); ?>">
                                     <?php echo htmlspecialchars($p['title']); ?> <i class="fa-solid fa-up-right-from-square ms-1" style="font-size: 8px; opacity: 0.7;"></i>
                                 </a>
                                 <small class="text-muted">ID: TK_<?php echo $p['id']; ?></small>
                             </td>
                             <td><span class="badge bg-secondary py-1"><?php echo $p['category']; ?></span></td>
-                            <td class="fw-bold">R$ <?php echo number_format($p['price'], 2, ',', '.'); ?></td>
-                            <td><?php echo number_format($p['sales'], 0, ',', '.'); ?> un</td>
-                            <td class="text-accent-turquoise fw-bold">R$ <?php echo number_format($p['revenue'], 2, ',', '.'); ?></td>
-                            <td class="text-success fw-semibold"><i class="fa-solid fa-circle-arrow-up me-1"></i>+<?php echo $p['growth']; ?>%</td>
-                            <td><span class="text-warning fw-bold"><?php echo $p['rating']; ?> ★</span></td>
+                            <td class="fw-bold" data-order="<?php echo $p['price']; ?>">R$ <?php echo number_format($p['price'], 2, ',', '.'); ?></td>
+                            <td data-order="<?php echo $p['sales']; ?>"><?php echo number_format($p['sales'], 0, ',', '.'); ?> un</td>
+                            <td class="text-accent-turquoise fw-bold" data-order="<?php echo $p['revenue']; ?>">R$ <?php echo number_format($p['revenue'], 2, ',', '.'); ?></td>
+                            <td class="text-success fw-semibold" data-order="<?php echo $p['growth']; ?>"><i class="fa-solid fa-circle-arrow-up me-1"></i>+<?php echo $p['growth']; ?>%</td>
+                            <td data-order="<?php echo $p['rating']; ?>"><span class="text-warning fw-bold"><?php echo $p['rating']; ?> ★</span></td>
                             <td>
                                 <div class="btn-group">
                                     <button onclick="lookupSuppliers(<?php echo $p['id']; ?>, '<?php echo addslashes($p['title']); ?>', <?php echo $p['price']; ?>)" class="btn btn-sm btn-outline-turquoise" title="Encontrar Fornecedores"><i class="fa-solid fa-truck-ramp-box"></i></button>
@@ -494,7 +619,7 @@ require __DIR__ . '/templates/header.php';
                             $shopUrl = "https://www.tiktok.com/search?q=" . urlencode($s['name']);
                         ?>
                         <tr>
-                            <td><span class="badge bg-purple-glow text-accent-purple fw-bold"><?php echo $s['rank']; ?></span></td>
+                            <td data-order="<?php echo $s['rank']; ?>"><span class="badge bg-purple-glow text-accent-purple fw-bold"><?php echo $s['rank']; ?></span></td>
                             <td>
                                 <a href="<?php echo $shopUrl; ?>" target="_blank" class="fw-bold text-white text-decoration-none hover-accent">
                                     <?php echo htmlspecialchars($s['name']); ?> <i class="fa-solid fa-up-right-from-square ms-1" style="font-size: 8px; opacity: 0.7;"></i>
@@ -502,10 +627,10 @@ require __DIR__ . '/templates/header.php';
                                 <small class="text-muted d-block">Shop ID: <?php echo 892340 + $s['rank']; ?></small>
                             </td>
                             <td><span class="badge bg-secondary py-1"><?php echo $s['niche']; ?></span></td>
-                            <td><?php echo number_format($s['items'], 0, ',', '.'); ?> itens</td>
-                            <td class="text-accent-turquoise fw-bold">R$ <?php echo number_format($s['revenue'], 2, ',', '.'); ?></td>
-                            <td class="text-success fw-semibold"><i class="fa-solid fa-arrow-trend-up me-1"></i>+<?php echo $s['growth']; ?>%</td>
-                            <td><span class="text-warning fw-bold"><?php echo $s['rating']; ?> ★</span></td>
+                            <td data-order="<?php echo $s['items']; ?>"><?php echo number_format($s['items'], 0, ',', '.'); ?> itens</td>
+                            <td class="text-accent-turquoise fw-bold" data-order="<?php echo $s['revenue']; ?>">R$ <?php echo number_format($s['revenue'], 2, ',', '.'); ?></td>
+                            <td class="text-success fw-semibold" data-order="<?php echo $s['growth']; ?>"><i class="fa-solid fa-arrow-trend-up me-1"></i>+<?php echo $s['growth']; ?>%</td>
+                            <td data-order="<?php echo $s['rating']; ?>"><span class="text-warning fw-bold"><?php echo $s['rating']; ?> ★</span></td>
                             <td>
                                 <button onclick="searchKeyword('<?php echo addslashes($s['niche']); ?>')" class="btn btn-sm btn-outline-purple py-1 px-2" style="font-size: 11px;"><i class="fa-solid fa-magnifying-glass"></i> Ver Produtos</button>
                             </td>
@@ -681,20 +806,27 @@ require __DIR__ . '/templates/header.php';
 <?php require __DIR__ . '/templates/footer.php'; ?>
 
 <script>
+let tkProductsTable = null;
 $(document).ready(function() {
-    const dtOptions = {
-        pageLength: 10,
-        lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Todos"]],
-        language: {
-            url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json"
-        },
-        order: [[1, 'asc']]
-    };
     if ($('#table-products').length) {
-        $('#table-products').DataTable(dtOptions);
+        tkProductsTable = $('#table-products').DataTable({
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Todos"]],
+            language: {
+                url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json"
+            },
+            order: [[5, 'desc']] // Ordenar por Receita Est. (maior para menor)
+        });
     }
     if ($('#table-shops').length) {
-        $('#table-shops').DataTable(dtOptions);
+        $('#table-shops').DataTable({
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Todos"]],
+            language: {
+                url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json"
+            },
+            order: [[0, 'asc']] // Ordenar pelo Rank (1..100)
+        });
     }
     if ($('#table-tiktok-keywords').length) {
         $('#table-tiktok-keywords').DataTable({
@@ -707,6 +839,14 @@ $(document).ready(function() {
         });
     }
 });
+
+function filterTkCategory(category, btn) {
+    $('#tk-category-filters button').removeClass('btn-info text-dark fw-bold').addClass('btn-outline-secondary text-light');
+    $(btn).removeClass('btn-outline-secondary text-light').addClass('btn-info text-dark fw-bold');
+    if (tkProductsTable) {
+        tkProductsTable.column(2).search(category).draw();
+    }
+}
 
 function saveTkProduct(id, title, price, category, img, sales, btn) {
     const icon = $(btn).find('i');
