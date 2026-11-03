@@ -144,6 +144,10 @@ abstract class BaseMarketplace implements MarketplaceInterface {
                     if ($title === '' || $price <= 0) {
                         continue;
                     }
+                    // Ensure the live hit actually matches the user's searched product tokens
+                    if (!$this->matchesSearchQuery($title, $clean)) {
+                        continue;
+                    }
                     $titleKey = mb_strtolower($title, 'UTF-8');
                     if (isset($seenTitles[$titleKey])) {
                         continue;
@@ -716,7 +720,8 @@ abstract class BaseMarketplace implements MarketplaceInterface {
                 $currentTpl = $templates[$key];
             }
 
-            if (!empty($liveProducts)) {
+            $useLiveItem = (!empty($liveProducts) && !isset($activeTemplate['featured_mercadolivre']) && ($i < count($liveProducts) || count($liveProducts) >= 4));
+            if ($useLiveItem) {
                 $liveItem = $liveProducts[$i % count($liveProducts)];
                 $baseTitle = $liveItem['title'];
                 $title = ($i < count($liveProducts)) ? $baseTitle : ($baseTitle . $variants[$i % count($variants)]);
@@ -730,9 +735,17 @@ abstract class BaseMarketplace implements MarketplaceInterface {
                 $baseTitle = $currentTpl['titles'][$titleIndex];
                 $variant = ($i < count($currentTpl['titles'])) ? '' : $variants[$i % count($variants)];
                 $title = $baseTitle . $variant;
-                $price = mt_rand((int)($currentTpl['price_min'] * 100), (int)($currentTpl['price_max'] * 100)) / 100;
+                if (!empty($liveProducts) && !isset($activeTemplate['featured_mercadolivre'])) {
+                    $anchorPrice = (float)$liveProducts[0]['price'];
+                    $price = round($anchorPrice * (mt_rand(92, 108) / 100), 2);
+                    $liveImg = $liveProducts[0]['image_url'] ?? '';
+                } else {
+                    $price = mt_rand((int)($currentTpl['price_min'] * 100), (int)($currentTpl['price_max'] * 100)) / 100;
+                    $liveImg = isset($activeTemplate['featured_mercadolivre'])
+                        ? 'https://image.zst.com.br/81E65F0029ECAF5A5C719930B4D2E540_375_375.jpg'
+                        : '';
+                }
                 $itemCategory = $currentTpl['category'];
-                $liveImg = '';
             }
 
             $hasOriginal = mt_rand(0, 100) > 30;

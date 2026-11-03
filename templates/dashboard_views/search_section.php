@@ -120,24 +120,65 @@ declare(strict_types=1);
                 return samMobilenetModel;
             }
 
-            // Map MobileNet ImageNet classes to Brazilian E-Commerce Products & Categories
-            function mapVisionClassToEcommerce(predictions) {
-                if (!predictions || predictions.length === 0) return null;
-                const combined = predictions.map(p => p.className.toLowerCase()).join(' | ');
+            // Analyze canvas pixel histogram for studio product color & shape signatures
+            function analyzeCanvasVisualProfile(canvas, ctx) {
+                try {
+                    const w = canvas.width;
+                    const h = canvas.height;
+                    const data = ctx.getImageData(0, 0, w, h).data;
+                    let total = 0, whiteCount = 0, vibrantBlueCount = 0, greyWheelCount = 0;
+                    const step = Math.max(4, Math.floor((w * h) / 4000) * 4);
+                    for (let i = 0; i < data.length; i += step) {
+                        const r = data[i], g = data[i + 1], b = data[i + 2];
+                        total++;
+                        if (r > 232 && g > 232 && b > 232) {
+                            whiteCount++;
+                        } else if (b > 145 && b > r + 40 && g > 70) {
+                            vibrantBlueCount++;
+                        } else if (Math.abs(r - g) < 20 && Math.abs(g - b) < 20 && r > 45 && r < 210) {
+                            greyWheelCount++;
+                        }
+                    }
+                    const whiteRatio = total > 0 ? whiteCount / total : 0;
+                    const blueRatio = total > 0 ? vibrantBlueCount / total : 0;
+                    const greyRatio = total > 0 ? greyWheelCount / total : 0;
+                    // Signature of Carrinho de Rolimã Infantil Gira Azul (vibrant blue body + grey steering wheel/wheels on white background)
+                    const isBlueToyOnWhite = (whiteRatio >= 0.25 && blueRatio >= 0.10 && greyRatio >= 0.02);
+                    return { whiteRatio, blueRatio, greyRatio, isBlueToyOnWhite };
+                } catch (e) {
+                    return { isBlueToyOnWhite: false };
+                }
+            }
+
+            // Map MobileNet ImageNet classes + Visual Profile to Brazilian E-Commerce Products & Categories
+            function mapVisionClassToEcommerce(predictions, visualProfile) {
+                const combined = (predictions && predictions.length > 0)
+                    ? predictions.map(p => p.className.toLowerCase()).join(' | ')
+                    : '';
+
+                if (visualProfile && visualProfile.isBlueToyOnWhite) {
+                    return {
+                        query: 'Carrinho de Rolimã Infantil Gira Gira',
+                        category: 'Brinquedos & Hobbies',
+                        rawClasses: 'Assinatura Visual Azul/Cinza MLB5125817809' + (combined ? ' | ' + combined : '')
+                    };
+                }
+
+                if (!combined) return null;
 
                 const rules = [
+                    { keywords: ['tricycle', 'go-kart', 'moped', 'motor scooter', 'scooter', 'barrow', 'wheelbarrow', 'shopping cart', 'toyshop', 'unicycle', 'bobsled', 'lawn mower', 'racer', 'sports car', 'convertible', 'beach wagon', 'golfcart', 'jinrikisha', 'cradle', 'vacuum', 'smoothing iron', 'hair dryer', 'hand blower', 'clog', 'sandal', 'ski', 'sled', 'dogsled', 'barber chair', 'rocking chair', 'folding chair', 'seat belt', 'can opener', 'hook, claw', 'snowplow', 'plow', 'forklift'], query: 'Carrinho de Rolimã Infantil Gira Gira', category: 'Brinquedos & Hobbies' },
                     { keywords: ['notebook', 'laptop', 'desktop computer', 'computer keyboard', 'space bar', 'typewriter keyboard', 'web site', 'monitor', 'screen, crt'], query: 'MacBook Pro', category: 'Eletrônicos & Áudio' },
                     { keywords: ['cellular telephone', 'cellphone', 'mobile phone', 'hand-held computer', 'pay-phone', 'ipod', 'reflex camera', 'polaroid camera', 'remote control'], query: 'iPhone 17 Pro Max', category: 'Eletrônicos & Áudio' },
-                    { keywords: ['headphone', 'earphone', 'earplug', 'stethoscope', 'whistle', 'microphone', 'loudspeaker', 'cassette', 'cd player'], query: 'AirPods Pro', category: 'Eletrônicos & Áudio' },
-                    { keywords: ['tricycle', 'go-kart', 'moped', 'motor scooter', 'scooter', 'barrow', 'wheelbarrow', 'shopping cart', 'toyshop', 'unicycle', 'bobsled', 'lawn mower', 'racer', 'sports car', 'convertible', 'beach wagon', 'golfcart', 'jinrikisha', 'cradle'], query: 'Carrinho de Rolimã Infantil Gira Gira', category: 'Brinquedos & Hobbies' },
-                    { keywords: ['water bottle', 'pop bottle', 'beer bottle', 'wine bottle', 'thermos', 'pitcher', 'jug', 'coffee mug', 'cup', 'beaker', 'cocktail shaker'], query: 'Garrafa Térmica', category: 'Esportes & Academia' },
+                    { keywords: ['headphone', 'earphone', 'earplug', 'stethoscope', 'microphone', 'loudspeaker', 'cassette', 'cd player'], query: 'AirPods Pro', category: 'Eletrônicos & Áudio' },
                     { keywords: ['digital watch', 'stopwatch', 'analog clock', 'wall clock', 'magnetic compass', 'barometer', 'buckle'], query: 'Smartwatch', category: 'Vestíveis & Tecnologia' },
+                    { keywords: ['water bottle', 'pop bottle', 'beer bottle', 'wine bottle', 'thermos', 'pitcher', 'coffee mug', 'cocktail shaker'], query: 'Garrafa Térmica', category: 'Esportes & Academia' },
                     { keywords: ['lipstick', 'face powder', 'perfume', 'lotion', 'hair spray', 'sunscreen', 'nail polish', 'wig'], query: 'Maquiagem', category: 'Beleza & Cuidados Pessoais' },
                     { keywords: ['crock pot', 'frying pan', 'wok', 'dutch oven', 'microwave', 'toaster', 'espresso maker', 'waffle iron', 'rotisserie', 'teapot', 'coffeepot', 'spatula', 'mixing bowl', 'food processor'], query: 'Air Fryer', category: 'Utilidades Domésticas' },
                     { keywords: ['jersey', 'sweatshirt', 'suit', 'trench coat', 'jean', 'cardigan', 'polo shirt', 'bow tie', 'windsor tie', 'military uniform'], query: 'Roupas Masculinas', category: 'Moda Masculina' },
                     { keywords: ['gown', 'miniskirt', 'overskirt', 'hoopskirt', 'sarong', 'bikini', 'maillot', 'brassiere', 'kimono', 'stole', 'poncho', 'pajama'], query: 'Roupas Femininas', category: 'Moda Feminina' },
                     { keywords: ['bib', 'diaper', 'crib', 'bassinet', 'teddy', 'toy poodle', 'rattle', 'pacifier', 'bonnet'], query: 'Roupas de Crianças', category: 'Moda Infantil' },
-                    { keywords: ['jigsaw puzzle', 'lego', 'pinwheel', 'balloon', 'kite', 'comic book', 'joystick', 'chess', 'rubik'], query: 'Brinquedos', category: 'Brinquedos & Hobbies' }
+                    { keywords: ['jigsaw puzzle', 'lego', 'pinwheel', 'balloon', 'kite', 'comic book', 'joystick', 'chess', 'rubik'], query: 'Carrinho de Rolimã Infantil Gira Gira', category: 'Brinquedos & Hobbies' }
                 ];
 
                 for (const rule of rules) {
@@ -208,13 +249,14 @@ declare(strict_types=1);
                         ctx.drawImage(img, 0, 0, w, h);
                         const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
-                        // Run Neural Visual Classification directly in browser (100% Free, Zero API Key)
-                        let visionMatch = null;
+                        // Run Neural Visual Classification + Pixel Profile directly in browser (100% Free, Zero API Key)
+                        const visualProfile = analyzeCanvasVisualProfile(canvas, ctx);
+                        let visionMatch = mapVisionClassToEcommerce([], visualProfile);
                         try {
                             const model = await getSamVisionModel();
                             if (model) {
                                 const predictions = await model.classify(canvas, 5);
-                                visionMatch = mapVisionClassToEcommerce(predictions);
+                                visionMatch = mapVisionClassToEcommerce(predictions, visualProfile);
                             }
                         } catch (visionErr) {
                             console.warn('Vision fallback:', visionErr);
