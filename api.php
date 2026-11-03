@@ -637,7 +637,6 @@ switch ($action) {
             $searchStmt = $db->prepare("INSERT INTO searches (user_id, query, category, marketplace, results_count) VALUES (?, ?, ?, ?, ?)");
             $searchStmt->execute([$userId, $query, $category, implode(',', $selectedMarketplaces), 0]);
             $searchId = (int)$db->lastInsertId();
-            Cache::delete(TrendsClient::CACHE_KEY);
         } catch (\PDOException) {
             $searchId = 0;
         }
@@ -1348,15 +1347,16 @@ switch ($action) {
         Validator::jsonResponse(200, ['success' => true, 'report' => $reportText]);
         break;
 
-    // 2. Fetch current SAM Hype e-commerce trending keywords for Brazil
+    // 2. Fetch current SAM Hype Daily E-Commerce Trending keywords for Brazil ("Alta do Dia")
     case 'get_trends':
         $forceRefresh = isset($_GET['refresh']) && $_GET['refresh'] == '1';
         if ($forceRefresh) {
+            Cache::delete(TrendsClient::CACHE_KEY . '_' . date('Y-m-d'));
             Cache::delete(TrendsClient::CACHE_KEY);
             Cache::delete('google_trends_br');
         }
         $trends = TrendsClient::getTrendingKeywords($forceRefresh);
-        Validator::jsonResponse(200, ['success' => true, 'trends' => $trends]);
+        Validator::jsonResponse(200, ['success' => true, 'date' => date('d/m/Y'), 'trends' => $trends]);
         break;
 
     // Sync/update keywords statistics dynamically

@@ -90,7 +90,6 @@ $(document).ready(function() {
                     window.currentSearchResults = response.products;
                     renderSearchResults(response.products);
                     $('#results-table-container').show();
-                    refreshTrends(false);
                     
                     // Setup export URLs
                     const marketsStr = selectedMarkets.join(',');

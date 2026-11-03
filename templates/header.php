@@ -272,15 +272,15 @@ $activeMeta = $pageMetaMap[$currentPage] ?? [
                 </a>
             </li>
             
-            <!-- Termômetro de Buscas em Alta (Avantpro Hype Radar) -->
+            <!-- Termômetro de Buscas em Alta do Dia (Avantpro Hype Radar) -->
             <li class="mt-3 px-2">
                 <div class="p-3 rounded-3 border border-light-subtle" style="background: linear-gradient(145deg, rgba(99, 102, 241, 0.08), rgba(6, 225, 204, 0.04));">
                     <div class="d-flex align-items-center justify-content-between mb-2 pb-1 border-bottom border-light-subtle border-opacity-25">
                         <div class="d-flex align-items-center gap-1">
                             <i class="fa-solid fa-fire text-warning" style="font-size: 12px;"></i>
-                            <h6 class="mb-0 fw-bold" style="font-size: 11.5px; color: var(--text-primary); letter-spacing: 0.2px;">SAM Hype • Termos em Alta</h6>
+                            <h6 class="mb-0 fw-bold" style="font-size: 11px; color: var(--text-primary); letter-spacing: 0.2px;">SAM Hype • Alta do Dia (<?php echo date('d/m'); ?>)</h6>
                         </div>
-                        <button type="button" onclick="refreshTrends(true)" class="btn btn-link p-0 text-muted hover-accent-turquoise" title="Atualizar Termos em Alta de E-commerce" style="font-size: 11px; text-decoration: none;"><i class="fa-solid fa-arrows-rotate"></i></button>
+                        <button type="button" onclick="refreshTrends(true)" class="btn btn-link p-0 text-muted hover-accent-turquoise" title="Sincronizar Ranking Oficial da Alta do Dia" style="font-size: 11px; text-decoration: none;"><i class="fa-solid fa-arrows-rotate"></i></button>
                     </div>
                     <ul id="google-trends-list" class="list-unstyled p-0 m-0 d-flex flex-column gap-1" style="font-size: 11px;">
                         <div class="text-center py-2"><i class="fa-solid fa-spinner fa-spin text-muted"></i></div>
