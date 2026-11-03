@@ -90,6 +90,7 @@ $(document).ready(function() {
                     window.currentSearchResults = response.products;
                     renderSearchResults(response.products);
                     $('#results-table-container').show();
+                    refreshTrends(false);
                     
                     // Setup export URLs
                     const marketsStr = selectedMarkets.join(',');
@@ -326,7 +327,7 @@ $(document).ready(function() {
         renderPaginationControls(products.length, limit);
     }
 
-    // 5. Load Sidebar Google Trends Widget
+    // 5. Load Sidebar SAM Hype Trending Terms Widget
     function loadTrends() {
         refreshTrends(false);
     }
@@ -338,14 +339,27 @@ $(document).ready(function() {
         const url = force ? 'api.php?action=get_trends&refresh=1' : 'api.php?action=get_trends';
         
         $.getJSON(url, function(response) {
-            if (response.success && response.trends.length > 0) {
+            if (response.success && Array.isArray(response.trends) && response.trends.length > 0) {
                 list.empty();
-                // Render top 8 trends
-                response.trends.slice(0, 8).forEach((term, index) => {
+                // Render top 8 e-commerce product trends with rank & growth badge
+                response.trends.slice(0, 8).forEach((item, index) => {
+                    const term = (typeof item === 'object' && item !== null) ? (item.term || '') : String(item);
+                    const growth = (typeof item === 'object' && item !== null && item.growth) ? item.growth : ('+' + (195 - index * 12) + '%');
+                    const channel = (typeof item === 'object' && item !== null && item.channel) ? item.channel : 'HOT';
+                    const safeTerm = term.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+
+                    let rankStyle = 'background: rgba(148,163,184,0.18); color: var(--text-secondary);';
+                    if (index === 0) rankStyle = 'background: linear-gradient(135deg,#f59e0b,#ea580c); color: #fff;';
+                    else if (index === 1) rankStyle = 'background: rgba(6,225,204,0.2); color: #06e1cc; border: 1px solid rgba(6,225,204,0.35);';
+                    else if (index === 2) rankStyle = 'background: rgba(99,102,241,0.22); color: #818cf8; border: 1px solid rgba(99,102,241,0.35);';
+
                     list.append(`
-                        <li class="d-flex align-items-center mb-2" style="cursor: pointer;" onclick="searchKeyword('${term}')">
-                            <span class="badge bg-secondary me-2">${index + 1}</span>
-                            <span class="text-truncate fw-medium hover-accent">${term}</span>
+                        <li class="d-flex align-items-center justify-content-between py-1 px-1 rounded hover-bg-subtle" style="cursor: pointer; gap: 6px;" title="Pesquisar '${term}' (${channel})" onclick="searchKeyword('${safeTerm}')">
+                            <div class="d-flex align-items-center" style="min-width: 0; flex: 1;">
+                                <span class="badge me-2 flex-shrink-0" style="width: 20px; height: 18px; font-size: 9.5px; display: inline-flex; align-items: center; justify-content: center; padding: 0; ${rankStyle}">${index + 1}</span>
+                                <span class="text-truncate fw-medium hover-accent" style="color: var(--text-primary); font-size: 11px;">${term}</span>
+                            </div>
+                            <span class="badge bg-success-subtle text-success flex-shrink-0" style="font-size: 9px; padding: 2px 5px; font-weight: 700;">${growth}</span>
                         </li>
                     `);
                 });
@@ -356,11 +370,30 @@ $(document).ready(function() {
     }
     window.refreshTrends = refreshTrends;
 
-    // Helper to start search from trends list click
+    // Helper to start search from trends list click on ANY page
     window.searchKeyword = function(keyword) {
-        $('#search-query').val(keyword);
-        $('#search-form').submit();
+        const searchInput = $('#search-query');
+        const searchForm = $('#search-form');
+        if (searchInput.length && searchForm.length) {
+            searchInput.val(keyword);
+            searchForm.submit();
+            $('html, body').animate({
+                scrollTop: Math.max(0, searchForm.offset().top - 90)
+            }, 350);
+        } else {
+            window.location.href = 'index.php?q=' + encodeURIComponent(keyword);
+        }
     };
+
+    // Auto-run search if navigated to index.php?q=... from another page's SAM Hype sidebar
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialQuery = urlParams.get('q');
+    if (initialQuery && $('#search-query').length && $('#search-form').length) {
+        $('#search-query').val(initialQuery);
+        setTimeout(() => {
+            $('#search-form').submit();
+        }, 150);
+    }
 
     // 6. Manage Favorites
     window.toggleFavorite = function(productId, btnElement) {

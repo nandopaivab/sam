@@ -730,7 +730,7 @@ class Database {
             'mouse sem fio recarregavel' => [52000, 0.18, '+70%', 'Média', 'Eletrônicos'],
             'teclado mecanico gamer' => [45000, 0.32, '+95%', 'Alta', 'Eletrônicos'],
             'pad mouse grande' => [28000, 0.14, '+40%', 'Baixa', 'Eletrônicos'],
-            'caixa de som bluetooth bluetooth' => [72000, 0.28, '+60%', 'Média', 'Eletrônicos'],
+            'caixa de som bluetooth portatil' => [72000, 0.28, '+60%', 'Média', 'Eletrônicos'],
             'microfone lapela sem fio' => [39000, 0.25, '+110%', 'Média', 'Eletrônicos'],
             'tripod celular selfie' => [22000, 0.12, '+30%', 'Baixa', 'Eletrônicos'],
             'anel de luz ring light' => [34000, 0.16, '-15%', 'Média', 'Eletrônicos'],
@@ -752,7 +752,7 @@ class Database {
         $tiktokKeywords = [
             '#achadinhos' => [12500000, 2.50, '1.8%', 'Alta', 'Geral'],
             'organizador acrilico giratorio' => [185000, 3.20, '1.5%', 'Média', 'Casa & Cozinha'],
-            'fone bluetooth bluetooth' => [450000, 4.10, '1.3%', 'Alta', 'Eletrônicos'],
+            'fone bluetooth tws sem fio' => [450000, 4.10, '1.3%', 'Alta', 'Eletrônicos'],
             'garrafa termica motivacional' => [680000, 2.20, '2.1%', 'Alta', 'Casa & Cozinha'],
             '#tiktokmademebuyit' => [18900000, 3.50, '2.4%', 'Alta', 'Geral'],
             'mini selador de embalagens' => [320000, 1.80, '1.9%', 'Média', 'Casa & Cozinha'],
