@@ -18,7 +18,7 @@ declare(strict_types=1);
         </div>
     </div>
     
-    <form id="search-form" autocomplete="off">
+    <form id="search-form" autocomplete="off" onsubmit="return false;">
         <div class="row g-3 mb-3">
             <!-- Keyword + Image search -->
             <div class="col-md-7 col-lg-8">

@@ -376,7 +376,7 @@ $(document).ready(function() {
         const searchForm = $('#search-form');
         if (searchInput.length && searchForm.length) {
             searchInput.val(keyword);
-            searchForm.submit();
+            searchForm.trigger('submit');
             $('html, body').animate({
                 scrollTop: Math.max(0, searchForm.offset().top - 90)
             }, 350);
@@ -384,16 +384,6 @@ $(document).ready(function() {
             window.location.href = 'index.php?q=' + encodeURIComponent(keyword);
         }
     };
-
-    // Auto-run search if navigated to index.php?q=... from another page's SAM Hype sidebar
-    const urlParams = new URLSearchParams(window.location.search);
-    const initialQuery = urlParams.get('q');
-    if (initialQuery && $('#search-query').length && $('#search-form').length) {
-        $('#search-query').val(initialQuery);
-        setTimeout(() => {
-            $('#search-form').submit();
-        }, 150);
-    }
 
     // 6. Manage Favorites
     window.toggleFavorite = function(productId, btnElement) {
